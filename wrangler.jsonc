@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mmwx-docs",
+  "compatibility_date": "2026-05-22",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "dist",
+    // SPA fallback: 任何未命中静态文件的路径都返回 dist/index.html(状态码 200),
+    // 让 React Router 接管客户端路由。不加这一行,/docs/* 等纯前端路由直接访问会 404。
+    "not_found_handling": "single-page-application"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}

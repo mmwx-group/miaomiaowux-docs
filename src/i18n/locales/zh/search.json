@@ -1,0 +1,10 @@
+{
+  "title": "搜索",
+  "description": "搜索文档和功能页面",
+  "placeholder": "搜索文档和功能...",
+  "empty": "没有找到相关结果",
+  "trigger": "搜索...",
+  "sections": {
+    "docs": "文档"
+  }
+}

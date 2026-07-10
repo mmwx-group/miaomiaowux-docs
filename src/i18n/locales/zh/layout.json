@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "trafficInfo": "流量信息",
+    "subscriptionLink": "订阅链接",
+    "generateSubscription": "生成订阅",
+    "nodeManagement": "节点管理",
+    "subscriptionManagement": "订阅管理",
+    "ruleManagement": "规则管理",
+    "probeManagement": "探针管理",
+    "userManagement": "用户管理",
+    "systemSettings": "系统设置",
+    "openMenu": "打开菜单",
+    "telegram": "Telegram 交流群组"
+  },
+  "userMenu": {
+    "user": "用户",
+    "ariaLabel": "用户菜单: {{name}}",
+    "notLoggedIn": "未登录",
+    "noEmail": "未填写邮箱",
+    "personalSettings": "个人设置",
+    "help": "使用帮助",
+    "backupData": "备份数据",
+    "checkUpdate": "检查更新",
+    "version": "版本 v",
+    "signOut": "退出登录"
+  },
+  "docLayout": {
+    "title": "妙妙屋文档",
+    "toc": "本页内容",
+    "tocAria": "目录",
+    "backToTop": "返回顶部"
+  },
+  "xDocLayout": {
+    "title": "妙妙屋X文档",
+    "mmwDocs": "妙妙屋文档"
+  },
+  "breadcrumb": {
+    "docs": "文档"
+  }
+}

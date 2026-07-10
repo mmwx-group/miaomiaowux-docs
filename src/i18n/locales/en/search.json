@@ -1,0 +1,10 @@
+{
+  "title": "Search",
+  "description": "Search documentation and feature pages",
+  "placeholder": "Search documentation and features...",
+  "empty": "No results found",
+  "trigger": "Search...",
+  "sections": {
+    "docs": "Documentation"
+  }
+}

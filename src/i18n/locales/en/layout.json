@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "trafficInfo": "Traffic Info",
+    "subscriptionLink": "Subscriptions",
+    "generateSubscription": "Generate",
+    "nodeManagement": "Nodes",
+    "subscriptionManagement": "Subscriptions",
+    "ruleManagement": "Rules",
+    "probeManagement": "Probes",
+    "userManagement": "Users",
+    "systemSettings": "Settings",
+    "openMenu": "Open menu",
+    "telegram": "Telegram Community"
+  },
+  "userMenu": {
+    "user": "User",
+    "ariaLabel": "User Menu: {{name}}",
+    "notLoggedIn": "Not logged in",
+    "noEmail": "Email not set",
+    "personalSettings": "Personal Settings",
+    "help": "Help",
+    "backupData": "Backup Data",
+    "checkUpdate": "Check Updates",
+    "version": "Version v",
+    "signOut": "Sign Out"
+  },
+  "docLayout": {
+    "title": "MiaoMiaoWu Docs",
+    "toc": "On This Page",
+    "tocAria": "Table of Contents",
+    "backToTop": "Back to top"
+  },
+  "xDocLayout": {
+    "title": "MiaoMiaoWu X Docs",
+    "mmwDocs": "MiaoMiaoWu Docs"
+  },
+  "breadcrumb": {
+    "docs": "Docs"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /home/ubuntu/opensource/miaomiaowu -type f -name \"*.go\" | head -20)",
+      "Read(//home/ubuntu/opensource/miaomiaowu/**)",
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)",
+      "Bash(npm install *)",
+      "Bash(node scripts/generate-search-index.mjs)",
+      "Bash(node -e ' *)",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(xargs ls -la)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Bash(grep -E \"\\\\.\\(go|tsx|ts\\)$\")",
+      "Bash(xxd /home/ubuntu/opensource/miaomiaowu-docs/src/components/landing/features.tsx)",
+      "Bash(python3 -c \"import json; json.load\\(open\\('/tmp/i18n-xdocs-a-zh.json'\\)\\); json.load\\(open\\('/tmp/i18n-xdocs-a-en.json'\\)\\); print\\('Both JSON files are valid'\\)\")",
+      "Bash(python3 -c \"import json; json.load\\(open\\('/tmp/i18n-docs-a-zh.json'\\)\\); json.load\\(open\\('/tmp/i18n-docs-a-en.json'\\)\\); print\\('Both JSON files are valid'\\)\")",
+      "Bash(python3 -c \"import json; json.load\\(open\\('/tmp/i18n-xdocs-b-zh.json'\\)\\); json.load\\(open\\('/tmp/i18n-xdocs-b-en.json'\\)\\); print\\('Both JSON files are valid'\\)\")",
+      "Bash(python3 -c \"import json; json.load\\(open\\('/tmp/i18n-docs-b-zh.json'\\)\\); json.load\\(open\\('/tmp/i18n-docs-b-en.json'\\)\\); print\\('Both JSON files are valid'\\)\")",
+      "Bash(git -C /home/ubuntu/opensource/miaomiaowu-docs diff --stat src/routes/docs/)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3)"
+    ]
+  }
+}

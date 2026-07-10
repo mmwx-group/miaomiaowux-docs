@@ -1,0 +1,16 @@
+{
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "Please check the URL or go back to the homepage."
+  },
+  "error": {
+    "title": "An Error Occurred",
+    "fallback": "Please try again later."
+  },
+  "brand": "MiaoMiaoWu",
+  "brandX": "MiaoMiaoWu X"
+}
