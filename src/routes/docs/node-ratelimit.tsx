@@ -91,6 +91,52 @@ Agent 在 Xray 内核层面实施速度和设备限制`}</pre>
       </section>
 
       <section className='mb-10'>
+        <h2 className='text-2xl font-bold mb-4'>{t('nodeRatelimit.connExplainHeading')}</h2>
+        <p className='text-muted-foreground mb-4'>{t('nodeRatelimit.connExplainIntro')}</p>
+        <ul className='list-disc pl-5 space-y-2 text-sm text-muted-foreground mb-4'>
+          <li>{t('nodeRatelimit.connExample1')}</li>
+          <li>{t('nodeRatelimit.connExample2')}</li>
+          <li>{t('nodeRatelimit.connExample3')}</li>
+        </ul>
+        <div className='flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20'>
+          <Info className='size-4 text-blue-500 mt-0.5 shrink-0' />
+          <p className='text-sm text-blue-700 dark:text-blue-400'>{t('nodeRatelimit.connExplainNote')}</p>
+        </div>
+      </section>
+
+      <section className='mb-10'>
+        <h2 className='text-2xl font-bold mb-4'>{t('nodeRatelimit.connRecommendHeading')}</h2>
+        <Card>
+          <CardContent className='pt-6'>
+            <div className='overflow-x-auto'>
+              <table className='w-full text-sm'>
+                <thead>
+                  <tr className='border-b'>
+                    <th className='text-left py-2 pr-4 font-medium'>{t('nodeRatelimit.connScenarioCol')}</th>
+                    <th className='text-left py-2 pr-4 font-medium whitespace-nowrap'>{t('nodeRatelimit.connValueCol')}</th>
+                    <th className='text-left py-2 font-medium'>{t('nodeRatelimit.connReasonCol')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(t('nodeRatelimit.connScenarios', { returnObjects: true }) as { scene: string; value: string; why: string }[]).map((row, i, arr) => (
+                    <tr key={row.scene} className={i < arr.length - 1 ? 'border-b' : ''}>
+                      <td className='py-2 pr-4'>{row.scene}</td>
+                      <td className='py-2 pr-4 font-medium text-primary whitespace-nowrap'>{row.value}</td>
+                      <td className='py-2 text-muted-foreground'>{row.why}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+        <div className='flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mt-4'>
+          <AlertTriangle className='size-4 text-amber-500 mt-0.5 shrink-0' />
+          <p className='text-sm text-amber-700 dark:text-amber-400'>{t('nodeRatelimit.connRecommendTip')}</p>
+        </div>
+      </section>
+
+      <section className='mb-10'>
         <h2 className='text-2xl font-bold mb-4'>{t('nodeRatelimit.userOverrideHeading')}</h2>
         <p className='text-muted-foreground mb-4'>{t('nodeRatelimit.userOverrideText')}</p>
         <Card>

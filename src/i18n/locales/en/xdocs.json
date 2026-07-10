@@ -858,7 +858,7 @@
     "title": "Node Rate Limiting",
     "description": "Set download speed and device limits for users through packages (PRO)",
     "overview": "Overview",
-    "overviewText": "Node rate limiting allows administrators to configure download speed limits and maximum concurrent devices for each package. When a user is bound to a package, rate limit rules are automatically pushed to all inbounds associated with that user, enforced at the traffic level by the embedded Xray core.",
+    "overviewText": "Node rate limiting lets admins configure a download-speed cap and a maximum concurrent-connection count per package. Once a user is assigned a package, the rules are automatically pushed to all inbounds the user is bound to and enforced at the traffic layer by the embedded Xray core.",
     "proNote": "Node rate limiting is a PRO feature that requires a valid license. Rate limiting only takes effect on servers using embedded Xray mode; external Xray mode does not support rate limit push.",
     "howItWorksHeading": "How It Works",
     "paramsHeading": "Rate Limit Parameters",
@@ -871,8 +871,8 @@
     "defaultNoLimit": "0 (no limit)",
     "descLabel": "Description",
     "speedLimitDesc": "Limits the per-user download speed for this package. Set to 0 for no limit. Internally converted to bytes/s: Mbps x 1000000 / 8",
-    "deviceLimitHeading": "Device Limit",
-    "deviceLimitDesc": "Limits the maximum number of concurrent online devices per user. Set to 0 for no limit. New connections exceeding the limit are rejected.",
+    "deviceLimitHeading": "Connection Limit",
+    "deviceLimitDesc": "Caps the maximum number of concurrent connections a user may have at any moment (note: connections, not devices). 0 means unlimited. New connections beyond the cap are rejected; existing ones are unaffected. The quota is shared per user + physical node. The field keeps its legacy name device_limit. See \"Understanding the Connection Limit\" below.",
     "userOverrideHeading": "User-Level Override",
     "userOverrideText": "In addition to package-level rate limit configuration, individual user-level rate limit overrides are supported, with higher priority than package settings.",
     "priorityCol": "Priority",
@@ -919,15 +919,15 @@
     "pkgNodesAll": "All",
     "pkgSpeedLimit": "Download Speed Limit (Mbps)",
     "pkgSpeedLimitDesc": "Per-user download speed limit",
-    "pkgDeviceLimit": "Device Limit",
-    "pkgDeviceLimitDesc": "Maximum concurrent online devices",
+    "pkgDeviceLimit": "Connection Limit",
+    "pkgDeviceLimitDesc": "Max concurrent connections (field: device_limit)",
     "pkgTrafficMode": "Traffic Counting Mode",
     "pkgTrafficModeDesc": "Unidirectional (max of upload or download) or bidirectional (upload + download)",
     "pkgTrafficModeBidirectional": "Bidirectional",
     "notesHeading": "Notes",
     "noteEmbeddedOnly": "Rate limiting only works on servers in embedded Xray mode. Servers in external Xray mode will not receive rate limit push, and users on those servers are not speed-limited.",
     "noteReconnect": "After modifying package rate limit parameters, you need to wait for the next push opportunity (e.g. server reconnect) for changes to take effect on already-connected Agents. It's recommended to manually restart the Agent or wait for heartbeat auto-push.",
-    "noteDeviceTracking": "Device limiting works by tracking each user's active connection count. When the connection count reaches the limit, new connections are rejected while existing connections are not affected.",
+    "noteDeviceTracking": "The connection limit is enforced by tracking each user's current active connection count: when the cap is reached new connections are rejected while existing ones continue. The quota is shared per user + physical node — all of a user's clients/sub-accounts on the same node share one budget.",
     "demo": {
       "heading": "Try it: rate limiting (package + user, two layers)",
       "description": "Click either button below to open the «package limits» or «user limits» dialog. All changes are saved locally in the demo and reflected in the «effective view» table below.",
@@ -994,7 +994,50 @@
         "confirmSave": "Confirm save",
         "savedToast": "User limits saved"
       }
-    }
+    },
+    "connExplainHeading": "Understanding the Connection Limit",
+    "connExplainIntro": "\"Connections\" here means the number of network connections being proxied at the same moment — not the number of devices. A single device opens many connections at once, so this is a coarse cap to prevent an account from being widely shared/resold, not a precise \"how many devices\" control.",
+    "connExample1": "Opening one web page ≠ one connection: a browser opens several connections to dozens of hosts (main domain, CDNs, fonts, analytics, ads…). A single page load often peaks at 10–50+ concurrent connections, then falls back as idle connections close.",
+    "connExample2": "Video, short-form feeds, multiple tabs and background apps each add more; every QUIC / HTTP3 (e.g. YouTube) connection also counts as one.",
+    "connExample3": "So one device browsing normally uses tens to over a hundred concurrent connections. Setting the cap to a tiny \"device count\" like 3 or 5 will simply break page loading.",
+    "connExplainNote": "A brief overage usually shows up as some requests hanging / failing to load, and recovers on its own once idle connections free up — it does not permanently cut off the user.",
+    "connRecommendHeading": "Recommended Values by Scenario",
+    "connScenarioCol": "Scenario",
+    "connValueCol": "Suggested Limit",
+    "connReasonCol": "Notes",
+    "connScenarios": [
+      {
+        "scene": "Single personal device (1 person, 1 phone/PC)",
+        "value": "100 – 150",
+        "why": "Covers normal web/video/app concurrency peaks with headroom, no false hits"
+      },
+      {
+        "scene": "Multiple personal devices (phone + PC + tablet)",
+        "value": "200 – 400",
+        "why": "Several devices online at once, ~100–150 each stacked"
+      },
+      {
+        "scene": "Family sharing (4–6 devices)",
+        "value": "500 – 800",
+        "why": "Multiple people/devices incl. TV boxes / IoT background connections"
+      },
+      {
+        "scene": "Small group (N known people)",
+        "value": "~ N × 150",
+        "why": "Leaves room for one heavy device per person; fewer people → be more generous"
+      },
+      {
+        "scene": "Strict anti-resale / anti-mass-sharing",
+        "value": "expected devices × 100, then tighten",
+        "why": "Aims to block dozens of people on one account, but must stay above one person's daily peak or it hurts legit users"
+      },
+      {
+        "scene": "Don't want to affect UX / unsure",
+        "value": "0 (unlimited) or 1000+",
+        "why": "Connection limit is a coarse anti-abuse tool; if unsure leave it off and rely on traffic/speed limits"
+      }
+    ],
+    "connRecommendTip": "These are starting points. After assigning a package, watch a user's live concurrent connections in the Traffic / Connections view and raise the cap to match the real peak — err on the high side rather than locking out legitimate users."
   },
   "nodeSpeedtest": {
     "title": "Node Speed Test",
