@@ -3225,7 +3225,40 @@
   },
   "toolMmwxTgbot": {
     "title": "Telegram 机器人(mmwX-tgbot)",
-    "description": "妙妙屋X 配套 Telegram 机器人 — 命令交互 + 每日通知 + 免登录 Mini App,一个二进制全搞定。",
+    "description": "主控内置的 Telegram Bot 与免登录 Mini App 配置和使用说明。",
+    "integrated": {
+      "heading": "TGBot 与 Mini App 已内置",
+      "text": "无需单独下载 mmwX-tgbot、部署 systemd/Docker 服务、维护配置文件或配置额外的 Nginx 反代。主控负责 Bot 的启动、停止和热重启，Mini App 直接使用主控地址下的 /tg-app。",
+      "miniappText": "Mini App 已合并到主控，地址自动使用「主控地址 + /tg-app」。用户从机器人菜单打开后，通过 Telegram initData 完成身份校验，无需再次输入妙妙屋X用户名和密码。"
+    },
+    "setup": {
+      "heading": "启用与配置",
+      "createBotHeading": "创建 Telegram Bot",
+      "createBotText": "在 Telegram 中打开 @BotFather，发送 /newbot 并按提示完成创建，保存得到的 Bot Token。",
+      "openSettingsHeading": "打开 TGBot 设置",
+      "openSettingsText": "使用管理员账号登录妙妙屋X，进入「系统设置」→「TGBot」。",
+      "tokenHeading": "填写 Bot Token",
+      "tokenText": "粘贴 @BotFather 提供的 Token。已保存的 Token 会显示为掩码，保持掩码不变不会覆盖原 Token。",
+      "adminIdsHeading": "填写管理员 Telegram ID",
+      "adminIdsText": "填写允许使用 /admin_* 命令及 Mini App 管理功能的 Telegram 数字 ID；多个 ID 使用英文逗号分隔。",
+      "enableHeading": "启用并保存",
+      "enableText": "打开 TGBot 开关并保存配置。主控会自动启动或热重启 Bot，页面状态显示「运行中」即表示启动成功。",
+      "verifyHeading": "验证 Bot 与 Mini App",
+      "verifyText": "向 Bot 发送 /start 或 /help，确认命令有响应；再从 Bot 菜单打开 Mini App，地址由主控自动设置为 /tg-app。",
+      "systemSettingsLink": "查看系统设置完整说明 →"
+    },
+    "security": {
+      "heading": "安全提示",
+      "text": "Bot Token 等同于机器人的控制凭据，请勿泄露。Mini App 调试预览允许从 URL 读取 initData，仅限本地调试；生产环境开启会带来重放风险，应保持关闭。"
+    },
+    "integratedFaq": {
+      "q1": "Bot 不回复怎么办？",
+      "a1": "确认 TGBot 已启用且状态为「运行中」，重新核对 Bot Token，并确认主控服务器能够访问 Telegram API。修改配置后点击保存，主控会自动重启 Bot。",
+      "q2": "管理员命令提示无权限？",
+      "a2": "确认当前 Telegram 数字 ID 已加入「管理员 Telegram ID」。多个 ID 必须使用英文逗号分隔，保存后再重试。",
+      "q3": "Mini App 无法打开？",
+      "a3": "确认主控地址使用可公开访问的 HTTPS 域名，且 /tg-app 可以访问。无需再配置旧版的 /app、23088 端口或独立 Nginx 反代。"
+    },
     "overview": {
       "heading": "这是什么",
       "text1": "mmwX-tgbot 是独立部署的 Telegram bot,自身无数据库。所有数据(账号、套餐、流量、订阅、兑换码)都在妙妙屋X 主控,bot 通过 Bearer admin token 调主控的 /api/admin/tgbot/* 接口域,只做 Telegram 这一层交互前端。",

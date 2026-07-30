@@ -3225,7 +3225,40 @@
   },
   "toolMmwxTgbot": {
     "title": "Telegram Bot (mmwX-tgbot)",
-    "description": "Companion Telegram bot for MiaoMiaoWu X — commands, daily notifications, and a login-free Mini App in a single binary.",
+    "description": "Configuration and usage guide for the Telegram Bot and login-free Mini App built into the master.",
+    "integrated": {
+      "heading": "TGBot and Mini App are built in",
+      "text": "You no longer need to download mmwX-tgbot, deploy a systemd/Docker service, maintain a config file, or add a separate Nginx proxy. The master starts, stops, and hot-restarts the Bot, while the Mini App is served at /tg-app under the master URL.",
+      "miniappText": "The Mini App is now part of the master and automatically uses master URL + /tg-app. Telegram initData verifies users opened from the Bot menu, so they do not enter their MiaoMiaoWu X credentials again."
+    },
+    "setup": {
+      "heading": "Enable and configure",
+      "createBotHeading": "Create a Telegram Bot",
+      "createBotText": "Open @BotFather in Telegram, send /newbot, follow the prompts, and save the resulting Bot Token.",
+      "openSettingsHeading": "Open TGBot settings",
+      "openSettingsText": "Sign in to MiaoMiaoWu X as an administrator and open System Settings → TGBot.",
+      "tokenHeading": "Enter the Bot Token",
+      "tokenText": "Paste the Token from @BotFather. A saved Token is masked; leaving the mask unchanged preserves the existing Token.",
+      "adminIdsHeading": "Enter administrator Telegram IDs",
+      "adminIdsText": "Enter numeric Telegram IDs allowed to use /admin_* commands and Mini App administration. Separate multiple IDs with commas.",
+      "enableHeading": "Enable and save",
+      "enableText": "Turn on TGBot and save. The master automatically starts or hot-restarts the Bot; a Running status confirms success.",
+      "verifyHeading": "Verify the Bot and Mini App",
+      "verifyText": "Send /start or /help to confirm the Bot responds, then open the Mini App from its menu. The master automatically serves it at /tg-app.",
+      "systemSettingsLink": "Read the complete System Settings guide →"
+    },
+    "security": {
+      "heading": "Security notes",
+      "text": "The Bot Token controls your Bot and must remain secret. Mini App development preview permits initData in a URL and is only for local debugging; keep it disabled in production to prevent replay risks."
+    },
+    "integratedFaq": {
+      "q1": "The Bot does not respond",
+      "a1": "Confirm TGBot is enabled and reports Running, verify the Bot Token, and ensure the master can reach the Telegram API. Saving changes automatically restarts the Bot.",
+      "q2": "Administrator commands report no permission",
+      "a2": "Confirm your numeric Telegram ID is listed under administrator Telegram IDs. Separate multiple IDs with commas, save, and retry.",
+      "q3": "The Mini App does not open",
+      "a3": "Confirm the master uses a publicly reachable HTTPS domain and /tg-app is accessible. The legacy /app path, port 23088, and separate Nginx proxy are no longer needed."
+    },
     "overview": {
       "heading": "What is it",
       "text1": "mmwX-tgbot is a standalone Telegram bot with no database of its own. All data (accounts, packages, traffic, subscriptions, redeem codes) lives in your MiaoMiaoWu X master. The bot talks to /api/admin/tgbot/* on the master via a Bearer admin token; it is just the Telegram front-end.",
