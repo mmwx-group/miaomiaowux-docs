@@ -22,41 +22,36 @@ function InstallDockerPage() {
               <pre>{`# 拉取镜像
 docker pull ghcr.io/iluobei/miaomiaowux:latest
 
-# 运行容器(基础:仅暴露面板端口)
+# 运行容器(只暴露面板 http 端口即可)
 docker run -d \\
   --name miaomiaowux \\
   -p 12889:12889 \\
-  -v ./data:/app/data \\
+  -v $(pwd)/data:/app/data \\
+  -v $(pwd)/subscribes:/app/subscribes \\
+  -v $(pwd)/rule_templates:/app/rule_templates \\
   ghcr.io/iluobei/miaomiaowux:latest
 
-# 或者:开启 HTTPS / 内置 nginx 反代,需额外映射 443 + 80(ACME 校验)
-docker run -d \\
-  --name miaomiaowux \\
-  -p 12889:12889 \\
-  -p 80:80 \\
-  -p 443:443 \\
-  -v ./data:/app/data \\
-  ghcr.io/iluobei/miaomiaowux:latest`}</pre>
+# 开启 HTTPS:推荐在【主控宿主机】上装一个 agent,用它的 nginx 反代主控(见下方章节),
+# 无需给容器映射 80/443。`}</pre>
             </div>
           </CardContent>
         </Card>
       </section>
 
       <section className='mb-10'>
-        <h2 className='text-2xl font-bold mb-4'>{t('installDocker.builtinNginx.heading')}</h2>
+        <h2 className='text-2xl font-bold mb-4'>{t('installDocker.httpsProxy.heading')}</h2>
         <Alert className='mb-4'>
           <Info className='h-4 w-4' />
-          <AlertTitle>{t('installDocker.builtinNginx.alertTitle')}</AlertTitle>
-          <AlertDescription>{t('installDocker.builtinNginx.alertText')}</AlertDescription>
+          <AlertTitle>{t('installDocker.httpsProxy.alertTitle')}</AlertTitle>
+          <AlertDescription>{t('installDocker.httpsProxy.alertText')}</AlertDescription>
         </Alert>
-        <p className='text-muted-foreground mb-2'>{t('installDocker.builtinNginx.text1')}</p>
-        <p className='text-muted-foreground mb-2'>{t('installDocker.builtinNginx.text2')}</p>
-        <ul className='space-y-1 text-sm text-muted-foreground ml-4 mb-4'>
-          <li>- <code className='bg-muted px-1 rounded'>80</code> {t('installDocker.builtinNginx.port80')}</li>
-          <li>- <code className='bg-muted px-1 rounded'>443</code> {t('installDocker.builtinNginx.port443')}</li>
-          <li>- <code className='bg-muted px-1 rounded'>12889</code> {t('installDocker.builtinNginx.port12889')}</li>
-        </ul>
-        <p className='text-muted-foreground'>{t('installDocker.builtinNginx.text3')}</p>
+        <p className='text-muted-foreground mb-2'>{t('installDocker.httpsProxy.text1')}</p>
+        <ol className='space-y-1 text-sm text-muted-foreground ml-4 mb-4 list-decimal'>
+          <li>{t('installDocker.httpsProxy.step1')}</li>
+          <li>{t('installDocker.httpsProxy.step2')}</li>
+          <li>{t('installDocker.httpsProxy.step3')}</li>
+        </ol>
+        <p className='text-muted-foreground text-sm'>{t('installDocker.httpsProxy.fallback')}</p>
       </section>
 
       <section className='mb-10'>
@@ -71,11 +66,11 @@ services:
     container_name: miaomiaowux
     restart: always
     ports:
-      - "12889:12889"   # 主控面板
-      - "80:80"         # ACME HTTP-01 校验(开启 HTTPS 必须)
-      - "443:443"       # 内置 nginx HTTPS 入口(开启 HTTPS 必须)
+      - "12889:12889"   # 主控面板(http)。HTTPS 由宿主机 agent 反代,无需映射 80/443
     volumes:
       - ./data:/app/data
+      - ./subscribes:/app/subscribes
+      - ./rule_templates:/app/rule_templates
     environment:
       - PORT=12889
       - JWT_SECRET=your-secret-key`}</pre>

@@ -1,0 +1,15 @@
+import { chromium } from 'playwright'
+const b = await chromium.launch()
+const ctx = await b.newContext({ viewport:{width:1500,height:1100} })
+await ctx.addCookies(['mmwx_license_token','mmwx_license_user','mmwx_license_role'].map((n,i)=>(
+  { name:n, value:['TK0000000000000000000000','iluobei','admin'][i], domain:'127.0.0.1', path:'/' })))
+const p = await ctx.newPage()
+p.on('dialog', d => d.accept())
+await p.goto('http://127.0.0.1:12890/licenses', { waitUntil:'networkidle' })
+await p.waitForTimeout(2500)
+console.log('页面标题:', await p.locator('h2').first().textContent().catch(()=>'?'))
+console.log('重置(文字)按钮:', await p.locator('button:has-text("重置编号")').count())
+console.log('RotateCcw title 按钮:', await p.locator('button[title*="重置"]').count())
+console.log('行数:', await p.locator('button:has-text("重置")').count())
+await p.screenshot({ path:'/tmp/ot/r3.png', clip:{x:900,y:190,width:600,height:70} })
+await b.close()

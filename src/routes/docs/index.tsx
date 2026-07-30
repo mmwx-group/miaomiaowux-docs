@@ -122,7 +122,7 @@ function XDocsIndexPage() {
             <CardDescription>{t('index.cards.installDeploy.desc')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to='/docs/install-docker'>
+            <Link to='/docs/install-direct'>
               <Button variant='ghost' className='group-hover:text-primary'>{t('index.cards.installDeploy.viewInstall')} <ArrowRight className='size-4 ml-2' /></Button>
             </Link>
           </CardContent>

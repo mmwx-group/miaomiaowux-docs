@@ -28,13 +28,10 @@ function QuickStartPage() {
           <CardContent className='pt-6'>
             <p className='text-muted-foreground mb-4'>{t('quickStart.step1.recommend')}</p>
             <div className='bg-muted rounded-lg p-4 font-mono text-sm mb-4 overflow-x-auto'>
-              <pre>{`docker pull ghcr.io/iluobei/miaomiaowux:latest
+              <pre>{`# 一键安装(自动检测架构、下载最新版、创建 systemd 服务)
+curl -sL https://raw.githubusercontent.com/iluobei/miaomiaowuX/main/install.sh | sudo bash
 
-docker run -d \\
-  --name miaomiaowux \\
-  -p 12889:12889 \\
-  -v ./data:/app/data \\
-  ghcr.io/iluobei/miaomiaowux:latest`}</pre>
+# 安装完成后访问 http://服务器IP:12889 进入初始化向导`}</pre>
             </div>
             <p className='text-sm text-muted-foreground'>
               {t('quickStart.step1.moreInstall')} <Link to='/docs/install-docker' className='text-primary hover:underline'>{t('quickStart.step1.dockerInstall')}</Link> {t('quickStart.step1.or')} <Link to='/docs/install-direct' className='text-primary hover:underline'>{t('quickStart.step1.directInstall')}</Link>

@@ -1,0 +1,18 @@
+import { chromium } from 'playwright'
+const b = await chromium.launch()
+const ctx = await b.newContext({ viewport:{width:1500,height:1100} })
+await ctx.addCookies(['mmwx_license_token','mmwx_license_user','mmwx_license_role'].map((n,i)=>(
+  { name:n, value:['TK0000000000000000000000','iluobei','admin'][i], domain:'127.0.0.1', path:'/' })))
+const p = await ctx.newPage()
+p.on('dialog', d => d.accept())
+await p.goto('http://127.0.0.1:12890/licenses', { waitUntil:'networkidle' })
+await p.waitForTimeout(2000)
+const reset = p.getByTitle(/许可证编号泄露|Use when a license/)
+console.log('重置按钮:', await reset.count())
+await p.screenshot({ path:'/tmp/ot/row5.png', clip:{x:1000,y:190,width:500,height:62} })
+await reset.first().click()
+await p.waitForTimeout(1200)
+console.log('结果窗口:', await p.locator('h3').filter({hasText:/编号已重置|Key reset/}).count())
+await p.screenshot({ path:'/tmp/ot/dlg5.png' })
+await b.close()
+console.log('done')

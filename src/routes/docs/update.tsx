@@ -33,7 +33,9 @@ docker stop miaomiaowux && docker rm miaomiaowux
 docker run -d \\
   --name miaomiaowux \\
   -p 12889:12889 \\
-  -v ./data:/app/data \\
+  -v $(pwd)/data:/app/data \\
+  -v $(pwd)/subscribes:/app/subscribes \\
+  -v $(pwd)/rule_templates:/app/rule_templates \\
   ghcr.io/iluobei/miaomiaowux:latest`}</pre>
             </div>
           </CardContent>

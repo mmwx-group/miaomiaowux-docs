@@ -769,17 +769,22 @@
     "description": "Deploy MiaoMiaoWu X directly via binary file",
     "download": {
       "heading": "Download",
-      "text": "Download the binary for your platform from GitHub Releases:"
+      "text": "Download the binary for your platform from GitHub Releases (data is written to data/ and subscribes/ next to the binary):"
     },
     "config": {
       "heading": "Configuration",
-      "text": "Customize via environment variables or configuration file:"
+      "text": "Tune runtime options via environment variables or a config file. The database path is fixed at data/mmwx.db under the working directory and cannot be changed via env var:"
     },
     "systemd": {
       "heading": "Systemd Service",
       "text": "Recommended to use systemd for service management:"
     },
-    "alsoDocker": "-> You can also use Docker for installation"
+    "alsoDocker": "-> You can also use Docker for installation",
+    "oneClick": {
+      "heading": "One-click install (recommended)",
+      "text": "Detects the architecture, downloads the latest release and creates a systemd service. When it finishes, open http://SERVER_IP:12889 to start the setup wizard.",
+      "manualNote": "If you need a custom install path or an offline deployment, you can also install manually as shown below."
+    }
   },
   "installDocker": {
     "title": "Docker Installation",
@@ -787,21 +792,20 @@
     "quickDeploy": {
       "heading": "Quick Deployment"
     },
-    "builtinNginx": {
-      "heading": "Built-in nginx (read this before enabling HTTPS)",
-      "alertTitle": "nginx is pre-installed in the image — no extra setup",
-      "alertText": "The MiaoMiaoWu X image already ships nginx, fully managed by the application. Clicking \"Deploy HTTPS\" in the web UI brings nginx up inside the container — you don't install, configure, or start nginx yourself.",
-      "text1": "Because nginx runs INSIDE the container, you must map the container's 443 port to the host for external HTTPS access. The basic example only maps 12889 — without 443, https://your-domain will not reach the container.",
-      "text2": "Recommended port mappings:",
-      "port80": "ACME HTTP-01 challenge. Required for issuing / renewing certificates. Can be omitted if you don't enable HTTPS.",
-      "port443": "Built-in nginx HTTPS entry. After \"Deploy HTTPS\" in the UI, this is where external TLS traffic terminates.",
-      "port12889": "Master HTTP panel port. Once HTTPS is on, nginx reverse-proxies to 12889, but exposing it externally still helps for bridge-mode debugging.",
-      "text3": "If something else on your host already holds 80 / 443, this container will conflict — switch to host networking (--network=host) or move the other apps off those ports."
+    "httpsProxy": {
+      "heading": "Enable HTTPS (recommended: reverse-proxy from a host agent)",
+      "alertTitle": "Don't run nginx inside the container for a Docker master",
+      "alertText": "Containers have no systemd, so managing nginx inside one is painful. Instead, install an agent on the master's HOST machine and let its nginx reverse-proxy the master on port 443 — the master container only needs to expose 12889 (http).",
+      "text1": "Steps:",
+      "step1": "On the master host, install an agent per the \"Deploy Agent\" doc, with master_url set to http://127.0.0.1:12889 (local loopback).",
+      "step2": "In the master's \"Service Management\", install nginx on that agent.",
+      "step3": "Click \"Reverse-proxy Master\": the master issues and pushes a certificate, and the agent's nginx serves 443 → 127.0.0.1:12889, so the master domain works over HTTPS.",
+      "fallback": "Alternative: the container's built-in nginx can also terminate HTTPS (nginx is pre-installed), but it requires host networking (--network=host) or mapping 80/443, and with no systemd inside the container it's harder to maintain — not recommended."
     },
-    "composeNote": "By default all ports are mapped. In production without HTTPS, you may drop the 80 / 443 lines and keep only 12889.",
+    "composeNote": "HTTPS is handled by the host agent's reverse proxy, so the container only needs to expose 12889. To use the container's built-in nginx instead, additionally map 80/443 or use host networking.",
     "dataPersistence": {
       "heading": "Data Persistence",
-      "text": "The database file is stored in data/traffic.db. Make sure to mount the ./data directory for data persistence."
+      "text": "Three directories must be mounted, or you will lose data when the container is recreated: data/ (database mmwx.db, master key, logs), subscribes/ (subscription files), rule_templates/ (rule templates). Note that subscribes is declared as a VOLUME in the image — without a bind mount it lands on an anonymous volume, which is replaced by a new empty one whenever the container is recreated, losing every subscription file."
     },
     "nextAgent": "-> Next: Deploy Agent to remote servers"
   },
@@ -1167,6 +1171,24 @@
     "opGroupDesc": "Assign nodes to different proxy groups",
     "opTags": "Multi-Tag",
     "opTagsDesc": "Since v0.2.3 nodes support multiple tags: the edit dialog lets you add / remove tags freely; frontend filters and package selected_tags match if any tag hits. Existing single-tag nodes are auto-backfilled to a single-element array.",
+    "portForward": {
+      "heading": "Port Forwarding",
+      "tunnelConfigHeading": "Tunnel Configuration",
+      "chainHeading": "Chained Tunnel",
+      "chainText": "Use multiple Agent servers to forward traffic to a selected exit node, or enter the target address and port manually.",
+      "forwardHeading": "Port Forwarding",
+      "forwardText": "Forward a port on one Agent to a selected exit node, or enter the target address and port manually.",
+      "relayHeading": "Relay Configuration",
+      "relayWarning": "Relay configuration does not make MiaoMiaoWu X handle the forwarding. It is typically used after configuring forwarding externally, then adding that forwarding configuration to a node."
+    },
+    "uriManagement": {
+      "heading": "URI Management",
+      "text": "View the protocol:// URI configurations for every node belonging to every user."
+    },
+    "sortMode": {
+      "heading": "Sort Mode",
+      "text": "When enabled, drag nodes or use the quick-move buttons to reorder them. Disable sort mode afterward to save the new order."
+    },
     "tunnelHeading": "Tunnel (Dokodemo-door) Management",
     "tunnelText": "A Tunnel (dokodemo-door) inbound forwards traffic on a port of one server to another target (an existing node or a fixed address) — commonly used for entry→exit relay chains. Tunnel inbounds do not appear in the node list; manage them from the \"Tunnel Management\" entry at the top of Node Management (aggregated across all remote / shared servers).",
     "tunnelForwardHeading": "① Forward an Existing Node (Recommended)",
@@ -1419,7 +1441,7 @@
     },
     "step1": {
       "heading": "Deploy Master",
-      "recommend": "Recommended to deploy the master using Docker:",
+      "recommend": "Recommended: install the master directly with the one-click script (sets up a systemd service; the same command handles updates and uninstall):",
       "moreInstall": "For more installation methods, see",
       "dockerInstall": "Docker Installation",
       "or": "or",
@@ -2034,7 +2056,7 @@
     }
   },
   "tutorial": {
-    "title": "Tutorial",
+    "title": "Steal Yourself Tutorial",
     "description": "Complete guide to deploying MiaoMiaoWu X from scratch",
     "steps": {
       "prepare": "Preparation",
@@ -2123,6 +2145,7 @@
       },
       "deployCert": {
         "heading": "5.3 Deploy Certificate",
+        "installNote": "Only a one-click installation can configure HTTPS automatically. For Docker installations, manage master HTTPS through the Agent; skip this step and see section 7.1.",
         "text": "After successful application, a prompt appears at the top. Click Deploy Certificate to Master to enable HTTPS. You can also manually click deploy in the certificate list.",
         "warning": "Nginx will be installed during deployment. Wait time depends on server performance and network conditions."
       }
@@ -2166,7 +2189,17 @@
       "addWebsiteInfo": "Don't worry about deploying other services. Click Agent Management -> Add Website to reuse port 443 for other services.",
       "stealSelfWarning": "When enabling Steal Self, you must prepare a domain and resolve it to this server beforehand, to fill in the Domain field below. This domain will serve as the REALITY steal-self target website.",
       "screenshotAlt": "Server Management page screenshot",
-      "screenshotCaption": "Server Management page, with added servers shown as cards"
+      "screenshotCaption": "Server Management page, with added servers shown as cards",
+      "masterSelf": {
+        "heading": "6.1 Install the Agent on the Master for Steal Yourself",
+        "prerequisite": "Enable Steal Yourself when adding the Agent server. For Tunnel mode, use the following settings:",
+        "domain": "Domain: master domain",
+        "websiteType": "Website type: Reverse Proxy",
+        "proxyAddress": "Reverse proxy address: 127.0.0.1:12889",
+        "autoConfigNote": "When the added server domain matches the master domain, enabling Steal Yourself automatically configures the three settings above.",
+        "dockerNote": "For Docker installations, use the master's actual port. The one-click installer normally uses port 12889.",
+        "next": "After saving the configuration, continue to the next step and install the Agent."
+      }
     },
     "step7": {
       "heading": "Install Agent",
@@ -2175,10 +2208,17 @@
       "item3": "3. Run the command on the target server, wait for installation to complete",
       "item4": "4. After successful installation, the server card name shows Connected",
       "detailRef": "For detailed instructions, see",
-      "agentDeploy": "Agent Deployment"
+      "agentDeploy": "Agent Deployment",
+      "localAgent": {
+        "heading": "7.1 Install Agent on the Master Host",
+        "text": "After installation, the Agent automatically configures a tunnel-in inbound and routes it to the master. You can then access the master at https://your-master-domain.",
+        "securityNote": "We recommend enabling Block Public Network Access under System Settings → System."
+      }
     },
     "step8": {
       "heading": "Add Node",
+      "stealSelfIntro": "For Steal Yourself, add a VLESS REALITY Vision node.",
+      "portNote": "After Steal Yourself is enabled, the node uses port 443 by default.",
       "text": "Click Node Management -> Add Node, select server and fill in the following:",
       "inputCol": "Input",
       "contentCol": "Content",
@@ -2236,10 +2276,8 @@
     },
     "step12": {
       "heading": "Tools (TG Bot & MiniApp)",
-      "text": "Integrate mmwX-tgbot to manage user-package bindings from within Telegram. The bot offers commands, daily notifications, and a login-free Mini App dashboard.",
-      "docLinkPre": "Full deployment + configuration guide: ",
-      "docLink": "Telegram Bot",
-      "docLinkPost": ".",
+      "text": "Manage user-package bindings from within Telegram. The bot offers commands, daily notifications, and a login-free Mini App dashboard.",
+      "settingsRef": "See System Settings → TG Bot for details.",
       "adminView": {
         "heading": "Admin view (Mini App)",
         "alt": "TG MiniApp admin view screenshot",
@@ -2679,8 +2717,40 @@
     "title": "System Settings",
     "description": "Detailed explanation of each MiaoMiaoWu X system setting",
     "overview": "Overview",
-    "overviewText": "The system settings page contains four main configuration areas: external subscription sync settings, feature toggles, notification push configuration, and proxy group config sync. All settings take effect immediately after modification, no service restart required.",
+    "overviewText": "System Settings is organized into 11 tabs covering subscriptions, features, notifications, security, probe, appearance, announcements, TGBot, verification, system, and license. Most settings hot-update after saving; a few listener settings, such as blocking public access, require a master restart.",
     "adminOnly": "System settings are visible only to admins. Regular users cannot access this page.",
+    "currentTabs": {
+      "heading": "Current Settings Overview",
+      "description": "This overview follows the current /system-settings implementation in the MiaoMiaoWu X main project. Mobile uses a selector; desktop uses tabs.",
+      "tabCol": "Tab",
+      "featuresCol": "Main capabilities",
+      "effectCol": "Activation",
+      "hotEffect": "Effective after saving",
+      "mixedEffect": "Some settings require restart",
+      "sub": "Subscriptions",
+      "subDesc": "External traffic sync, node-name regex filtering, forced refresh, matching rules, sync scope, name preservation, and cache lifetime.",
+      "features": "Features",
+      "featuresDesc": "Short links, override scripts, update CDN, Clash output, legacy compatibility, silent mode, mandatory Agent encryption, default templates, and multiplier prefixes.",
+      "push": "Notifications",
+      "pushDesc": "Telegram notifications, test messages, and independent events for login, subscription fetches, server status, daily traffic, and threshold alerts.",
+      "security": "Security",
+      "securityDesc": "Login rate limiting, brute-force protection, and subscription request limits. Fields auto-save on blur and hot-update the limiters.",
+      "probe": "Probe",
+      "probeDesc": "Disguise the site as a public monitor; configure title, logo, hidden login, visible servers, and Agent CPU, memory, disk, and Ping collection.",
+      "appearance": "Appearance",
+      "appearanceDesc": "Set the default theme, login wallpaper, and custom branding. A user's theme takes priority; custom branding requires the matching PRO feature.",
+      "announce": "Announcements",
+      "announceDesc": "Configure blocked/recovered node, maintenance, subscription update, and general templates; select Bot/Mini App channels and probes, or publish immediately.",
+      "tgbot": "TGBot",
+      "tgbotDesc": "Enable the built-in Bot and Mini App, configure the Bot Token and administrator Telegram IDs, and control the development-only preview. Saving hot-restarts the Bot.",
+      "captcha": "Verification",
+      "captchaDesc": "Configure and test Cloudflare Turnstile Site Key and Secret Key. Login verification is enabled only when both keys are configured.",
+      "system": "System",
+      "systemDesc": "Sync custom proxy groups, tune scheduled tasks, set the public master URL and listener scope, configure TG redemption copy, and view or regenerate the API Token.",
+      "license": "License",
+      "licenseDesc": "Review license status, plan, expiry, and server/node/user quotas; update the key and verify PRO feature availability.",
+      "restartWarning": "Block Public Access makes the master listen only on 127.0.0.1 and requires a restart. It only suits a reverse proxy on the same host; Docker port mapping, cross-server proxying, and direct IP:port access will stop working. Regenerating the API Token invalidates the old token immediately."
+    },
     "typeLabel": "Type",
     "defaultLabel": "Default",
     "descLabel": "Description",

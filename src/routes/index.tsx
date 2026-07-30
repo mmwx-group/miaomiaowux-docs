@@ -54,7 +54,7 @@ const comparisonKeys = [
 
 const quickLinkDefs = [
   { key: 'quickStart', href: '/docs/quick-start', icon: Zap },
-  { key: 'install', href: '/docs/install-docker', icon: Server },
+  { key: 'install', href: '/docs/install-direct', icon: Server },
   { key: 'protocols', href: '/docs/protocol-matrix', icon: Network },
   { key: 'fullDocs', href: '/docs', icon: BookOpen },
 ]

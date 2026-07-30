@@ -769,17 +769,22 @@
     "description": "通过二进制文件直接部署妙妙屋X",
     "download": {
       "heading": "下载",
-      "text": "从 GitHub Releases 下载对应平台的二进制文件："
+      "text": "从 GitHub Releases 下载对应平台的二进制文件(数据会写在二进制所在目录的 data/ 与 subscribes/ 下):"
     },
     "config": {
       "heading": "配置",
-      "text": "可通过环境变量或配置文件自定义："
+      "text": "通过环境变量或配置文件调整运行参数。数据库路径固定为工作目录下的 data/mmwx.db,不可通过环境变量更改:"
     },
     "systemd": {
       "heading": "Systemd 服务",
       "text": "推荐使用 systemd 管理服务："
     },
-    "alsoDocker": "→ 也可以使用 Docker 安装"
+    "alsoDocker": "→ 也可以使用 Docker 安装",
+    "oneClick": {
+      "heading": "一键安装(推荐)",
+      "text": "自动检测架构、下载最新版本、创建 systemd 服务。安装完成后访问 http://服务器IP:12889 进入初始化向导。",
+      "manualNote": "如果需要自定义安装路径或离线部署,也可以按下面的方式手动安装。"
+    }
   },
   "installDocker": {
     "title": "Docker 安装",
@@ -787,21 +792,20 @@
     "quickDeploy": {
       "heading": "快速部署"
     },
-    "builtinNginx": {
-      "heading": "内置 nginx(开启 HTTPS 必读)",
-      "alertTitle": "镜像内置 nginx,无需额外部署",
-      "alertText": "妙妙屋X 镜像已经预装 nginx 并由代码托管。在前端点「部署到 HTTPS」时,容器内部 nginx 会自动起来,无需自己装、配、起 nginx。",
-      "text1": "因为 nginx 跑在容器**内部**,要让外网访问到 HTTPS 入口,必须把容器的 443 端口映射到宿主机。基础示例只映射了 12889,外网访问 https://your-domain 会直接失败。",
-      "text2": "推荐的端口映射:",
-      "port80": "ACME HTTP-01 证书校验。申请 / 续期证书时必须;不开 HTTPS 也可以省略。",
-      "port443": "内置 nginx HTTPS 入口。前端「部署到 HTTPS」后由它承接外网 TLS 流量。",
-      "port12889": "主控 HTTP 面板端口。开了 HTTPS 后流量会被 nginx 反代到 12889,但映射出去仍然方便 bridge 网络调试。",
-      "text3": "如果你的服务器同时还有别的应用占着 80 / 443,与本容器有冲突 — 此时建议改用 host 网络模式启动(--network=host),或把那些应用迁出。"
+    "httpsProxy": {
+      "heading": "开启 HTTPS(推荐:宿主机 agent 反代)",
+      "alertTitle": "Docker 主控不建议在容器内跑 nginx",
+      "alertText": "容器里没有 systemd,容器内 nginx 的管理体验差。推荐在【主控所在宿主机】上装一个 agent,用它的 nginx 对外 443 反代主控,主控容器只需暴露 12889(http)。",
+      "text1": "步骤:",
+      "step1": "在主控宿主机上按「部署 Agent」文档装一个 agent,agent 的 master_url 配成 http://127.0.0.1:12889(本机直连)。",
+      "step2": "在主控「服务管理」里给这台 agent 安装 nginx。",
+      "step3": "点「反代主控」按钮:主控会自动申请证书并下发,agent 的 nginx 对外 443 反代到 127.0.0.1:12889,主控域名即可走 HTTPS。",
+      "fallback": "备选:也可让容器内置 nginx 承接 HTTPS(镜像已预装 nginx),但需用 host 网络模式(--network=host)或额外映射 80/443,且容器内无 systemd、维护性差,不推荐。"
     },
-    "composeNote": "默认所有端口都映射出去,生产环境如果不开 HTTPS,可以删掉 80 / 443 这两行只保留 12889。",
+    "composeNote": "HTTPS 由宿主机 agent 反代承接,容器只需暴露 12889;若改用容器内置 nginx 开 HTTPS,需额外映射 80/443 或使用 host 网络模式。",
     "dataPersistence": {
       "heading": "数据持久化",
-      "text": "数据库文件存储在 data/traffic.db，请确保挂载 ./data 目录以持久化数据。"
+      "text": "容器内有三个目录必须挂载出来,缺一个就会在容器重建时丢数据:data/(数据库 mmwx.db、主控密钥、日志)、subscribes/(订阅文件)、rule_templates/(规则模板)。其中 subscribes 在镜像里被声明为 VOLUME,不做 bind mount 会落到匿名卷上 —— 容器一旦重建就换成新的空卷,订阅文件全部丢失。"
     },
     "nextAgent": "→ 接下来部署 Agent 到远程服务器"
   },
@@ -1167,6 +1171,24 @@
     "opGroupDesc": "将节点分配到不同的代理组",
     "opTags": "多标签",
     "opTagsDesc": "v0.2.3 起支持节点多标签：编辑对话框可添加 / 删除多个标签，前端筛选按任一命中,套餐 selected_tags 也按任一命中匹配；老节点会自动 backfill 为原单标签的数组",
+    "portForward": {
+      "heading": "端口转发",
+      "tunnelConfigHeading": "隧道配置",
+      "chainHeading": "链式隧道",
+      "chainText": "使用多台 Agent 服务器转发选择的落地节点，或手动填写目标地址与端口。",
+      "forwardHeading": "端口转发",
+      "forwardText": "将一台 Agent 的端口转发到选择的落地节点，或手动填写目标地址与端口。",
+      "relayHeading": "中转配置",
+      "relayWarning": "中转配置不会在妙妙屋X中处理转发。该功能通常用于已经配置外部转发的场景，再将转发配置添加到节点中使用。"
+    },
+    "uriManagement": {
+      "heading": "URI 管理",
+      "text": "在这里可以查看所有用户、所有节点的 protocol:// URI 配置。"
+    },
+    "sortMode": {
+      "heading": "排序模式",
+      "text": "开启后，可以拖动节点或点击快速移动按钮调整排序；关闭排序模式后保存排序结果。"
+    },
     "tunnelHeading": "Tunnel(任意门转发)管理",
     "tunnelText": "Tunnel(dokodemo-door)入站用于把一台服务器某端口的流量转发到另一目标(已有节点或固定地址),常用于「入口机中转落地机」等链式加速。Tunnel 入站本身不进节点列表,统一在节点管理顶部的「Tunnel 管理」入口里查看、添加与删除(跨所有远程 / 分享服务器聚合)。",
     "tunnelForwardHeading": "① 转发已有节点(推荐)",
@@ -1419,7 +1441,7 @@
     },
     "step1": {
       "heading": "部署主控",
-      "recommend": "推荐使用 Docker 方式部署主控端：",
+      "recommend": "推荐使用一键脚本直接安装主控端(自动创建 systemd 服务,升级/卸载同一条命令搞定):",
       "moreInstall": "更多安装方式请参考",
       "dockerInstall": "Docker 安装",
       "or": "或",
@@ -2034,7 +2056,7 @@
     }
   },
   "tutorial": {
-    "title": "使用教程",
+    "title": "偷自己使用教程",
     "description": "从零开始部署妙妙屋X完整指南",
     "steps": {
       "prepare": "安装前准备",
@@ -2123,6 +2145,7 @@
       },
       "deployCert": {
         "heading": "5.3 部署证书",
+        "installNote": "仅一键安装的妙妙屋X可以自动配置 HTTPS。Docker 安装请通过 Agent 管理主控 HTTPS，跳过此步并查看 7.1 章节。",
         "text": "申请成功后，顶部弹出提示框，点击「部署证书到主控」即可开启 HTTPS。也可在证书列表中手动点击部署。",
         "warning": "部署过程中会安装 Nginx，视服务器性能与网络情况需等待一段时间。"
       }
@@ -2166,7 +2189,17 @@
       "addWebsiteInfo": "无需担心无法部署其他服务，点击「Agent 管理」→「添加网站」即可复用 443 端口部署其他服务。",
       "stealSelfWarning": "开启「我要偷自己」时，必须提前准备好一个域名并解析到该服务器，用于填写下方的「域名」字段。该域名将作为 REALITY 偷自己的目标网站。",
       "screenshotAlt": "服务管理页面截图",
-      "screenshotCaption": "服务管理页面，已添加的服务器以卡片形式展示"
+      "screenshotCaption": "服务管理页面，已添加的服务器以卡片形式展示",
+      "masterSelf": {
+        "heading": "6.1 主控安装 Agent 偷自己",
+        "prerequisite": "添加 Agent 服务器时必须开启「偷自己」。以 Tunnel 模式为例，填写以下配置：",
+        "domain": "域名：主控域名",
+        "websiteType": "网站类型：反向代理",
+        "proxyAddress": "反向代理地址：127.0.0.1:12889",
+        "autoConfigNote": "当添加的服务器域名与主控域名一致时，开启偷自己后，以上 3 项配置可以自动完成。",
+        "dockerNote": "Docker 安装请以主控实际使用的端口为准；一键安装脚本通常默认使用 12889。",
+        "next": "配置完成后进入下一步，安装 Agent。"
+      }
     },
     "step7": {
       "heading": "安装 Agent",
@@ -2175,10 +2208,17 @@
       "item3": "3. 在目标服务器上运行该命令，等待安装完成",
       "item4": "4. 安装成功后，服务器卡片名称后会显示「已连接」",
       "detailRef": "详细说明请参考",
-      "agentDeploy": "Agent 部署"
+      "agentDeploy": "Agent 部署",
+      "localAgent": {
+        "heading": "7.1 主控本机安装 Agent",
+        "text": "Agent 安装完成后会自动配置 tunnel-in 入站并分流到主控，此时使用 https://主控域名 即可访问主控。",
+        "securityNote": "建议在「系统设置」的「系统」选项卡中开启「禁止公网访问」。"
+      }
     },
     "step8": {
       "heading": "添加节点",
+      "stealSelfIntro": "偷自己场景请添加一个 VLESS REALITY Vision 节点。",
+      "portNote": "开启偷自己后，节点默认端口为 443。",
       "text": "点击「节点管理」→「添加节点」，选择服务器后填写以下参数：",
       "inputCol": "输入项",
       "contentCol": "填写内容",
@@ -2236,10 +2276,8 @@
     },
     "step12": {
       "heading": "小工具（TG Bot & MiniApp）",
-      "text": "可以接入 mmwX-tgbot，在 Telegram 机器人内管理用户与套餐绑定。机器人提供命令交互、每日通知和免登录 Mini App 面板。",
-      "docLinkPre": "完整部署 + 配置教程见 ",
-      "docLink": "Telegram 机器人",
-      "docLinkPost": "。",
+      "text": "在 Telegram 机器人内管理用户与套餐绑定。机器人提供命令交互、每日通知和免登录 Mini App 面板。",
+      "settingsRef": "详见「系统设置」→「TG Bot」。",
       "adminView": {
         "heading": "管理员视图（Mini App）",
         "alt": "TG MiniApp 管理员视图截图",
@@ -2679,8 +2717,40 @@
     "title": "系统设置",
     "description": "妙妙屋X 系统设置的每个配置项详解",
     "overview": "概述",
-    "overviewText": "系统设置页面包含四个主要配置区域：外部订阅同步设置、功能开关、通知推送配置、代理组配置同步。所有设置修改后立即生效，无需重启服务。",
+    "overviewText": "系统设置按 11 个选项卡组织，覆盖订阅、功能、推送、安全、探针、外观、公告、TGBot、验证、系统与许可证。大部分设置保存后热更新；关闭公网访问等少数监听配置需要重启主控。",
     "adminOnly": "系统设置仅管理员可见，普通用户无法访问此页面。",
+    "currentTabs": {
+      "heading": "当前设置页功能总览",
+      "description": "以下内容依据妙妙屋X主项目当前的 /system-settings 页面整理。移动端使用下拉菜单切换，桌面端使用选项卡切换。",
+      "tabCol": "选项卡",
+      "featuresCol": "主要功能",
+      "effectCol": "生效方式",
+      "hotEffect": "保存后生效",
+      "mixedEffect": "部分设置需重启",
+      "sub": "订阅",
+      "subDesc": "外部订阅流量同步、节点名正则过滤、强制刷新、匹配规则、同步范围、保留节点名与缓存时间。",
+      "features": "功能",
+      "featuresDesc": "短链接、覆写脚本、更新 CDN、Clash 输出格式、妙妙屋兼容功能、静默模式、强制 Agent 加密、默认模板与节点倍率前缀。",
+      "push": "推送",
+      "pushDesc": "Telegram 通知配置、测试消息，以及登录、订阅获取、服务器上下线、每日流量和阈值告警等独立开关。",
+      "security": "安全",
+      "securityDesc": "登录限流、暴力破解防护和订阅请求频率限制；字段失焦后自动保存并热更新限流器。",
+      "probe": "探针",
+      "probeDesc": "将站点伪装为公开监控页，配置标题、Logo、隐蔽登录、服务器范围，以及 CPU、内存、硬盘、Ping 等 Agent 采集项。",
+      "appearance": "外观",
+      "appearanceDesc": "设置默认主题、登录页壁纸与自定义品牌。用户个人主题优先；自定义品牌需要对应 PRO 功能。",
+      "announce": "公告",
+      "announceDesc": "配置节点被墙、恢复、维护、订阅更新和通用公告模板；选择 Bot/Mini App 渠道、探测源并立即发布。",
+      "tgbot": "TGBot",
+      "tgbotDesc": "启停内置 Bot 与 Mini App，填写 Bot Token、管理员 Telegram ID，并控制仅限调试的 Mini App 预览。保存后 Bot 热重启。",
+      "captcha": "验证",
+      "captchaDesc": "配置 Cloudflare Turnstile Site Key 与 Secret Key，并在页面内自测。两项都配置后登录验证才会启用。",
+      "system": "系统",
+      "systemDesc": "同步自定义代理组、调整定时任务、设置主控公开地址与公网监听、配置 TG 兑换文案，以及查看或重新生成 API Token。",
+      "license": "许可证",
+      "licenseDesc": "查看许可证状态、套餐、有效期和服务器/节点/用户额度，更新许可证密钥并确认 PRO 功能。",
+      "restartWarning": "「关闭公网访问」会让主控仅监听 127.0.0.1，必须重启主控后生效。它只适合同机反向代理；Docker 端口映射、跨服务器反代和 IP:端口直连会失效。API Token 重新生成后，旧 Token 会立即失效。"
+    },
     "typeLabel": "类型",
     "defaultLabel": "默认值",
     "descLabel": "说明",
