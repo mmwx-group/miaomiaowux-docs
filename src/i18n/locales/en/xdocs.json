@@ -2056,8 +2056,12 @@
     }
   },
   "tutorial": {
-    "title": "Steal Yourself Tutorial",
+    "title": "Beginner Tutorial",
     "description": "Complete guide to deploying MiaoMiaoWu X from scratch",
+    "deploymentWarning": {
+      "heading": "Steal Yourself is not recommended for the master",
+      "text": "Sharing port 443 between the master and REALITY Steal Yourself increases routing complexity and troubleshooting cost. Prefer a direct Nginx reverse proxy for the master with a separate subscription domain; Steal Yourself is better suited to regular Agent nodes."
+    },
     "steps": {
       "prepare": "Preparation",
       "dns": "DNS Resolution",
@@ -2145,13 +2149,43 @@
       },
       "deployCert": {
         "heading": "5.3 Deploy Certificate",
-        "installNote": "Only a one-click installation can configure HTTPS automatically. For Docker installations, manage master HTTPS through the Agent; skip this step and see section 7.1.",
+        "installNote": "Only a one-click installation can configure HTTPS automatically. For Docker installations, install Nginx or a similar tool to manage master HTTPS yourself; skip this step and see section 5.4.",
         "text": "After successful application, a prompt appears at the top. Click Deploy Certificate to Master to enable HTTPS. You can also manually click deploy in the certificate list.",
         "warning": "Nginx will be installed during deployment. Wait time depends on server performance and network conditions."
+      },
+      "reverseProxy": {
+        "heading": "5.4 Recommended: reverse-proxy the master with Nginx",
+        "intro": "Configure HTTPS separately for the master and subscription domains. The master domain proxies the full panel, while the subscription domain permits only subscription paths and returns 404 elsewhere. Point both domains to the master server and prepare their certificates first.",
+        "installHeading": "Install Nginx",
+        "installText": "Use the one-click script from the MiaoMiaoWu X master repository. It installs to /usr/local/nginx by default; additional server blocks can be placed in /usr/local/nginx/servers/.",
+        "certificateHeading": "Download and place certificates from the master",
+        "certificateText": "Open Certificate Management on the master, locate the certificate for the domain, and click Download. Extract the downloaded archive to obtain these two files:",
+        "fullchainDescription": "the domain certificate and complete certificate chain.",
+        "privateKeyDescription": "the certificate private key; never publish it or send it to others.",
+        "certificateUploadText": "Use a separate directory for each domain. The example below uploads both files to the master server and places them under /usr/local/nginx/cert/{domain}/. Replace {server_ip} and {domain} with actual values. Repeat this process for the subscription domain.",
+        "masterHeading": "Master domain configuration",
+        "masterText": "Replace {domain} with the master domain and confirm that fullchain.pem and privkey.pem exist in its directory. Save this as, for example, /usr/local/nginx/servers/master.conf.",
+        "subscriptionHeading": "Separate subscription domain",
+        "subscriptionText": "Replace {domain} with the subscription domain and confirm that its certificate files are in the corresponding directory. This server exposes only short links and subscription APIs, not the administration panel.",
+        "subscriptionSettingPre": "After configuring Nginx, open",
+        "systemSettings": "System Settings",
+        "subscriptionSettingPost": " and enter the full subscription domain in the master address section (for example, https://sub.example.com). Otherwise generated links will continue using the master domain.",
+        "finishText": "Finally, run /usr/local/nginx/sbin/nginx -t to validate the configuration, then systemctl reload nginx to reload it.",
+        "caddyHeading": "5.5 Optional: reverse-proxy the master with Caddy",
+        "caddyIntro": "Caddy automatically obtains and renews HTTPS certificates and handles WebSocket connections and common forwarding headers. Point both domains to the master server and ensure ports 80 and 443 are reachable.",
+        "caddyInstallHeading": "Install Caddy",
+        "caddyInstallText": "These commands use Caddy's official stable Debian/Ubuntu repository. The package creates and starts the caddy systemd service.",
+        "caddyConfigHeading": "Configure /etc/caddy/Caddyfile",
+        "caddyConfigText": "Replace {master_domain} and {subscription_domain} with the actual domains. The master domain exposes the full panel; the subscription domain permits only short links and subscription APIs and returns 404 elsewhere.",
+        "caddyHttpsNote": "Certificate paths are not required by default: Caddy obtains and renews certificates automatically. To use existing certificates, add tls /absolute/path/cert.pem /absolute/path/key.pem to the relevant site block.",
+        "caddySubscriptionPre": "When using a separate subscription domain, you must also open",
+        "caddySubscriptionPost": " and enter its full URL. Otherwise generated subscription links will continue using the master domain.",
+        "caddyFinishText": "After saving the Caddyfile, validate it and reload the service:"
       }
     },
     "step6": {
       "heading": "Add Server",
+      "publicAccessWarning": "We recommend enabling Block Public Network Access under System Settings → System.",
       "infoNote": "In this example, we use the MiaoMiaoWu X master server simultaneously as an Agent server.",
       "text": "Click Service Management -> Add Server, fill in the following:",
       "inputCol": "Input",
@@ -2191,13 +2225,12 @@
       "screenshotAlt": "Server Management page screenshot",
       "screenshotCaption": "Server Management page, with added servers shown as cards",
       "masterSelf": {
-        "heading": "6.1 Install the Agent on the Master for Steal Yourself",
+        "heading": "6.1 Agent Steal Yourself",
+        "warning": "Important: Deploying HTTPS for the MiaoMiaoWu X master occupies port 443. Do not enable Steal Yourself for an Agent installed on the master server.",
         "prerequisite": "Enable Steal Yourself when adding the Agent server. For Tunnel mode, use the following settings:",
-        "domain": "Domain: master domain",
-        "websiteType": "Website type: Reverse Proxy",
-        "proxyAddress": "Reverse proxy address: 127.0.0.1:12889",
-        "autoConfigNote": "When the added server domain matches the master domain, enabling Steal Yourself automatically configures the three settings above.",
-        "dockerNote": "For Docker installations, use the master's actual port. The one-click installer normally uses port 12889.",
+        "domain": "Domain: the domain of the service being deployed",
+        "websiteType": "Website type: Reverse Proxy or Static Page",
+        "proxyAddress": "Reverse proxy address: 127.0.0.1:8080 (for example, proxy local port 8080); static page directory: /usr/local/nginx/html (the static asset directory on the host)",
         "next": "After saving the configuration, continue to the next step and install the Agent."
       }
     },
@@ -2210,16 +2243,18 @@
       "detailRef": "For detailed instructions, see",
       "agentDeploy": "Agent Deployment",
       "localAgent": {
-        "heading": "7.1 Install Agent on the Master Host",
-        "text": "After installation, the Agent automatically configures a tunnel-in inbound and routes it to the master. You can then access the master at https://your-master-domain.",
-        "securityNote": "We recommend enabling Block Public Network Access under System Settings → System."
+        "text": "After installation, the Agent automatically configures a tunnel-in inbound and routes traffic to the domain of the deployed service. You can then access that service at https://your-service-domain."
       }
     },
     "step8": {
       "heading": "Add Node",
       "stealSelfIntro": "For Steal Yourself, add a VLESS REALITY Vision node.",
-      "portNote": "After Steal Yourself is enabled, the node uses port 443 by default.",
       "text": "Click Node Management -> Add Node, select server and fill in the following:",
+      "firstReality": {
+        "heading": "First Reality Node After Enabling Steal Yourself",
+        "note": "The first Reality node is forced to use port 443 and automatically selects the deployed website as its dest.",
+        "portExplanation": "The port shown while creating the node may not be 443 because Steal Yourself uses settings.port from the tunnel-in inbound, which defaults to 46174. You can ignore this value and check the node after it has been added."
+      },
       "inputCol": "Input",
       "contentCol": "Content",
       "noteCol": "Note",
@@ -2234,7 +2269,11 @@
       "selectUserValue": "Select an existing user",
       "saveNote": "After saving, the node appears in the node management list and users can use it via subscription links.",
       "screenshotAlt": "Node Management page screenshot",
-      "screenshotCaption": "Node Management page, listing all inbounds and their status"
+      "screenshotCaption": "Node Management page, listing all inbounds and their status",
+      "nodeCheck": {
+        "heading": "Check the Node",
+        "text": "After adding the node, confirm that its port is 443 in Node Management. Then open https://your-service-domain in a browser. If the deployed website loads successfully, the configuration is working."
+      }
     },
     "step9": {
       "heading": "Create Package",

@@ -2056,8 +2056,12 @@
     }
   },
   "tutorial": {
-    "title": "偷自己使用教程",
+    "title": "新手教程",
     "description": "从零开始部署妙妙屋X完整指南",
+    "deploymentWarning": {
+      "heading": "不建议使用“偷自己”方式部署主控",
+      "text": "主控与 REALITY 偷自己共用 443 端口会增加链路复杂度和排障成本。推荐让 Nginx 直接反向代理主控，并为订阅使用单独域名；偷自己更适合普通 Agent 节点。"
+    },
     "steps": {
       "prepare": "安装前准备",
       "dns": "DNS 解析",
@@ -2145,13 +2149,43 @@
       },
       "deployCert": {
         "heading": "5.3 部署证书",
-        "installNote": "仅一键安装的妙妙屋X可以自动配置 HTTPS。Docker 安装请通过 Agent 管理主控 HTTPS，跳过此步并查看 7.1 章节。",
+        "installNote": "仅一键安装的妙妙屋X可以自动配置 HTTPS。Docker 安装请自行安装 Nginx 等工具管理主控 HTTPS，跳过此步并查看 5.4 章节。",
         "text": "申请成功后，顶部弹出提示框，点击「部署证书到主控」即可开启 HTTPS。也可在证书列表中手动点击部署。",
         "warning": "部署过程中会安装 Nginx，视服务器性能与网络情况需等待一段时间。"
+      },
+      "reverseProxy": {
+        "heading": "5.4 推荐：使用 Nginx 反向代理主控",
+        "intro": "为主控域名和订阅域名分别配置 HTTPS：主控域名反代完整面板，订阅域名只允许订阅相关路径，其余请求统一返回 404。请先确保两个域名均已解析到主控服务器，并准备对应证书。",
+        "installHeading": "安装 Nginx",
+        "installText": "使用妙妙屋X主控仓库提供的一键脚本安装。默认安装目录为 /usr/local/nginx，额外的 server 配置可放在 /usr/local/nginx/servers/。",
+        "certificateHeading": "从主控下载并放置证书",
+        "certificateText": "进入主控的「证书管理」，找到对应域名的证书并点击下载。解压下载的压缩包后会得到以下两个文件：",
+        "fullchainDescription": "域名证书及完整证书链。",
+        "privateKeyDescription": "证书私钥，请勿公开或发送给他人。",
+        "certificateUploadText": "每个域名单独使用一个目录。以下示例先把两个文件上传到主控服务器，再放入 /usr/local/nginx/cert/{domain}/；请将 {server_ip} 和 {domain} 替换为实际值。订阅域名也需要重复此步骤。",
+        "masterHeading": "主控域名配置",
+        "masterText": "将 {domain} 替换为主控域名，并确认对应目录中已存在 fullchain.pem 和 privkey.pem。保存为例如 /usr/local/nginx/servers/master.conf。",
+        "subscriptionHeading": "独立订阅域名配置",
+        "subscriptionText": "将 {domain} 替换为独立订阅域名，并确认已将该域名的证书放入对应目录。此配置只放行短链接和订阅 API，不开放管理面板。",
+        "subscriptionSettingPre": "配置完成后，必须前往",
+        "systemSettings": "系统设置",
+        "subscriptionSettingPost": "，在主服务器地址区域填写完整的订阅域名（例如 https://sub.example.com），否则系统生成的订阅链接仍会使用主控域名。",
+        "finishText": "最后执行 /usr/local/nginx/sbin/nginx -t 检查配置，再运行 systemctl reload nginx 重新加载。",
+        "caddyHeading": "5.5 可选：使用 Caddy 反向代理主控",
+        "caddyIntro": "Caddy 会自动申请和续期 HTTPS 证书，并自动处理 WebSocket 与常用转发请求头。请确保两个域名均已解析到主控服务器，且 80、443 端口可访问。",
+        "caddyInstallHeading": "安装 Caddy",
+        "caddyInstallText": "以下命令使用 Caddy 官方 Debian/Ubuntu 稳定版软件源；安装完成后会创建并启动 caddy systemd 服务。",
+        "caddyConfigHeading": "配置 /etc/caddy/Caddyfile",
+        "caddyConfigText": "将 {master_domain} 和 {subscription_domain} 替换为实际域名。主控域名开放完整面板；订阅域名只放行短链接和订阅 API，其他请求返回 404。",
+        "caddyHttpsNote": "默认无需填写证书路径。Caddy 会自动申请并续期证书；如需使用已有证书，可在对应站点块中添加 tls /绝对路径/cert.pem /绝对路径/key.pem。",
+        "caddySubscriptionPre": "使用独立订阅域名时，同样必须前往",
+        "caddySubscriptionPost": "填写完整订阅域名，否则生成的订阅链接仍会使用主控域名。",
+        "caddyFinishText": "保存 Caddyfile 后，先验证配置，再重新加载服务："
       }
     },
     "step6": {
       "heading": "添加服务器",
+      "publicAccessWarning": "建议在「系统设置」的「系统」选项卡中开启「禁止公网访问」。",
       "infoNote": "本示例中我们将妙妙屋X主控服务器同时作为 Agent 服务器接入。",
       "text": "点击「服务管理」→「添加服务器」，按以下参数填写：",
       "inputCol": "输入项",
@@ -2191,13 +2225,12 @@
       "screenshotAlt": "服务管理页面截图",
       "screenshotCaption": "服务管理页面，已添加的服务器以卡片形式展示",
       "masterSelf": {
-        "heading": "6.1 主控安装 Agent 偷自己",
-        "prerequisite": "添加 Agent 服务器时必须开启「偷自己」。以 Tunnel 模式为例，填写以下配置：",
-        "domain": "域名：主控域名",
-        "websiteType": "网站类型：反向代理",
-        "proxyAddress": "反向代理地址：127.0.0.1:12889",
-        "autoConfigNote": "当添加的服务器域名与主控域名一致时，开启偷自己后，以上 3 项配置可以自动完成。",
-        "dockerNote": "Docker 安装请以主控实际使用的端口为准；一键安装脚本通常默认使用 12889。",
+        "heading": "6.1 Agent 偷自己",
+        "warning": "注意：妙妙屋X主控部署 HTTPS 后会占用 443 端口，因此不要为安装在主控服务器上的 Agent 开启「偷自己」。",
+        "prerequisite": "添加 Agent 服务器时开启「偷自己」。以 Tunnel 模式为例，填写以下配置：",
+        "domain": "域名：准备部署的服务域名",
+        "websiteType": "网站类型：反向代理或静态页面",
+        "proxyAddress": "反向代理地址：127.0.0.1:8080（例如反代本机 8080 端口）；静态页面目录：/usr/local/nginx/html（主机上的静态资源目录）",
         "next": "配置完成后进入下一步，安装 Agent。"
       }
     },
@@ -2210,16 +2243,18 @@
       "detailRef": "详细说明请参考",
       "agentDeploy": "Agent 部署",
       "localAgent": {
-        "heading": "7.1 主控本机安装 Agent",
-        "text": "Agent 安装完成后会自动配置 tunnel-in 入站并分流到主控，此时使用 https://主控域名 即可访问主控。",
-        "securityNote": "建议在「系统设置」的「系统」选项卡中开启「禁止公网访问」。"
+        "text": "Agent 安装完成后会自动配置 tunnel-in 入站，并分流到添加的部署服务域名。此时使用 https://部署的服务域名 即可访问部署的服务。"
       }
     },
     "step8": {
       "heading": "添加节点",
       "stealSelfIntro": "偷自己场景请添加一个 VLESS REALITY Vision 节点。",
-      "portNote": "开启偷自己后，节点默认端口为 443。",
       "text": "点击「节点管理」→「添加节点」，选择服务器后填写以下参数：",
+      "firstReality": {
+        "heading": "开启偷自己后的首个 Reality 节点",
+        "note": "首个 Reality 节点会强制使用 443 端口，并自动选择已部署的网站作为 dest。",
+        "portExplanation": "创建节点时看到的端口可能不是 443，因为偷自己使用的是 tunnel-in 入站的 settings.port，默认值为 46174，无需关注。添加完成后再按下方步骤检查节点。"
+      },
       "inputCol": "输入项",
       "contentCol": "填写内容",
       "noteCol": "备注",
@@ -2234,7 +2269,11 @@
       "selectUserValue": "选择已存在的用户",
       "saveNote": "点击保存后，节点会出现在节点管理列表中，用户即可通过订阅链接使用。",
       "screenshotAlt": "节点管理页面截图",
-      "screenshotCaption": "节点管理页面，列出所有入站及其状态"
+      "screenshotCaption": "节点管理页面，列出所有入站及其状态",
+      "nodeCheck": {
+        "heading": "节点检查",
+        "text": "添加完成后，确认节点管理中该节点的端口为 443，并通过浏览器访问 https://部署的服务域名；能够正常打开已部署的网站即表示配置成功。"
+      }
     },
     "step9": {
       "heading": "创建套餐",

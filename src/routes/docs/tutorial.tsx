@@ -10,6 +10,110 @@ export const Route = createFileRoute("/docs/tutorial")({
   component: TutorialPage,
 });
 
+const masterProxyConfig = `server {
+    listen 443;
+    #listen 443 quic;
+    listen [::]:443;
+    #listen [::]:443 quic;
+    http2 on;
+    server_name {domain};
+
+    ssl_certificate /usr/local/nginx/cert/{domain}/fullchain.pem;
+    ssl_certificate_key /usr/local/nginx/cert/{domain}/privkey.pem;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    ssl_prefer_server_ciphers on;
+    error_page 497 https://$host:443$1;
+    #add_header Alt-Svc 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000';
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
+    location / {
+        proxy_ssl_server_name on;
+        proxy_set_header Host $host;
+        client_max_body_size 512M;
+        proxy_set_header Connection $http_connection;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://127.0.0.1:12889;
+    }
+
+    proxy_read_timeout 600s;
+    proxy_connect_timeout 600s;
+}`;
+
+const subscriptionProxyConfig = `server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+
+    server_name {domain};
+
+    ssl_certificate /usr/local/nginx/cert/{domain}/fullchain.pem;
+    ssl_certificate_key /usr/local/nginx/cert/{domain}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    # Allowed endpoints:
+    #   /x/{code}                    short links and package subscription links
+    #   /api/clash/subscribe         direct Clash/Mihomo subscriptions
+    #   /api/user/package-subscribe  direct package subscriptions
+    #   /api/subscribe               compatibility endpoint
+    location ~ ^(?:/x/|/api/(?:clash/subscribe|user/package-subscribe|subscribe)$) {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        proxy_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    location / {
+        return 404;
+    }
+}`;
+
+const caddyInstallCommand = `sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+sudo chmod o+r /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update
+sudo apt install caddy`;
+
+const nginxCertificateCommand = `# 先在本地执行，将解压后的证书上传到主控服务器
+scp fullchain.pem privkey.pem root@{server_ip}:/tmp/
+
+# 再登录主控服务器执行；将 {domain} 替换为对应域名
+sudo mkdir -p /usr/local/nginx/cert/{domain}
+sudo cp /tmp/fullchain.pem /usr/local/nginx/cert/{domain}/fullchain.pem
+sudo cp /tmp/privkey.pem /usr/local/nginx/cert/{domain}/privkey.pem
+sudo chmod 644 /usr/local/nginx/cert/{domain}/fullchain.pem
+sudo chmod 600 /usr/local/nginx/cert/{domain}/privkey.pem`;
+
+const caddyProxyConfig = `{master_domain} {
+    reverse_proxy 127.0.0.1:12889
+}
+
+{subscription_domain} {
+    @subscriptions {
+        path /x/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+    }
+
+    handle @subscriptions {
+        reverse_proxy 127.0.0.1:12889
+    }
+
+    handle {
+        respond 404
+    }
+}`;
+
 function TutorialPage() {
   const { t } = useTranslation("xdocs");
 
@@ -35,6 +139,18 @@ function TutorialPage() {
     >
       <div className="mb-8 overflow-x-auto pb-4">
         <StepIndicator currentStep={0} totalSteps={12} labels={steps} />
+      </div>
+
+      <div className="flex items-start gap-2 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-8">
+        <AlertTriangle className="size-5 text-amber-500 mt-0.5 shrink-0" />
+        <div>
+          <p className="font-semibold text-amber-700 dark:text-amber-400">
+            {t("tutorial.deploymentWarning.heading")}
+          </p>
+          <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+            {t("tutorial.deploymentWarning.text")}
+          </p>
+        </div>
       </div>
 
       {/* Step 1 */}
@@ -352,11 +468,156 @@ function TutorialPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="font-medium mb-3">
+                {t("tutorial.step5.reverseProxy.heading")}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                {t("tutorial.step5.reverseProxy.intro")}
+              </p>
+              <h4 className="font-medium mb-2">
+                {t("tutorial.step5.reverseProxy.installHeading")}
+              </h4>
+              <div className="bg-muted rounded-lg p-4 font-mono text-sm overflow-x-auto mb-4">
+                <pre>
+                  {
+                    "curl -fsSL https://raw.githubusercontent.com/iluobei/miaomiaowuX/main/install-nginx.sh | bash"
+                  }
+                </pre>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                {t("tutorial.step5.reverseProxy.installText")}
+              </p>
+
+              <h4 className="font-medium mb-2">
+                {t("tutorial.step5.reverseProxy.certificateHeading")}
+              </h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                {t("tutorial.step5.reverseProxy.certificateText")}
+              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground list-disc pl-5 mb-3">
+                <li>
+                  <code>fullchain.pem</code>:{" "}
+                  {t("tutorial.step5.reverseProxy.fullchainDescription")}
+                </li>
+                <li>
+                  <code>privkey.pem</code>:{" "}
+                  {t("tutorial.step5.reverseProxy.privateKeyDescription")}
+                </li>
+              </ul>
+              <p className="text-sm text-muted-foreground mb-3">
+                {t("tutorial.step5.reverseProxy.certificateUploadText")}
+              </p>
+              <div className="bg-muted rounded-lg p-4 font-mono text-xs overflow-x-auto mb-6">
+                <pre>{nginxCertificateCommand}</pre>
+              </div>
+
+              <h4 className="font-medium mb-2">
+                {t("tutorial.step5.reverseProxy.masterHeading")}
+              </h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                {t("tutorial.step5.reverseProxy.masterText")}
+              </p>
+              <div className="bg-muted rounded-lg p-4 font-mono text-xs overflow-x-auto mb-6">
+                <pre>{masterProxyConfig}</pre>
+              </div>
+
+              <h4 className="font-medium mb-2">
+                {t("tutorial.step5.reverseProxy.subscriptionHeading")}
+              </h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                {t("tutorial.step5.reverseProxy.subscriptionText")}
+              </p>
+              <div className="bg-muted rounded-lg p-4 font-mono text-xs overflow-x-auto mb-4">
+                <pre>{subscriptionProxyConfig}</pre>
+              </div>
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 mb-4">
+                <Info className="size-4 text-blue-500 mt-0.5 shrink-0" />
+                <p className="text-sm text-blue-700 dark:text-blue-400">
+                  {t("tutorial.step5.reverseProxy.subscriptionSettingPre")}{" "}
+                  <Link
+                    to="/docs/system-settings"
+                    className="font-medium underline underline-offset-4"
+                  >
+                    {t("tutorial.step5.reverseProxy.systemSettings")}
+                  </Link>
+                  {t("tutorial.step5.reverseProxy.subscriptionSettingPost")}
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {t("tutorial.step5.reverseProxy.finishText")}
+              </p>
+
+              <div className="mt-8 border-t pt-6">
+                <h3 className="font-medium mb-3">
+                  {t("tutorial.step5.reverseProxy.caddyHeading")}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t("tutorial.step5.reverseProxy.caddyIntro")}
+                </p>
+
+                <h4 className="font-medium mb-2">
+                  {t("tutorial.step5.reverseProxy.caddyInstallHeading")}
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t("tutorial.step5.reverseProxy.caddyInstallText")}
+                </p>
+                <div className="bg-muted rounded-lg p-4 font-mono text-xs overflow-x-auto mb-6">
+                  <pre>{caddyInstallCommand}</pre>
+                </div>
+
+                <h4 className="font-medium mb-2">
+                  {t("tutorial.step5.reverseProxy.caddyConfigHeading")}
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t("tutorial.step5.reverseProxy.caddyConfigText")}
+                </p>
+                <div className="bg-muted rounded-lg p-4 font-mono text-xs overflow-x-auto mb-4">
+                  <pre>{caddyProxyConfig}</pre>
+                </div>
+
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 mb-4">
+                  <Info className="size-4 text-blue-500 mt-0.5 shrink-0" />
+                  <p className="text-sm text-blue-700 dark:text-blue-400">
+                    {t("tutorial.step5.reverseProxy.caddyHttpsNote")}
+                  </p>
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-4">
+                  <AlertTriangle className="size-4 text-amber-500 mt-0.5 shrink-0" />
+                  <p className="text-sm text-amber-700 dark:text-amber-400">
+                    {t("tutorial.step5.reverseProxy.caddySubscriptionPre")}{" "}
+                    <Link
+                      to="/docs/system-settings"
+                      className="font-medium underline underline-offset-4"
+                    >
+                      {t("tutorial.step5.reverseProxy.systemSettings")}
+                    </Link>
+                    {t("tutorial.step5.reverseProxy.caddySubscriptionPost")}
+                  </p>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t("tutorial.step5.reverseProxy.caddyFinishText")}
+                </p>
+                <div className="bg-muted rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                  <pre>{`sudo caddy validate --config /etc/caddy/Caddyfile
+sudo systemctl reload caddy`}</pre>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
       {/* Step 6 */}
       <section id="step-6" className="mb-10">
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-4">
+          <AlertTriangle className="size-4 text-amber-500 mt-0.5 shrink-0" />
+          <p className="text-sm text-amber-700 dark:text-amber-400">
+            {t("tutorial.step6.publicAccessWarning")}
+          </p>
+        </div>
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-3">
           <div className="size-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
             6
@@ -539,6 +800,12 @@ function TutorialPage() {
               <h3 className="font-medium mb-3">
                 {t("tutorial.step6.masterSelf.heading")}
               </h3>
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-4">
+                <AlertTriangle className="size-4 text-amber-500 mt-0.5 shrink-0" />
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                  {t("tutorial.step6.masterSelf.warning")}
+                </p>
+              </div>
               <p className="text-sm text-muted-foreground mb-3">
                 {t("tutorial.step6.masterSelf.prerequisite")}
               </p>
@@ -547,18 +814,6 @@ function TutorialPage() {
                 <li>{t("tutorial.step6.masterSelf.websiteType")}</li>
                 <li>{t("tutorial.step6.masterSelf.proxyAddress")}</li>
               </ul>
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 mt-4">
-                <Info className="size-4 text-blue-500 mt-0.5 shrink-0" />
-                <p className="text-sm text-blue-700 dark:text-blue-400">
-                  {t("tutorial.step6.masterSelf.autoConfigNote")}
-                </p>
-              </div>
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 mt-4">
-                <Info className="size-4 text-blue-500 mt-0.5 shrink-0" />
-                <p className="text-sm text-blue-700 dark:text-blue-400">
-                  {t("tutorial.step6.masterSelf.dockerNote")}
-                </p>
-              </div>
               <p className="text-sm text-muted-foreground mt-4">
                 {t("tutorial.step6.masterSelf.next")}
               </p>
@@ -593,18 +848,9 @@ function TutorialPage() {
               </Link>
             </p>
             <div className="mt-6 border-t pt-6">
-              <h3 className="font-medium mb-3">
-                {t("tutorial.step7.localAgent.heading")}
-              </h3>
               <p className="text-sm text-muted-foreground">
                 {t("tutorial.step7.localAgent.text")}
               </p>
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mt-4">
-                <AlertTriangle className="size-4 text-amber-500 mt-0.5 shrink-0" />
-                <p className="text-sm text-amber-700 dark:text-amber-400">
-                  {t("tutorial.step7.localAgent.securityNote")}
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -626,15 +872,23 @@ function TutorialPage() {
                 {t("tutorial.step8.stealSelfIntro")}
               </p>
             </div>
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-4">
-              <AlertTriangle className="size-4 text-amber-500 mt-0.5 shrink-0" />
-              <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
-                {t("tutorial.step8.portNote")}
-              </p>
-            </div>
             <p className="text-sm text-muted-foreground mb-4">
               {t("tutorial.step8.text")}
             </p>
+            <div className="mb-6 border-b pb-6">
+              <h3 className="font-medium mb-3">
+                {t("tutorial.step8.firstReality.heading")}
+              </h3>
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-3">
+                <AlertTriangle className="size-4 text-amber-500 mt-0.5 shrink-0" />
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                  {t("tutorial.step8.firstReality.note")}
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {t("tutorial.step8.firstReality.portExplanation")}
+              </p>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -700,6 +954,14 @@ function TutorialPage() {
               alt={t("tutorial.step8.screenshotAlt")}
               caption={t("tutorial.step8.screenshotCaption")}
             />
+            <div className="mt-6 border-t pt-6">
+              <h3 className="font-medium mb-3">
+                {t("tutorial.step8.nodeCheck.heading")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("tutorial.step8.nodeCheck.text")}
+              </p>
+            </div>
           </CardContent>
         </Card>
       </section>
