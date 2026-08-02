@@ -59,7 +59,8 @@
       "step2": "2. 点击「申请证书」",
       "step3": "3. 选择 DNS 提供商并填写凭证",
       "step4": "4. 输入域名（支持通配符，如 *.example.com）",
-      "step5": "5. 提交后系统自动完成 DNS 验证和证书签发"
+      "step5": "5. 申请泛域名时可同时勾选根域名，系统会把 example.com 与 *.example.com 作为同一张证书的 SAN",
+      "step6": "6. 提交后系统完成 DNS 验证；签发结果同时保存到数据库与证书目录"
     },
     "autoRenew": {
       "heading": "自动续期",
@@ -67,6 +68,10 @@
     },
     "storage": {
       "heading": "证书存储"
+    },
+    "download": {
+      "heading": "下载与自动部署",
+      "text": "证书列表的「下载」会生成包含 fullchain.pem 与 privkey.pem 的压缩包。续期、重新签发或 Webhook 更新后，系统会重新下发到所有引用该证书的 Nginx 与 Xray 目录并替换旧文件；从 Agent 恢复历史 Xray 配置时也会先补发配置引用的证书。"
     },
     "useCases": {
       "heading": "使用场景",
@@ -793,16 +798,16 @@
       "heading": "快速部署"
     },
     "httpsProxy": {
-      "heading": "开启 HTTPS(推荐:宿主机 agent 反代)",
-      "alertTitle": "Docker 主控不建议在容器内跑 nginx",
-      "alertText": "容器里没有 systemd,容器内 nginx 的管理体验差。推荐在【主控所在宿主机】上装一个 agent,用它的 nginx 对外 443 反代主控,主控容器只需暴露 12889(http)。",
+      "heading": "在容器中开启 HTTPS",
+      "alertTitle": "镜像已内置 Nginx 服务控制",
+      "alertText": "当前镜像不依赖 systemctl：主控可直接启动、重载和停止容器内 Nginx。请映射 80/443，或使用 host 网络，并确认宿主机端口未被占用。",
       "text1": "步骤:",
-      "step1": "在主控宿主机上按「部署 Agent」文档装一个 agent,agent 的 master_url 配成 http://127.0.0.1:12889(本机直连)。",
-      "step2": "在主控「服务管理」里给这台 agent 安装 nginx。",
-      "step3": "点「反代主控」按钮:主控会自动申请证书并下发,agent 的 nginx 对外 443 反代到 127.0.0.1:12889,主控域名即可走 HTTPS。",
-      "fallback": "备选:也可让容器内置 nginx 承接 HTTPS(镜像已预装 nginx),但需用 host 网络模式(--network=host)或额外映射 80/443,且容器内无 systemd、维护性差,不推荐。"
+      "step1": "将宿主机 80、443 映射到容器，或使用 host 网络。",
+      "step2": "在证书管理添加 DNS 提供商并申请与主控域名匹配的证书。",
+      "step3": "部署证书到主控；系统会生成 Nginx 反代配置并直接管理进程。",
+      "fallback": "也可继续使用宿主机已有的 Nginx/Caddy 反代容器的 12889 端口；两种方式只选一种，避免争用 80/443。"
     },
-    "composeNote": "HTTPS 由宿主机 agent 反代承接,容器只需暴露 12889;若改用容器内置 nginx 开 HTTPS,需额外映射 80/443 或使用 host 网络模式。",
+    "composeNote": "容器管理 HTTPS 必须映射 80/443 或使用 host 网络；若由宿主机反代，则删除这两个映射并只暴露 12889。",
     "dataPersistence": {
       "heading": "数据持久化",
       "text": "容器内有三个目录必须挂载出来,缺一个就会在容器重建时丢数据:data/(数据库 mmwx.db、主控密钥、日志)、subscribes/(订阅文件)、rule_templates/(规则模板)。其中 subscribes 在镜像里被声明为 VOLUME,不做 bind mount 会落到匿名卷上 —— 容器一旦重建就换成新的空卷,订阅文件全部丢失。"
@@ -3690,6 +3695,59 @@
         "empty": "当前没有路由出站子节点。",
         "deletedToast": "已删除(mock)"
       }
+    }
+  },
+  "websiteManagement": {
+    "title": "Nginx 网站管理",
+    "description": "集中管理 Agent 上由妙妙屋X部署的静态站点与反向代理",
+    "screenshotAlt": "服务管理页面",
+    "open": {
+      "heading": "进入网站管理",
+      "text": "打开「服务管理」，在目标服务器的 Agent 下拉菜单选择「网站管理」。系统会扫描妙妙屋X的默认 Nginx servers 目录，并标记每个站点是静态目录还是反向代理；可在同一页面新增或删除。"
+    },
+    "types": {
+      "staticTitle": "静态网站",
+      "staticText": "填写域名与服务器上的绝对目录。保存前确认 Agent 对目录具有读取权限。",
+      "proxyTitle": "反向代理",
+      "proxyText": "填写域名及上游地址，例如 127.0.0.1:8080。WebSocket 和常用转发头由模板统一配置。"
+    },
+    "environment": {
+      "heading": "安装与运行环境",
+      "text": "未安装 Nginx 时可由 Agent 安装；检测到现有 Nginx 时会复用兼容目录。服务控制按环境自动选择：",
+      "item1": "systemd、OpenRC 或 SysV 服务管理",
+      "item2": "没有服务管理器时直接使用 nginx 命令启动、重载和停止",
+      "item3": "Docker 镜像内置 Nginx，无需 systemctl"
+    },
+    "safety": {
+      "heading": "端口与主控保护",
+      "text": "添加前会检查 80/443 占用。主控已经启用 HTTPS 时，同机 Agent 不允许开启「偷自己」，避免抢占 443 导致面板失联。删除站点只删除妙妙屋X管理的配置，不会删除静态目录或上游应用。"
+    }
+  },
+  "backupRestore": {
+    "title": "备份与恢复",
+    "description": "导出、校验并恢复主控数据",
+    "password": {
+      "heading": "新备份不再设置密码",
+      "text": "当前版本导出普通 ZIP，不要求密码。只有历史 .zip.enc 加密备份在恢复时需要原密码。请把备份文件当作敏感数据妥善保存。"
+    },
+    "contents": {
+      "heading": "备份内容",
+      "databaseTitle": "数据库",
+      "databaseText": "用户、套餐、节点、服务器和系统设置。",
+      "subscriptionsTitle": "订阅资源",
+      "subscriptionsText": "subscribes 目录及生成订阅所需文件。",
+      "certificatesTitle": "证书",
+      "certificatesText": "已签发证书、自签证书与私钥。"
+    },
+    "steps": {
+      "heading": "恢复步骤",
+      "item1": "在系统菜单下载新备份，并确认浏览器已完整保存 ZIP。",
+      "item2": "恢复前另存当前数据；上传备份后等待服务完成校验与替换。",
+      "item3": "重新登录，检查服务器、节点、证书与订阅，并让 Agent 重新连接。"
+    },
+    "recovery": {
+      "heading": "数据库启动恢复",
+      "text": "主控启动时会执行 SQLite 完整性检查；数据库无法打开且存在有效的 mmwx.db.backup 时会尝试恢复。项目已移除每小时数据库自动备份任务，因此不要把该应急副本当作正式备份，仍应定期从界面下载完整备份。"
     }
   },
   "protocolSnell": {

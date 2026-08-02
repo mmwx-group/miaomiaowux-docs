@@ -17,6 +17,7 @@ import { Route as DocsXrayServiceRouteImport } from './routes/docs/xray-service'
 import { Route as DocsXrayRoutingRouteImport } from './routes/docs/xray-routing'
 import { Route as DocsXrayOutboundsRouteImport } from './routes/docs/xray-outbounds'
 import { Route as DocsXrayInboundsRouteImport } from './routes/docs/xray-inbounds'
+import { Route as DocsWebsiteManagementRouteImport } from './routes/docs/website-management'
 import { Route as DocsUsersRouteImport } from './routes/docs/users'
 import { Route as DocsUpgradeFromMmwRouteImport } from './routes/docs/upgrade-from-mmw'
 import { Route as DocsUpdateRouteImport } from './routes/docs/update'
@@ -62,6 +63,7 @@ import { Route as DocsCustomRulesRouteImport } from './routes/docs/custom-rules'
 import { Route as DocsComparisonRouteImport } from './routes/docs/comparison'
 import { Route as DocsChangelogRouteImport } from './routes/docs/changelog'
 import { Route as DocsCertificatesRouteImport } from './routes/docs/certificates'
+import { Route as DocsBackupRestoreRouteImport } from './routes/docs/backup-restore'
 import { Route as DocsAboutRouteImport } from './routes/docs/about'
 
 const DocsRoute = DocsRouteImport.update({
@@ -102,6 +104,11 @@ const DocsXrayOutboundsRoute = DocsXrayOutboundsRouteImport.update({
 const DocsXrayInboundsRoute = DocsXrayInboundsRouteImport.update({
   id: '/xray-inbounds',
   path: '/xray-inbounds',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsWebsiteManagementRoute = DocsWebsiteManagementRouteImport.update({
+  id: '/website-management',
+  path: '/website-management',
   getParentRoute: () => DocsRoute,
 } as any)
 const DocsUsersRoute = DocsUsersRouteImport.update({
@@ -330,6 +337,11 @@ const DocsCertificatesRoute = DocsCertificatesRouteImport.update({
   path: '/certificates',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsBackupRestoreRoute = DocsBackupRestoreRouteImport.update({
+  id: '/backup-restore',
+  path: '/backup-restore',
+  getParentRoute: () => DocsRoute,
+} as any)
 const DocsAboutRoute = DocsAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -340,6 +352,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
   '/docs/about': typeof DocsAboutRoute
+  '/docs/backup-restore': typeof DocsBackupRestoreRoute
   '/docs/certificates': typeof DocsCertificatesRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/comparison': typeof DocsComparisonRoute
@@ -385,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/docs/update': typeof DocsUpdateRoute
   '/docs/upgrade-from-mmw': typeof DocsUpgradeFromMmwRoute
   '/docs/users': typeof DocsUsersRoute
+  '/docs/website-management': typeof DocsWebsiteManagementRoute
   '/docs/xray-inbounds': typeof DocsXrayInboundsRoute
   '/docs/xray-outbounds': typeof DocsXrayOutboundsRoute
   '/docs/xray-routing': typeof DocsXrayRoutingRoute
@@ -395,6 +409,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/docs/about': typeof DocsAboutRoute
+  '/docs/backup-restore': typeof DocsBackupRestoreRoute
   '/docs/certificates': typeof DocsCertificatesRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/comparison': typeof DocsComparisonRoute
@@ -440,6 +455,7 @@ export interface FileRoutesByTo {
   '/docs/update': typeof DocsUpdateRoute
   '/docs/upgrade-from-mmw': typeof DocsUpgradeFromMmwRoute
   '/docs/users': typeof DocsUsersRoute
+  '/docs/website-management': typeof DocsWebsiteManagementRoute
   '/docs/xray-inbounds': typeof DocsXrayInboundsRoute
   '/docs/xray-outbounds': typeof DocsXrayOutboundsRoute
   '/docs/xray-routing': typeof DocsXrayRoutingRoute
@@ -452,6 +468,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
   '/docs/about': typeof DocsAboutRoute
+  '/docs/backup-restore': typeof DocsBackupRestoreRoute
   '/docs/certificates': typeof DocsCertificatesRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/comparison': typeof DocsComparisonRoute
@@ -497,6 +514,7 @@ export interface FileRoutesById {
   '/docs/update': typeof DocsUpdateRoute
   '/docs/upgrade-from-mmw': typeof DocsUpgradeFromMmwRoute
   '/docs/users': typeof DocsUsersRoute
+  '/docs/website-management': typeof DocsWebsiteManagementRoute
   '/docs/xray-inbounds': typeof DocsXrayInboundsRoute
   '/docs/xray-outbounds': typeof DocsXrayOutboundsRoute
   '/docs/xray-routing': typeof DocsXrayRoutingRoute
@@ -510,6 +528,7 @@ export interface FileRouteTypes {
     | '/'
     | '/docs'
     | '/docs/about'
+    | '/docs/backup-restore'
     | '/docs/certificates'
     | '/docs/changelog'
     | '/docs/comparison'
@@ -555,6 +574,7 @@ export interface FileRouteTypes {
     | '/docs/update'
     | '/docs/upgrade-from-mmw'
     | '/docs/users'
+    | '/docs/website-management'
     | '/docs/xray-inbounds'
     | '/docs/xray-outbounds'
     | '/docs/xray-routing'
@@ -565,6 +585,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/docs/about'
+    | '/docs/backup-restore'
     | '/docs/certificates'
     | '/docs/changelog'
     | '/docs/comparison'
@@ -610,6 +631,7 @@ export interface FileRouteTypes {
     | '/docs/update'
     | '/docs/upgrade-from-mmw'
     | '/docs/users'
+    | '/docs/website-management'
     | '/docs/xray-inbounds'
     | '/docs/xray-outbounds'
     | '/docs/xray-routing'
@@ -621,6 +643,7 @@ export interface FileRouteTypes {
     | '/'
     | '/docs'
     | '/docs/about'
+    | '/docs/backup-restore'
     | '/docs/certificates'
     | '/docs/changelog'
     | '/docs/comparison'
@@ -666,6 +689,7 @@ export interface FileRouteTypes {
     | '/docs/update'
     | '/docs/upgrade-from-mmw'
     | '/docs/users'
+    | '/docs/website-management'
     | '/docs/xray-inbounds'
     | '/docs/xray-outbounds'
     | '/docs/xray-routing'
@@ -735,6 +759,13 @@ declare module '@tanstack/react-router' {
       path: '/xray-inbounds'
       fullPath: '/docs/xray-inbounds'
       preLoaderRoute: typeof DocsXrayInboundsRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/website-management': {
+      id: '/docs/website-management'
+      path: '/website-management'
+      fullPath: '/docs/website-management'
+      preLoaderRoute: typeof DocsWebsiteManagementRouteImport
       parentRoute: typeof DocsRoute
     }
     '/docs/users': {
@@ -1052,6 +1083,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsCertificatesRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/backup-restore': {
+      id: '/docs/backup-restore'
+      path: '/backup-restore'
+      fullPath: '/docs/backup-restore'
+      preLoaderRoute: typeof DocsBackupRestoreRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/about': {
       id: '/docs/about'
       path: '/about'
@@ -1064,6 +1102,7 @@ declare module '@tanstack/react-router' {
 
 interface DocsRouteChildren {
   DocsAboutRoute: typeof DocsAboutRoute
+  DocsBackupRestoreRoute: typeof DocsBackupRestoreRoute
   DocsCertificatesRoute: typeof DocsCertificatesRoute
   DocsChangelogRoute: typeof DocsChangelogRoute
   DocsComparisonRoute: typeof DocsComparisonRoute
@@ -1109,6 +1148,7 @@ interface DocsRouteChildren {
   DocsUpdateRoute: typeof DocsUpdateRoute
   DocsUpgradeFromMmwRoute: typeof DocsUpgradeFromMmwRoute
   DocsUsersRoute: typeof DocsUsersRoute
+  DocsWebsiteManagementRoute: typeof DocsWebsiteManagementRoute
   DocsXrayInboundsRoute: typeof DocsXrayInboundsRoute
   DocsXrayOutboundsRoute: typeof DocsXrayOutboundsRoute
   DocsXrayRoutingRoute: typeof DocsXrayRoutingRoute
@@ -1119,6 +1159,7 @@ interface DocsRouteChildren {
 
 const DocsRouteChildren: DocsRouteChildren = {
   DocsAboutRoute: DocsAboutRoute,
+  DocsBackupRestoreRoute: DocsBackupRestoreRoute,
   DocsCertificatesRoute: DocsCertificatesRoute,
   DocsChangelogRoute: DocsChangelogRoute,
   DocsComparisonRoute: DocsComparisonRoute,
@@ -1164,6 +1205,7 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsUpdateRoute: DocsUpdateRoute,
   DocsUpgradeFromMmwRoute: DocsUpgradeFromMmwRoute,
   DocsUsersRoute: DocsUsersRoute,
+  DocsWebsiteManagementRoute: DocsWebsiteManagementRoute,
   DocsXrayInboundsRoute: DocsXrayInboundsRoute,
   DocsXrayOutboundsRoute: DocsXrayOutboundsRoute,
   DocsXrayRoutingRoute: DocsXrayRoutingRoute,

@@ -59,7 +59,8 @@
       "step2": "2. Click \"Apply for Certificate\"",
       "step3": "3. Select a DNS provider and enter credentials",
       "step4": "4. Enter the domain (wildcards supported, e.g. *.example.com)",
-      "step5": "5. After submission, the system automatically completes DNS verification and certificate issuance"
+      "step5": "5. For a wildcard request, optionally include the apex domain so example.com and *.example.com become SANs on one certificate",
+      "step6": "6. The system completes DNS validation and stores the issued certificate in both the database and certificate directory"
     },
     "autoRenew": {
       "heading": "Auto Renewal",
@@ -67,6 +68,10 @@
     },
     "storage": {
       "heading": "Certificate Storage"
+    },
+    "download": {
+      "heading": "Download and automatic deployment",
+      "text": "Download creates an archive containing fullchain.pem and privkey.pem. After renewal, re-issuance, or webhook updates, the system replaces the certificate in every referenced Nginx and Xray directory. Restoring a historical Xray config from an Agent also deploys its referenced certificates first."
     },
     "useCases": {
       "heading": "Use Cases",
@@ -793,16 +798,16 @@
       "heading": "Quick Deployment"
     },
     "httpsProxy": {
-      "heading": "Enable HTTPS (recommended: reverse-proxy from a host agent)",
-      "alertTitle": "Don't run nginx inside the container for a Docker master",
-      "alertText": "Containers have no systemd, so managing nginx inside one is painful. Instead, install an agent on the master's HOST machine and let its nginx reverse-proxy the master on port 443 — the master container only needs to expose 12889 (http).",
+      "heading": "Enable HTTPS inside the container",
+      "alertTitle": "The image includes Nginx process control",
+      "alertText": "The current image does not require systemctl: the master can start, reload, and stop Nginx directly. Map ports 80/443 or use host networking, and ensure those host ports are free.",
       "text1": "Steps:",
-      "step1": "On the master host, install an agent per the \"Deploy Agent\" doc, with master_url set to http://127.0.0.1:12889 (local loopback).",
-      "step2": "In the master's \"Service Management\", install nginx on that agent.",
-      "step3": "Click \"Reverse-proxy Master\": the master issues and pushes a certificate, and the agent's nginx serves 443 → 127.0.0.1:12889, so the master domain works over HTTPS.",
-      "fallback": "Alternative: the container's built-in nginx can also terminate HTTPS (nginx is pre-installed), but it requires host networking (--network=host) or mapping 80/443, and with no systemd inside the container it's harder to maintain — not recommended."
+      "step1": "Map host ports 80 and 443 into the container, or use host networking.",
+      "step2": "Add a DNS provider in Certificate Management and request a certificate matching the master domain.",
+      "step3": "Deploy the certificate to the master; the system generates the reverse-proxy config and controls Nginx directly.",
+      "fallback": "You may instead keep an existing host Nginx/Caddy proxy to container port 12889. Choose one approach to avoid competing for ports 80/443."
     },
-    "composeNote": "HTTPS is handled by the host agent's reverse proxy, so the container only needs to expose 12889. To use the container's built-in nginx instead, additionally map 80/443 or use host networking.",
+    "composeNote": "Container-managed HTTPS requires mapped ports 80/443 or host networking. If a host proxy handles HTTPS, remove those mappings and expose only 12889.",
     "dataPersistence": {
       "heading": "Data Persistence",
       "text": "Three directories must be mounted, or you will lose data when the container is recreated: data/ (database mmwx.db, master key, logs), subscribes/ (subscription files), rule_templates/ (rule templates). Note that subscribes is declared as a VOLUME in the image — without a bind mount it lands on an anonymous volume, which is replaced by a new empty one whenever the container is recreated, losing every subscription file."
@@ -3690,6 +3695,59 @@
         "empty": "No routed outbound children.",
         "deletedToast": "Deleted (mock)"
       }
+    }
+  },
+  "websiteManagement": {
+    "title": "Nginx Website Management",
+    "description": "Manage static sites and reverse proxies deployed by MiaomiaowuX on an Agent",
+    "screenshotAlt": "Server management page",
+    "open": {
+      "heading": "Open Website Management",
+      "text": "Open Server Management and choose Website Management from the target server's Agent menu. The page scans MiaomiaowuX's default Nginx servers directory, identifies static and reverse-proxy sites, and lets you add or remove them."
+    },
+    "types": {
+      "staticTitle": "Static site",
+      "staticText": "Enter a domain and an absolute directory on the server. Ensure the Agent can read it before saving.",
+      "proxyTitle": "Reverse proxy",
+      "proxyText": "Enter a domain and upstream such as 127.0.0.1:8080. The template supplies WebSocket and common forwarding headers."
+    },
+    "environment": {
+      "heading": "Installation and runtime",
+      "text": "The Agent can install Nginx when absent and reuse a compatible existing installation. Service control is selected for the environment:",
+      "item1": "systemd, OpenRC, or SysV service management",
+      "item2": "direct nginx start, reload, and stop commands when no service manager exists",
+      "item3": "the Docker image includes Nginx and does not require systemctl"
+    },
+    "safety": {
+      "heading": "Port and master protection",
+      "text": "Port 80/443 conflicts are checked before changes. When the master already serves HTTPS, a same-host Agent cannot enable Steal Self because taking port 443 would disconnect the panel. Removing a site deletes only the MiaomiaowuX-managed config, not its static files or upstream application."
+    }
+  },
+  "backupRestore": {
+    "title": "Backup & Restore",
+    "description": "Export, validate, and restore master data",
+    "password": {
+      "heading": "New backups have no password",
+      "text": "Current exports are regular ZIP files and require no password. Only legacy encrypted .zip.enc backups require their original password. Treat every backup as sensitive data."
+    },
+    "contents": {
+      "heading": "Included data",
+      "databaseTitle": "Database",
+      "databaseText": "Users, packages, nodes, servers, and system settings.",
+      "subscriptionsTitle": "Subscription resources",
+      "subscriptionsText": "The subscribes directory and files needed to generate subscriptions.",
+      "certificatesTitle": "Certificates",
+      "certificatesText": "Issued certificates, self-signed certificates, and private keys."
+    },
+    "steps": {
+      "heading": "Restore workflow",
+      "item1": "Download a fresh backup from the system menu and ensure the ZIP finishes saving.",
+      "item2": "Keep a separate copy of current data; upload the backup and wait for validation and replacement.",
+      "item3": "Sign in again, verify servers, nodes, certificates, and subscriptions, then allow Agents to reconnect."
+    },
+    "recovery": {
+      "heading": "Startup database recovery",
+      "text": "The master checks SQLite integrity on startup and may restore a valid mmwx.db.backup if the database cannot open. The hourly database backup task has been removed, so this emergency copy is not a formal backup; regularly download a complete backup from the UI."
     }
   },
   "protocolSnell": {

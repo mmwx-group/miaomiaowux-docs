@@ -100,6 +100,12 @@ const xNavStructure: XNavItemDef[] = [
     badgeKey: "core",
     children: [
       { id: "remote-servers", href: "/docs/remote-servers", icon: Globe },
+      {
+        id: "website-management",
+        href: "/docs/website-management",
+        icon: Globe,
+        badgeKey: "new",
+      },
       { id: "xray-service", href: "/docs/xray-service", icon: Server },
       { id: "xray-inbounds", href: "/docs/xray-inbounds", icon: Network },
       { id: "xray-outbounds", href: "/docs/xray-outbounds", icon: Route },
@@ -226,6 +232,7 @@ const xNavStructure: XNavItemDef[] = [
     icon: Wrench,
     children: [
       { id: "custom-rules", href: "/docs/custom-rules", icon: FileCode },
+      { id: "backup-restore", href: "/docs/backup-restore", icon: Database },
     ],
   },
   {

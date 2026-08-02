@@ -1287,10 +1287,6 @@ allowed_origins: "*"`}</pre>
                 <td className="py-3 px-4">{t("systemSettings.envPort")}</td>
               </tr>
               <tr className="border-b">
-                <td className="py-3 px-4 font-mono text-xs">DATABASE_PATH</td>
-                <td className="py-3 px-4">{t("systemSettings.envDbPath")}</td>
-              </tr>
-              <tr className="border-b">
                 <td className="py-3 px-4 font-mono text-xs">JWT_SECRET</td>
                 <td className="py-3 px-4">
                   {t("systemSettings.envJwtSecret")}
