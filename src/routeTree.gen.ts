@@ -40,6 +40,7 @@ import { Route as DocsProtocolShadowsocksRouteImport } from './routes/docs/proto
 import { Route as DocsProtocolMatrixRouteImport } from './routes/docs/protocol-matrix'
 import { Route as DocsProtocolHysteria2RouteImport } from './routes/docs/protocol-hysteria2'
 import { Route as DocsProtocolAnytlsRouteImport } from './routes/docs/protocol-anytls'
+import { Route as DocsProbeApiRouteImport } from './routes/docs/probe-api'
 import { Route as DocsPackagesRouteImport } from './routes/docs/packages'
 import { Route as DocsNodesRouteImport } from './routes/docs/nodes'
 import { Route as DocsNodeSpeedtestRouteImport } from './routes/docs/node-speedtest'
@@ -222,6 +223,11 @@ const DocsProtocolAnytlsRoute = DocsProtocolAnytlsRouteImport.update({
   path: '/protocol-anytls',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsProbeApiRoute = DocsProbeApiRouteImport.update({
+  id: '/probe-api',
+  path: '/probe-api',
+  getParentRoute: () => DocsRoute,
+} as any)
 const DocsPackagesRoute = DocsPackagesRouteImport.update({
   id: '/packages',
   path: '/packages',
@@ -376,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/docs/node-speedtest': typeof DocsNodeSpeedtestRoute
   '/docs/nodes': typeof DocsNodesRoute
   '/docs/packages': typeof DocsPackagesRoute
+  '/docs/probe-api': typeof DocsProbeApiRoute
   '/docs/protocol-anytls': typeof DocsProtocolAnytlsRoute
   '/docs/protocol-hysteria2': typeof DocsProtocolHysteria2Route
   '/docs/protocol-matrix': typeof DocsProtocolMatrixRoute
@@ -433,6 +440,7 @@ export interface FileRoutesByTo {
   '/docs/node-speedtest': typeof DocsNodeSpeedtestRoute
   '/docs/nodes': typeof DocsNodesRoute
   '/docs/packages': typeof DocsPackagesRoute
+  '/docs/probe-api': typeof DocsProbeApiRoute
   '/docs/protocol-anytls': typeof DocsProtocolAnytlsRoute
   '/docs/protocol-hysteria2': typeof DocsProtocolHysteria2Route
   '/docs/protocol-matrix': typeof DocsProtocolMatrixRoute
@@ -492,6 +500,7 @@ export interface FileRoutesById {
   '/docs/node-speedtest': typeof DocsNodeSpeedtestRoute
   '/docs/nodes': typeof DocsNodesRoute
   '/docs/packages': typeof DocsPackagesRoute
+  '/docs/probe-api': typeof DocsProbeApiRoute
   '/docs/protocol-anytls': typeof DocsProtocolAnytlsRoute
   '/docs/protocol-hysteria2': typeof DocsProtocolHysteria2Route
   '/docs/protocol-matrix': typeof DocsProtocolMatrixRoute
@@ -552,6 +561,7 @@ export interface FileRouteTypes {
     | '/docs/node-speedtest'
     | '/docs/nodes'
     | '/docs/packages'
+    | '/docs/probe-api'
     | '/docs/protocol-anytls'
     | '/docs/protocol-hysteria2'
     | '/docs/protocol-matrix'
@@ -609,6 +619,7 @@ export interface FileRouteTypes {
     | '/docs/node-speedtest'
     | '/docs/nodes'
     | '/docs/packages'
+    | '/docs/probe-api'
     | '/docs/protocol-anytls'
     | '/docs/protocol-hysteria2'
     | '/docs/protocol-matrix'
@@ -667,6 +678,7 @@ export interface FileRouteTypes {
     | '/docs/node-speedtest'
     | '/docs/nodes'
     | '/docs/packages'
+    | '/docs/probe-api'
     | '/docs/protocol-anytls'
     | '/docs/protocol-hysteria2'
     | '/docs/protocol-matrix'
@@ -922,6 +934,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsProtocolAnytlsRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/probe-api': {
+      id: '/docs/probe-api'
+      path: '/probe-api'
+      fullPath: '/docs/probe-api'
+      preLoaderRoute: typeof DocsProbeApiRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/packages': {
       id: '/docs/packages'
       path: '/packages'
@@ -1126,6 +1145,7 @@ interface DocsRouteChildren {
   DocsNodeSpeedtestRoute: typeof DocsNodeSpeedtestRoute
   DocsNodesRoute: typeof DocsNodesRoute
   DocsPackagesRoute: typeof DocsPackagesRoute
+  DocsProbeApiRoute: typeof DocsProbeApiRoute
   DocsProtocolAnytlsRoute: typeof DocsProtocolAnytlsRoute
   DocsProtocolHysteria2Route: typeof DocsProtocolHysteria2Route
   DocsProtocolMatrixRoute: typeof DocsProtocolMatrixRoute
@@ -1183,6 +1203,7 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsNodeSpeedtestRoute: DocsNodeSpeedtestRoute,
   DocsNodesRoute: DocsNodesRoute,
   DocsPackagesRoute: DocsPackagesRoute,
+  DocsProbeApiRoute: DocsProbeApiRoute,
   DocsProtocolAnytlsRoute: DocsProtocolAnytlsRoute,
   DocsProtocolHysteria2Route: DocsProtocolHysteria2Route,
   DocsProtocolMatrixRoute: DocsProtocolMatrixRoute,

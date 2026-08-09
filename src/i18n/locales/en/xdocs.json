@@ -778,7 +778,7 @@
     },
     "config": {
       "heading": "Configuration",
-      "text": "Tune runtime options via environment variables or a config file. The database path is fixed at data/mmwx.db under the working directory and cannot be changed via env var:"
+      "text": "Tune runtime options through environment variables or a config file. One-click installs use /etc/mmwx/data; MMWX_DATA_DIR can override it:"
     },
     "systemd": {
       "heading": "Systemd Service",
@@ -787,7 +787,7 @@
     "alsoDocker": "-> You can also use Docker for installation",
     "oneClick": {
       "heading": "One-click install (recommended)",
-      "text": "Detects the architecture, downloads the latest release and creates a systemd service. When it finishes, open http://SERVER_IP:12889 to start the setup wizard.",
+      "text": "Interactively choose native or Docker Compose installation and SQLite or PostgreSQL 18; the script installs dependencies, configures the database and starts the service.",
       "manualNote": "If you need a custom install path or an offline deployment, you can also install manually as shown below."
     }
   },
@@ -800,17 +800,17 @@
     "httpsProxy": {
       "heading": "Enable HTTPS inside the container",
       "alertTitle": "The image includes Nginx process control",
-      "alertText": "The current image does not require systemctl: the master can start, reload, and stop Nginx directly. Map ports 80/443 or use host networking, and ensure those host ports are free.",
+      "alertText": "The current image does not require systemctl: the master can start, reload, and stop Nginx directly. The recommended installation consistently uses host networking; ensure host ports 80/443 are free.",
       "text1": "Steps:",
-      "step1": "Map host ports 80 and 443 into the container, or use host networking.",
+      "step1": "Start the container with host networking as shown in Quick Deployment.",
       "step2": "Add a DNS provider in Certificate Management and request a certificate matching the master domain.",
       "step3": "Deploy the certificate to the master; the system generates the reverse-proxy config and controls Nginx directly.",
       "fallback": "You may instead keep an existing host Nginx/Caddy proxy to container port 12889. Choose one approach to avoid competing for ports 80/443."
     },
-    "composeNote": "Container-managed HTTPS requires mapped ports 80/443 or host networking. If a host proxy handles HTTPS, remove those mappings and expose only 12889.",
+    "composeNote": "This example matches the repository README and docker-compose.yml: it consistently uses host networking. Do not add separate 12889, 80, or 443 port mappings.",
     "dataPersistence": {
       "heading": "Data Persistence",
-      "text": "Three directories must be mounted, or you will lose data when the container is recreated: data/ (database mmwx.db, master key, logs), subscribes/ (subscription files), rule_templates/ (rule templates). Note that subscribes is declared as a VOLUME in the image — without a bind mount it lands on an anonymous volume, which is replaced by a new empty one whenever the container is recreated, losing every subscription file."
+      "text": "Persist data/, subscribes/, and rule_templates/. PostgreSQL 18 deployments must also mount postgres-data/ at /var/lib/postgresql. Missing a required mount can lose data when containers are recreated."
     },
     "nextAgent": "-> Next: Deploy Agent to remote servers"
   },
@@ -2338,7 +2338,11 @@
     "title": "Version Update",
     "description": "How to upgrade MiaoMiaoWu X to the latest version",
     "docker": {
-      "heading": "Docker Update"
+      "heading": "Docker Update",
+      "text": "Docker Compose is recommended because it preserves the existing ports, environment variables, and persistent mounts. If you recreate the container with docker run, use exactly the same mappings as the installation command.",
+      "composeHeading": "Docker Compose (recommended)",
+      "runHeading": "docker run",
+      "mountWarning": "When recreating the container, keep host networking and the data, subscribes, and rule_templates mounts; otherwise dynamic ports may become unreachable or persistent data may be lost."
     },
     "binary": {
       "heading": "Binary Update",

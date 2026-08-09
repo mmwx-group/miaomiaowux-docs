@@ -233,6 +233,12 @@ const xNavStructure: XNavItemDef[] = [
     children: [
       { id: "custom-rules", href: "/docs/custom-rules", icon: FileCode },
       { id: "backup-restore", href: "/docs/backup-restore", icon: Database },
+      {
+        id: "probe-api",
+        href: "/docs/probe-api",
+        icon: Gauge,
+        badgeKey: "new",
+      },
     ],
   },
   {

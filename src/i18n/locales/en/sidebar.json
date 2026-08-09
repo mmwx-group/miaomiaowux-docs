@@ -35,6 +35,7 @@
     "templates": "Template Management",
     "templatesV3": "Template Management (V3)",
     "custom-rules": "Custom Rules",
+    "probe-api": "Probe API",
     "system-settings": "System Settings",
     "advanced": "Advanced Tips",
     "chain-proxy": "Chain Proxy",

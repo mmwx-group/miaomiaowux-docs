@@ -35,6 +35,7 @@
     "templates": "模板管理",
     "templatesV3": "模板管理(V3)",
     "custom-rules": "自定义规则",
+    "probe-api": "探针 API",
     "system-settings": "系统设置",
     "advanced": "高级技巧",
     "chain-proxy": "链式代理",

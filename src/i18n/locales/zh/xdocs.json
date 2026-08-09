@@ -778,7 +778,7 @@
     },
     "config": {
       "heading": "配置",
-      "text": "通过环境变量或配置文件调整运行参数。数据库路径固定为工作目录下的 data/mmwx.db,不可通过环境变量更改:"
+      "text": "通过环境变量或配置文件调整运行参数。一键安装的数据目录为 /etc/mmwx/data，也可用 MMWX_DATA_DIR 指定:"
     },
     "systemd": {
       "heading": "Systemd 服务",
@@ -787,7 +787,7 @@
     "alsoDocker": "→ 也可以使用 Docker 安装",
     "oneClick": {
       "heading": "一键安装(推荐)",
-      "text": "自动检测架构、下载最新版本、创建 systemd 服务。安装完成后访问 http://服务器IP:12889 进入初始化向导。",
+      "text": "交互选择本机或 Docker Compose，并选择 SQLite 或 PostgreSQL 18；脚本自动安装依赖、创建数据库配置并启动服务。",
       "manualNote": "如果需要自定义安装路径或离线部署,也可以按下面的方式手动安装。"
     }
   },
@@ -800,17 +800,17 @@
     "httpsProxy": {
       "heading": "在容器中开启 HTTPS",
       "alertTitle": "镜像已内置 Nginx 服务控制",
-      "alertText": "当前镜像不依赖 systemctl：主控可直接启动、重载和停止容器内 Nginx。请映射 80/443，或使用 host 网络，并确认宿主机端口未被占用。",
+      "alertText": "当前镜像不依赖 systemctl：主控可直接启动、重载和停止容器内 Nginx。推荐安装命令统一使用 host 网络，请确认宿主机 80/443 端口未被占用。",
       "text1": "步骤:",
-      "step1": "将宿主机 80、443 映射到容器，或使用 host 网络。",
+      "step1": "按照快速部署示例使用 host 网络启动容器。",
       "step2": "在证书管理添加 DNS 提供商并申请与主控域名匹配的证书。",
       "step3": "部署证书到主控；系统会生成 Nginx 反代配置并直接管理进程。",
       "fallback": "也可继续使用宿主机已有的 Nginx/Caddy 反代容器的 12889 端口；两种方式只选一种，避免争用 80/443。"
     },
-    "composeNote": "容器管理 HTTPS 必须映射 80/443 或使用 host 网络；若由宿主机反代，则删除这两个映射并只暴露 12889。",
+    "composeNote": "该示例与仓库 README、docker-compose.yml 一致，统一使用 host 网络；不要再额外配置 12889、80 或 443 的端口映射。",
     "dataPersistence": {
       "heading": "数据持久化",
-      "text": "容器内有三个目录必须挂载出来,缺一个就会在容器重建时丢数据:data/(数据库 mmwx.db、主控密钥、日志)、subscribes/(订阅文件)、rule_templates/(规则模板)。其中 subscribes 在镜像里被声明为 VOLUME,不做 bind mount 会落到匿名卷上 —— 容器一旦重建就换成新的空卷,订阅文件全部丢失。"
+      "text": "必须持久化 data/、subscribes/、rule_templates/；选择 PostgreSQL 18 时还必须持久化 postgres-data/ 到 /var/lib/postgresql。缺少任一对应挂载都可能在容器重建时丢失数据。"
     },
     "nextAgent": "→ 接下来部署 Agent 到远程服务器"
   },
@@ -2338,7 +2338,11 @@
     "title": "版本更新",
     "description": "如何升级妙妙屋X到最新版本",
     "docker": {
-      "heading": "Docker 更新"
+      "heading": "Docker 更新",
+      "text": "推荐使用 Docker Compose 更新，它会沿用现有端口、环境变量和持久化挂载。若使用 docker run 重建容器，必须保持与安装时完全相同的映射。",
+      "composeHeading": "Docker Compose（推荐）",
+      "runHeading": "docker run",
+      "mountWarning": "重建时必须继续使用 host 网络，并保留 data、subscribes、rule_templates 三个目录挂载，否则可能导致动态端口不可达或持久化数据丢失。"
     },
     "binary": {
       "heading": "二进制更新",

@@ -18,6 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **技术栈**: React 19 + TypeScript + Vite 7 + Tailwind CSS 4 + shadcn/ui (new-york)。部署 Cloudflare（wrangler,SPA fallback）。
 
 **路由**: TanStack Router 文件式路由,`src/routes/`,自动生成 `src/routeTree.gen.ts`（**不要手动编辑**,vite 插件在 dev/build 时重生成）。
+
 - `/` — 落地页 `src/routes/index.tsx`（hero + 协议卡片 + 功能 + 对比 + 快速导航）
 - `/docs` — 文档 layout `src/routes/docs.tsx`（`src/components/docs/x-doc-layout.tsx` + `x-doc-sidebar.tsx`）
 - `/docs/*` — 52 个文档页 `src/routes/docs/*.tsx`（含 `protocol-*` 各协议专页）

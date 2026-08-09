@@ -52,6 +52,27 @@ function BackupRestorePage() {
           <li>{t("backupRestore.steps.item3")}</li>
         </ol>
       </section>
+      <section className="mb-10">
+        <h2 className="text-2xl font-bold mb-4">PostgreSQL 备份</h2>
+        <Alert className="mb-4">
+          <Info className="h-4 w-4" />
+          <AlertTitle>ZIP 备份仅适用于 SQLite</AlertTitle>
+          <AlertDescription>
+            主控切换到 PostgreSQL 后会拒绝生成不包含数据库的 ZIP。数据库使用
+            pg_dump/pg_restore，data 与 subscribes 目录仍需单独备份。
+          </AlertDescription>
+        </Alert>
+        <div className="bg-muted rounded-lg p-4 font-mono text-sm overflow-x-auto">
+          <pre>{`# Docker Compose 数据库备份
+docker exec miaomiaowux-postgres pg_dump -U mmwx -Fc mmwx > mmwx.dump
+
+# 恢复到空数据库
+docker exec -i miaomiaowux-postgres pg_restore -U mmwx -d mmwx --clean --if-exists < mmwx.dump
+
+# 同时备份运行目录
+tar czf mmwx-files.tar.gz data subscribes rule_templates`}</pre>
+        </div>
+      </section>
       <section>
         <h2 className="text-2xl font-bold mb-4">
           {t("backupRestore.recovery.heading")}
