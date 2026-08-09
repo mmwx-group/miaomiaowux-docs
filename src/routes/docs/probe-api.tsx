@@ -92,7 +92,17 @@ const serverRows: Record<"zh" | "en", Row[]> = {
     [
       "traffic_used / traffic_limit",
       "integer, byte",
-      "当前重置周期已用流量和限额；限额 0 表示不限",
+      "按服务器统计模式计算的当前周期计费用量和限额；限额 0 表示不限",
+    ],
+    [
+      "traffic_used_up / traffic_used_down / traffic_used_total",
+      "integer, byte",
+      "当前周期实际上行、下行及两者合计",
+    ],
+    [
+      "period_start / period_end",
+      "YYYY-MM-DD",
+      "计费周期起点（含）和下一重置日（不含）",
     ],
     [
       "cumulative_up / cumulative_down",
@@ -153,7 +163,17 @@ const serverRows: Record<"zh" | "en", Row[]> = {
     [
       "traffic_used / traffic_limit",
       "integer, byte",
-      "Used traffic and limit in the reset cycle; zero limit is unlimited",
+      "Billable cycle usage under the server traffic mode and its limit; zero means unlimited",
+    ],
+    [
+      "traffic_used_up / traffic_used_down / traffic_used_total",
+      "integer, byte",
+      "Actual cycle upload, download, and their sum",
+    ],
+    [
+      "period_start / period_end",
+      "YYYY-MM-DD",
+      "Inclusive cycle start and exclusive next reset boundary",
     ],
     [
       "cumulative_up / cumulative_down",
