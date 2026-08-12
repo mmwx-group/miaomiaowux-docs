@@ -81,6 +81,12 @@ const xNavStructure: XNavItemDef[] = [
         badgeKey: "new",
       },
       {
+        id: "install-external-probe",
+        href: "/docs/install-external-probe",
+        icon: Gauge,
+        badgeKey: "new",
+      },
+      {
         id: "upgrade-from-mmw",
         href: "/docs/upgrade-from-mmw",
         icon: ArrowRightLeft,

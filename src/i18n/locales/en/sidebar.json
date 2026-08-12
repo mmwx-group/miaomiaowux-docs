@@ -54,6 +54,7 @@
     "install-direct": "Direct Install",
     "install-docker": "Docker Install",
     "install-agent": "Agent Deployment",
+    "install-external-probe": "Standalone Probe",
     "upgrade-from-mmw": "Migrate from MiaoMiaoWu",
     "system-requirements": "System Requirements",
     "update": "Version Update",

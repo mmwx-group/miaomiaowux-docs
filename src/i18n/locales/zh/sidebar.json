@@ -54,6 +54,7 @@
     "install-direct": "直接安装",
     "install-docker": "Docker 安装",
     "install-agent": "Agent 部署",
+    "install-external-probe": "外置探针部署",
     "upgrade-from-mmw": "从妙妙屋迁移",
     "system-requirements": "系统要求",
     "update": "版本更新",

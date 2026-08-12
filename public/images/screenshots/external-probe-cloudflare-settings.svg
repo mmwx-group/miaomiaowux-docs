@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="882" height="1341" viewBox="0 0 882 1341" role="img" aria-labelledby="title desc">
+  <title id="title">Cloudflare Worker 项目配置</title>
+  <desc id="desc">配置 Git 账户、项目名称、MMWX_ORIGIN、PROBE_TOKEN、构建和部署命令。</desc>
+  <rect width="882" height="1341" fill="#fafafa"/>
+  <rect x="20" y="15" width="843" height="1265" rx="22" fill="#fff" stroke="#dedede" stroke-width="2"/>
+  <g font-family="Arial, 'Noto Sans SC', sans-serif" fill="#1f2328">
+    <text x="62" y="79" font-size="27">设置您的应用程序</text>
+    <text x="62" y="111" font-size="19" fill="#777">配置您的 Worker 项目，并将其部署到 Cloudflare。</text>
+
+    <text x="62" y="162" font-size="19">Git 帐户</text>
+    <rect x="62" y="180" width="756" height="57" rx="14" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <circle cx="92" cy="208" r="10" fill="#24292f"/>
+    <text x="114" y="216" font-size="19">iluobei</text>
+    <path d="m781 202 5-5 5 5m-10 11 5 5 5-5" fill="none" stroke="#777" stroke-width="2"/>
+    <text x="62" y="267" font-size="18" fill="#777">将为您创建一个 Git 存储库，并将其连接到您的应用程序。对生产分支的每次推送都将自动部署。</text>
+    <rect x="62" y="339" width="28" height="28" rx="7" fill="#050505"/>
+    <path d="m69 352 6 6 10-13" fill="none" stroke="#fff" stroke-width="3"/>
+    <text x="99" y="359" font-size="19">创建专用 Git 存储库</text>
+
+    <rect x="34" y="393" width="807" height="431" rx="1" fill="none" stroke="#ff565b" stroke-width="6"/>
+    <text x="62" y="423" font-size="19">项目名称</text>
+    <rect x="62" y="438" width="756" height="57" rx="14" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <text x="81" y="474" font-size="20">mmwx-probe-xxxx</text>
+
+    <text x="62" y="552" font-size="20" font-weight="600">MMWX_ORIGIN</text>
+    <text x="62" y="582" font-size="18" fill="#777">妙妙屋 X 主控的公网 HTTPS 地址，例如 https://panel.example.com。</text>
+    <rect x="62" y="602" width="756" height="57" rx="14" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <text x="81" y="641" font-size="24">••••••••••••••••••••••</text>
+
+    <text x="62" y="701" font-size="20" font-weight="600">PROBE_TOKEN</text>
+    <text x="62" y="730" font-size="18" fill="#777">在主控的 系统设置 → 探针 中生成的独立探针访问密钥。</text>
+    <rect x="62" y="746" width="756" height="57" rx="14" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <text x="81" y="785" font-size="24">••••••••••••••••••••••••••••••</text>
+
+    <text x="62" y="869" font-size="19">构建命令 ⓘ</text>
+    <rect x="62" y="886" width="756" height="57" rx="14" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <text x="81" y="923" font-size="20">npm run build</text>
+
+    <text x="62" y="997" font-size="19">部署命令 ⓘ</text>
+    <rect x="62" y="1015" width="756" height="57" rx="14" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <text x="81" y="1052" font-size="20">npm run deploy</text>
+
+    <rect x="62" y="1110" width="28" height="28" rx="7" fill="#050505"/>
+    <path d="m69 1123 6 6 10-13" fill="none" stroke="#fff" stroke-width="3"/>
+    <text x="99" y="1131" font-size="19">生产分支</text>
+    <text x="201" y="1131" font-size="18" fill="#1677ff">构建</text>
+    <text x="62" y="1197" font-size="19">高级设置⌄</text>
+  </g>
+  <line x1="20" y1="1244" x2="863" y2="1244" stroke="#dedede"/>
+  <text x="51" y="1290" fill="#111" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="20">返回</text>
+  <rect x="769" y="1254" width="81" height="52" rx="14" fill="#1677ff"/>
+  <text x="790" y="1287" fill="#fff" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="20">部署</text>
+</svg>

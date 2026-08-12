@@ -46,6 +46,7 @@ import { Route as DocsNodesRouteImport } from './routes/docs/nodes'
 import { Route as DocsNodeSpeedtestRouteImport } from './routes/docs/node-speedtest'
 import { Route as DocsNodeRatelimitRouteImport } from './routes/docs/node-ratelimit'
 import { Route as DocsMcpRouteImport } from './routes/docs/mcp'
+import { Route as DocsInstallExternalProbeRouteImport } from './routes/docs/install-external-probe'
 import { Route as DocsInstallDockerRouteImport } from './routes/docs/install-docker'
 import { Route as DocsInstallDirectRouteImport } from './routes/docs/install-direct'
 import { Route as DocsInstallAgentRouteImport } from './routes/docs/install-agent'
@@ -253,6 +254,12 @@ const DocsMcpRoute = DocsMcpRouteImport.update({
   path: '/mcp',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsInstallExternalProbeRoute =
+  DocsInstallExternalProbeRouteImport.update({
+    id: '/install-external-probe',
+    path: '/install-external-probe',
+    getParentRoute: () => DocsRoute,
+  } as any)
 const DocsInstallDockerRoute = DocsInstallDockerRouteImport.update({
   id: '/install-docker',
   path: '/install-docker',
@@ -377,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/docs/install-agent': typeof DocsInstallAgentRoute
   '/docs/install-direct': typeof DocsInstallDirectRoute
   '/docs/install-docker': typeof DocsInstallDockerRoute
+  '/docs/install-external-probe': typeof DocsInstallExternalProbeRoute
   '/docs/mcp': typeof DocsMcpRoute
   '/docs/node-ratelimit': typeof DocsNodeRatelimitRoute
   '/docs/node-speedtest': typeof DocsNodeSpeedtestRoute
@@ -435,6 +443,7 @@ export interface FileRoutesByTo {
   '/docs/install-agent': typeof DocsInstallAgentRoute
   '/docs/install-direct': typeof DocsInstallDirectRoute
   '/docs/install-docker': typeof DocsInstallDockerRoute
+  '/docs/install-external-probe': typeof DocsInstallExternalProbeRoute
   '/docs/mcp': typeof DocsMcpRoute
   '/docs/node-ratelimit': typeof DocsNodeRatelimitRoute
   '/docs/node-speedtest': typeof DocsNodeSpeedtestRoute
@@ -495,6 +504,7 @@ export interface FileRoutesById {
   '/docs/install-agent': typeof DocsInstallAgentRoute
   '/docs/install-direct': typeof DocsInstallDirectRoute
   '/docs/install-docker': typeof DocsInstallDockerRoute
+  '/docs/install-external-probe': typeof DocsInstallExternalProbeRoute
   '/docs/mcp': typeof DocsMcpRoute
   '/docs/node-ratelimit': typeof DocsNodeRatelimitRoute
   '/docs/node-speedtest': typeof DocsNodeSpeedtestRoute
@@ -556,6 +566,7 @@ export interface FileRouteTypes {
     | '/docs/install-agent'
     | '/docs/install-direct'
     | '/docs/install-docker'
+    | '/docs/install-external-probe'
     | '/docs/mcp'
     | '/docs/node-ratelimit'
     | '/docs/node-speedtest'
@@ -614,6 +625,7 @@ export interface FileRouteTypes {
     | '/docs/install-agent'
     | '/docs/install-direct'
     | '/docs/install-docker'
+    | '/docs/install-external-probe'
     | '/docs/mcp'
     | '/docs/node-ratelimit'
     | '/docs/node-speedtest'
@@ -673,6 +685,7 @@ export interface FileRouteTypes {
     | '/docs/install-agent'
     | '/docs/install-direct'
     | '/docs/install-docker'
+    | '/docs/install-external-probe'
     | '/docs/mcp'
     | '/docs/node-ratelimit'
     | '/docs/node-speedtest'
@@ -976,6 +989,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsMcpRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/install-external-probe': {
+      id: '/docs/install-external-probe'
+      path: '/install-external-probe'
+      fullPath: '/docs/install-external-probe'
+      preLoaderRoute: typeof DocsInstallExternalProbeRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/install-docker': {
       id: '/docs/install-docker'
       path: '/install-docker'
@@ -1140,6 +1160,7 @@ interface DocsRouteChildren {
   DocsInstallAgentRoute: typeof DocsInstallAgentRoute
   DocsInstallDirectRoute: typeof DocsInstallDirectRoute
   DocsInstallDockerRoute: typeof DocsInstallDockerRoute
+  DocsInstallExternalProbeRoute: typeof DocsInstallExternalProbeRoute
   DocsMcpRoute: typeof DocsMcpRoute
   DocsNodeRatelimitRoute: typeof DocsNodeRatelimitRoute
   DocsNodeSpeedtestRoute: typeof DocsNodeSpeedtestRoute
@@ -1198,6 +1219,7 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsInstallAgentRoute: DocsInstallAgentRoute,
   DocsInstallDirectRoute: DocsInstallDirectRoute,
   DocsInstallDockerRoute: DocsInstallDockerRoute,
+  DocsInstallExternalProbeRoute: DocsInstallExternalProbeRoute,
   DocsMcpRoute: DocsMcpRoute,
   DocsNodeRatelimitRoute: DocsNodeRatelimitRoute,
   DocsNodeSpeedtestRoute: DocsNodeSpeedtestRoute,
