@@ -2,16 +2,18 @@
 
 ## Project Structure & Module Organization
 
-This is the static documentation and landing site for 妙妙屋X. Application code lives in `src/`: TanStack Router pages are under `src/routes/`, reusable components under `src/components/`, translations under `src/i18n/locales/{zh,en}/`, and styles under `src/styles/`. Static images and fonts belong in `public/`; imported assets belong in `src/assets/`. Build helpers are in `scripts/`, while `site.json` controls branding and metadata.
+This repository contains the 妙妙屋X landing page and documentation. Astro Starlight serves the documentation at `/docs`; Markdown sources live in `src/content/docs/`, with English translations in `src/content/docs/en/`. Configure its navigation and theme in `astro.config.docs.mjs` and `src/styles/starlight.css`. The React/TanStack landing page remains in `src/routes/`, with reusable components in `src/components/`. Static images and fonts belong in `public/`; build helpers are in `scripts/`.
 
 Do not edit `src/routeTree.gen.ts`; the router plugin regenerates it during development and builds. Treat `src/components/ui/` as generated shadcn/ui code and avoid manual changes unless updating the component itself.
 
 ## Build, Test, and Development Commands
 
 - `npm install` installs the locked dependency set.
-- `npm run dev` generates the search index, then starts Vite locally.
-- `npm run build` performs the production pipeline: search indexing, TypeScript checks, Vite build, metadata injection, and per-route HTML generation.
-- `npm run build:only` runs type-checking and the core Vite build.
+- `npm run dev` starts the Starlight documentation site locally.
+- `npm run dev:landing` starts the legacy Vite landing page.
+- `npm run build` builds the landing page and the `/docs` static site, then validates documentation links.
+- `npm run build:docs` builds only Starlight and its Pagefind full-text index.
+- `npm run check:docs` checks links in an existing `dist/docs/` build.
 - `npm run lint` checks TypeScript and React code with ESLint.
 - `npm run format:check` verifies Prettier formatting; `npm run format` applies it.
 - `npm run knip` reports unused files, exports, and dependencies.
@@ -19,13 +21,13 @@ Do not edit `src/routeTree.gen.ts`; the router plugin regenerates it during deve
 
 ## Coding Style & Naming Conventions
 
-Use TypeScript and functional React components. Follow the existing Prettier output and let the import-sorting and Tailwind plugins organize imports/classes. Use kebab-case filenames such as `search-trigger.tsx`; component names use PascalCase and variables use camelCase. Prefer the `@/` alias for imports from `src/`, inline type imports (`import { type Foo }`), and underscore-prefixed names for intentionally unused parameters.
+Write documentation in Markdown or MDX, using kebab-case files such as `install-agent.md`, descriptive headings, fenced code blocks, and root-relative image paths such as `/images/install/example.webp`. Use TypeScript and functional React components for the landing page. Follow Prettier output; component names use PascalCase and variables use camelCase.
 
-Documentation routes follow `src/routes/docs/<topic>.tsx`. When changing user-facing copy, update both English and Chinese locale files and keep translation keys aligned.
+Treat `src/content/docs/` as the authoritative documentation source. When content is localized, update both the Chinese file and its matching `en/` file. Keep sidebar entries in `astro.config.docs.mjs` aligned with added, renamed, or removed pages.
 
 ## Testing Guidelines
 
-There is currently no automated test command or coverage threshold. Before submitting, run `npm run lint`, `npm run format:check`, and `npm run build`. Manually verify affected routes, language switching, dark mode, navigation, and search in `npm run dev`. Add focused tests alongside new test infrastructure rather than relying on root-level exploratory scripts.
+There is no unit-test suite or coverage threshold. Before submitting, run `npm run lint`, `npm run format:check`, and `npm run build`. The build generates Pagefind indexes and checks internal documentation links. Manually verify affected pages, language switching, dark mode, navigation, and search with `npm run dev`.
 
 ## Commit & Pull Request Guidelines
 
