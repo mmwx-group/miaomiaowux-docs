@@ -20,6 +20,7 @@ const content = {
     snapshot: "服务器快照字段",
     server: "servers[] 字段",
     nested: "嵌套结构",
+    forward: "转发链字段",
     series: "历史序列",
     notes: "字段缺省规则",
     notesText:
@@ -36,6 +37,7 @@ const content = {
     snapshot: "Snapshot fields",
     server: "servers[] fields",
     nested: "Nested structures",
+    forward: "Forward chains",
     series: "History series",
     notes: "Optional fields",
     notesText:
@@ -54,6 +56,7 @@ const topRows: Record<"zh" | "en", Row[]> = {
     ["show_globe", "boolean", "是否显示 3D 地球"],
     ["license_badge", "object", "可选许可证铭牌：name、display_name"],
     ["servers", "array", "管理员选择展示的服务器列表"],
+    ["forward", "array", "转发链列表；未配置转发链或无采集时缺省，结构见转发链字段"],
   ],
   en: [
     [
@@ -69,6 +72,44 @@ const topRows: Record<"zh" | "en", Row[]> = {
     ["show_globe", "boolean", "Whether the 3D globe is displayed"],
     ["license_badge", "object", "Optional badge with name and display_name"],
     ["servers", "array", "Servers selected by the administrator"],
+    [
+      "forward",
+      "array",
+      "Forward chains; omitted when none are configured or no samples exist. See Forward chains",
+    ],
+  ],
+};
+
+const forwardRows: Record<"zh" | "en", Row[]> = {
+  zh: [
+    ["name", "string", "转发链名称"],
+    [
+      "end_to_end_ms",
+      "integer, ms",
+      "入口→出口端到端延迟，各组“→下一组”均值之和",
+    ],
+    ["loss_pct", "number, %", "全链探测点丢包率均值"],
+    ["bucket_sec", "integer, 秒", "趋势桶宽，当前为 300（5 分钟）"],
+    ["groups", "array", "有序转发组：入口→中转…→出口"],
+    ["trend", "array", "端到端延迟趋势桶"],
+    ["traffic", "object", "周期内每日每台流量；无采集时缺省"],
+  ],
+  en: [
+    ["name", "string", "Forward chain name"],
+    [
+      "end_to_end_ms",
+      "integer, ms",
+      "Entry→exit latency; sum of each group's to-next-group average",
+    ],
+    ["loss_pct", "number, %", "Average packet loss across all probes"],
+    ["bucket_sec", "integer, s", "Trend bucket width, currently 300 (5 minutes)"],
+    ["groups", "array", "Ordered forward groups: entry→mid…→exit"],
+    ["trend", "array", "End-to-end latency trend buckets"],
+    [
+      "traffic",
+      "object",
+      "Per-day per-server traffic over the period; omitted when no samples",
+    ],
   ],
 };
 
@@ -283,7 +324,7 @@ function ProbeAPIPage() {
                     : "Pushes the same snapshot every five seconds"}
                 </td>
               </tr>
-              <tr>
+              <tr className="border-b">
                 <td className="px-4 py-3 font-mono">
                   GET /api/public/probe-series
                 </td>
@@ -291,6 +332,16 @@ function ProbeAPIPage() {
                   {lang === "zh"
                     ? "延迟或系统指标历史"
                     : "Latency or system metric history"}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-mono">
+                  GET /api/public/probe-forward
+                </td>
+                <td className="px-4 py-3">
+                  {lang === "zh"
+                    ? "转发链端到端 / 逐组逐台延迟与每日流量"
+                    : "Forward chain end-to-end / per-group / per-server latency and daily traffic"}
                 </td>
               </tr>
             </tbody>
@@ -325,6 +376,40 @@ function ProbeAPIPage() {
           <code>return_routes[]</code>: <code>carrier</code>{" "}
           (telecom/unicom/mobile), <code>region</code>, <code>route_type</code>,{" "}
           <code>tested_at</code> (RFC 3339).
+        </p>
+      </section>
+
+      <section className="mb-10 space-y-4">
+        <h2 className="text-2xl font-bold">{t.forward}</h2>
+        <p className="text-muted-foreground">
+          {lang === "zh"
+            ? "forward[] 是 probe-servers 快照的 forward 字段，也是 probe-forward 的 chains 字段，两者结构相同。probe-forward 顶层额外返回 enabled（boolean）与 generated_at（Unix 秒）。转发链各组承载同一份流量逐跳中转，故各组延迟与流量相近。"
+            : "forward[] is the forward field of the probe-servers snapshot and the chains field of probe-forward; both share the same shape. probe-forward additionally returns top-level enabled (boolean) and generated_at (Unix seconds). Each group relays the same traffic hop by hop, so per-group latency and traffic are similar."}
+        </p>
+        <FieldTable rows={forwardRows[lang]} lang={lang} />
+        <p>
+          <code>groups[]</code>: <code>name</code>, <code>role</code>{" "}
+          (entry/mid/exit), <code>to_next_ms</code>, <code>servers</code>.
+        </p>
+        <p>
+          <code>groups[].servers[]</code>: <code>name</code>,{" "}
+          <code>to_next_ms</code>, <code>healthy</code>.{" "}
+          {lang === "zh"
+            ? "to_next_ms 为该服务器到下一组的探测延迟（整数 ms）；探测成功但亚毫秒的同城中转向上取整为 1，0 表示未成功探测。healthy 表示该上游是否健康可达。"
+            : "to_next_ms is the probed latency to the next group (integer ms); a successful sub-millisecond same-city hop rounds up to 1, and 0 means no successful probe. healthy indicates whether the upstream is reachable."}
+        </p>
+        <p>
+          <code>trend[]</code>: <code>ts</code>{" "}
+          {lang === "zh" ? "（Unix 秒）" : "(Unix seconds)"}, <code>e2e_ms</code>{" "}
+          {lang === "zh" ? "（整数 ms）" : "(integer ms)"}, <code>loss</code>{" "}
+          {lang === "zh" ? "（丢包率）" : "(packet loss)"}.
+        </p>
+        <p>
+          <code>traffic</code>: <code>days</code> (YYYY-MM-DD),{" "}
+          <code>servers</code>, <code>total_gb</code>.{" "}
+          {lang === "zh"
+            ? "traffic.servers[] 含 name、group（所属组名）、role、daily_gb（与 days 对齐，每日上+下行合计 GB）、total_gb。"
+            : "traffic.servers[] contains name, group, role, daily_gb (aligned with days, per-day up+down GB), and total_gb."}
         </p>
       </section>
 
