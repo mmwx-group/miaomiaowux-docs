@@ -43,6 +43,10 @@ You can set an auto-update interval for each subscription. The system will perio
 | Daily           | General use                     |
 | Custom          | Set as needed                   |
 
+## Traffic column
+
+Admins see selected stats servers (all when empty); only external subscriptions matched through `selected_tags` are added, using their upload/download/both mode. A regular user sees only owned files: the limit comes from the primary package, usage aggregates every package credential, and external subscriptions are not added. A file limit overrides the displayed limit. See [Traffic accounting](/docs/en/traffic-accounting).
+
 ## Notes
 
 - \- Imported nodes are merged with local inbound nodes in output

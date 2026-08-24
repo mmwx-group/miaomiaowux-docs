@@ -6,34 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/ratelimit";
+
 ## 在线演示:节点限速(套餐 + 用户两层)
 
 点击下方两个按钮分别体验「套餐限速」和「用户限速」对话框。所有修改在演示器内本地保存,实时反映到下方「当前生效一览」。
 
-Mock 演示PRO套餐设默认 + 用户覆盖 → 生效一览实时变化 · 全本地
-
-两层限速 + 节点级精细控制
-
-套餐通用值作用于「套餐内所有节点 × 所有绑定该套餐的用户」;套餐每节点 / 用户全局 / 用户每节点 在其之上层层覆盖。每层用「输入是否为空」判断,非空(含 0)即视为显式设置。
-
-生效 = 用户每节点 ?? 用户全局 ?? 套餐每节点 ?? 套餐通用 ?? 不限速
-
-\*\*编辑套餐限速
-
-套餐右侧节点表每行内嵌 限速 + 客户端数 两列\*\*\*\*编辑用户限速
-
-统一 Dialog 含「全局覆盖」+「每节点覆盖」两段\*\*
-
-当前生效一览(按 fallback 链推导)
-
-| 节点                  | 限速     | 客户端数 | 来源       |
-| --------------------- | -------- | -------- | ---------- |
-| 🇭🇰 HK 香港 PRO B      | 30 Mbps  | ∞        | 套餐每节点 |
-| 🇭🇰 HK 香港家宽(HKT)   | 100 Mbps | ∞        | 套餐通用   |
-| 🇺🇸 US 美国家宽(ATT)   | 100 Mbps | ∞        | 套餐通用   |
-| 🇯🇵 JP 日本 PRO R      | 100 Mbps | ∞        | 套餐通用   |
-| 🇸🇬 SG 新加坡 PRO B    | 100 Mbps | ∞        | 套餐通用   |
-| 🇹🇼 TW 台湾家宽(HINET) | 100 Mbps | ∞        | 套餐通用   |
+<DocDemo lang="zh" client:load />
 
 ## 概述
 
@@ -65,11 +44,59 @@ Agent 在 Xray 内核层面实施速度和设备限制
 
 ### 下载限速 (Mbps)
 
-<table class="w-full text-sm"><tbody><tr class="border-b"><td class="py-2 pr-4 font-medium w-28">字段</td><td class="py-2"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">speed_limit_mbps</code></td></tr><tr class="border-b"><td class="py-2 pr-4 font-medium">单位</td><td class="py-2">Mbps（兆比特每秒）</td></tr><tr class="border-b"><td class="py-2 pr-4 font-medium">默认值</td><td class="py-2">0（不限速）</td></tr><tr><td class="py-2 pr-4 font-medium">说明</td><td class="py-2">限制用户在该套餐下的单用户下载速度上限。设置为 0 表示不限速。内部转换为字节/秒：Mbps × 1000000 / 8</td></tr></tbody></table>
+<table class="w-full text-sm">
+  <tbody>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium w-28">字段</td>
+      <td class="py-2">
+        <code class="bg-muted px-1.5 py-0.5 rounded text-xs">
+          speed_limit_mbps
+        </code>
+      </td>
+    </tr>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium">单位</td>
+      <td class="py-2">Mbps（兆比特每秒）</td>
+    </tr>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium">默认值</td>
+      <td class="py-2">0（不限速）</td>
+    </tr>
+    <tr>
+      <td class="py-2 pr-4 font-medium">说明</td>
+      <td class="py-2">
+        限制用户在该套餐下的单用户下载速度上限。设置为 0
+        表示不限速。内部转换为字节/秒：Mbps × 1000000 / 8
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### 连接数限制
 
-<table class="w-full text-sm"><tbody><tr class="border-b"><td class="py-2 pr-4 font-medium w-28">字段</td><td class="py-2"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">device_limit</code></td></tr><tr class="border-b"><td class="py-2 pr-4 font-medium">默认值</td><td class="py-2">0（不限速）</td></tr><tr><td class="py-2 pr-4 font-medium">说明</td><td class="py-2">限制用户在同一时刻的最大并发连接数(注意:是连接数,不是设备数)。设置为 0 表示不限制。超出上限的新连接会被拒绝,已有连接不受影响。配额按“用户 + 物理节点”共享。字段名沿用历史的 device_limit。详见下方《连接数限制怎么理解》。</td></tr></tbody></table>
+<table class="w-full text-sm">
+  <tbody>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium w-28">字段</td>
+      <td class="py-2">
+        <code class="bg-muted px-1.5 py-0.5 rounded text-xs">device_limit</code>
+      </td>
+    </tr>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium">默认值</td>
+      <td class="py-2">0（不限速）</td>
+    </tr>
+    <tr>
+      <td class="py-2 pr-4 font-medium">说明</td>
+      <td class="py-2">
+        限制用户在同一时刻的最大并发连接数(注意:是连接数,不是设备数)。设置为 0
+        表示不限制。超出上限的新连接会被拒绝,已有连接不受影响。配额按“用户 +
+        物理节点”共享。字段名沿用历史的
+        device_limit。详见下方《连接数限制怎么理解》。
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## 连接数限制怎么理解
 

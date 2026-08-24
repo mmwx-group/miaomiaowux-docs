@@ -6,43 +6,43 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
-# Welcome to MiaoMiaoWu X Documentation
-
 MiaoMiaoWu X is an enhanced version of MiaoMiaoWu, supporting remote server management, Xray inbound/outbound configuration, certificate management, and other advanced features, using Master-Agent architecture for unified multi-server management.
 
-[**Quick Start**](/docs/en/quick-start)[**GitHub**](https://github.com/iluobei/miaomiaowu)
+[**Quick Start**](/docs/en/quick-start) · [**GitHub**](https://github.com/iluobei/miaomiaowuX)
 
-Remote Servers
+## Core features
+
+### Remote Servers
 
 Master-Agent architecture for unified management of multiple remote servers
 
 [**Learn More**](/docs/en/remote-servers)
 
-Xray Inbound Management
+### Xray Inbound Management
 
 Visual inbound configuration with full protocol matrix support
 
 [**Learn More**](/docs/en/xray-inbounds)
 
-Protocol Reference
+### Protocol Reference
 
 Complete protocol x transport x security combination documentation
 
 [**Learn More**](/docs/en/protocol-matrix)
 
-Certificate Management
+### Certificate Management
 
 ACME automated certificate issuance and deployment
 
 [**Learn More**](/docs/en/certificates)
 
-Users & Packages
+### Users & Packages
 
 User management and traffic package configuration
 
 [**Learn More**](/docs/en/users)
 
-Installation & Deployment
+### Installation & Deployment
 
 Multiple deployment methods including Agent installation
 
@@ -68,4 +68,9 @@ Traffic package configuration with user traffic quota management
 
 ## Quick Navigation
 
-[\-> Quick Start](/docs/en/quick-start)[\-> Docker Installation](/docs/en/install-docker)[\-> Remote Servers](/docs/en/remote-servers)[\-> Inbound Management](/docs/en/xray-inbounds)[\-> Protocol Matrix](/docs/en/protocol-matrix)[\-> FAQ](/docs/en/faq)
+- [Quick Start](/docs/en/quick-start)
+- [Docker Installation](/docs/en/install-docker)
+- [Remote Servers](/docs/en/remote-servers)
+- [Inbound Management](/docs/en/xray-inbounds)
+- [Protocol Matrix](/docs/en/protocol-matrix)
+- [FAQ](/docs/en/faq)

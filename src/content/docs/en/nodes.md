@@ -62,6 +62,10 @@ Relay configuration does not make MiaoMiaoWu X handle the forwarding. It is typi
 
 View the protocol:// URI configurations for every node belonging to every user.
 
+## Node traffic and multipliers
+
+For a regular user, `×N` is the primary package (`users.package_id`) weight for the node. It is not raw node usage and does not describe that user's other package instances. Raw directions are under Traffic · Nodes; user billing also includes the package direction multiplier. See [Traffic accounting](/docs/en/traffic-accounting).
+
 ## Sort Mode
 
 When enabled, drag nodes or use the quick-move buttons to reorder them. Disable sort mode afterward to save the new order.

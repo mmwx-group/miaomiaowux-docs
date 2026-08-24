@@ -6,85 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/embedded-xray";
+
 ## 在线演示:外置 vs 内嵌 Xray
 
 切换上方模式按钮,下面 3 台服务器的「进程关系图」会实时变化:外置模式下 mmw-agent + xray 是两个独立进程,内嵌模式下 xray-core 嵌进 mmw-agent 进程内,共进退、共享内存。
 
-Mock 演示PRO切换模式 → 进程图实时变 + 对比表对应高亮
-
-Xray 运行模式
-
-外置 Xray
-
-独立 xray 进程,Agent 通过 gRPC 控制。免费、官方标准布局。
-
-内嵌 XrayPRO
-
-xray-core 编进 Agent 二进制,同进程运行。占用少、升级方便。
-
-各服务器进程视图
-
-hk1.example.com
-
-mmw-agent
-
-PID 1234
-
-主控通信 + Xray gRPC 控制端
-
-gRPC
-
-xray
-
-PID 5678
-
-独立 xray 进程,处理代理流量
-
-us1.example.com
-
-mmw-agent
-
-PID 1234
-
-主控通信 + Xray gRPC 控制端
-
-gRPC
-
-xray
-
-PID 5678
-
-独立 xray 进程,处理代理流量
-
-jp1.example.com
-
-mmw-agent
-
-PID 1234
-
-主控通信 + Xray gRPC 控制端
-
-gRPC
-
-xray
-
-PID 5678
-
-独立 xray 进程,处理代理流量
-
-| 对比项     | 外置 Xray                           | 内嵌 Xray             |
-| ---------- | ----------------------------------- | --------------------- |
-| 进程数     | 2 (mmw-agent + xray)                | 1 (mmw-agent 含 xray) |
-| 磁盘占用   | ~30 MB(agent) + ~30 MB(xray 二进制) | ~50 MB(只装 agent)    |
-| 内存占用   | agent + xray 各自常驻               | 单进程,共享内存       |
-| Xray 升级  | 需重装 xray-core                    | 随 agent 升级         |
-| 配置文件   | /usr/local/etc/xray/config.json     | 由 agent 持有         |
-| gRPC 通讯  | 需要                                | 不需要(进程内调用)    |
-| 故障隔离   | 独立进程,互不影响                   | 同进程,一同生死       |
-| 排障熟悉度 | 官方 Xray 标准布局                  | 需通过 agent 日志     |
-| PRO 许可证 | ✓ 免费                              | ✗ 仅 PRO 可用         |
-
-当前模式:外置 Xraymmw-agent ↔ xray 两个进程独立运行
+<DocDemo lang="zh" client:load />
 
 ## 概述
 

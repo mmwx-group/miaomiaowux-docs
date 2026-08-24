@@ -6,99 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/routed-outbound";
+
 ## 在线演示:节点管理 + 路由出站
 
 下面是节点管理表的本地 mock 复刻 — 启停 / 复制订阅 / 路由出站 / 编辑 / 删除全可点;点节点行的「路由出站」按钮(右侧表格里那个紫色路径图标)即可打开「新增落地节点」对话框,跟主控里完全一致。
 
-Mock 演示5 个 mock 节点 · 所有操作即点即响应 · 不发任何网络请求
-
-节点管理5
-
-**添加节点**
-
-| 节点名称 | 服务器 | 协议 | 流量 | 状态 | 操作 |
-| -------- | ------ | ---- | ---- | ---- | ---- |
-
-|
-🇭🇰 HK直连
-
-| hk1.example.com | VLESS |
-
-↑ 12.30 GB
-
-↓ 184.70 GB
-
-|
-
-|
-
-|
-|
-
-🇺🇸 US-Reality
-
-| us1.example.com | VLESS |
-
-↑ 3.10 GB
-
-↓ 46.50 GB
-
-|
-
-|
-
-|
-|
-
-🇯🇵 JP-Hy2
-
-🇯🇵 JP → HK直连
-
-| jp1.example.com | Hysteria2 |
-
-↑ 8.70 GB
-
-↓ 112.30 GB
-
-|
-
-|
-
-|
-|
-
-🇸🇬 SG-Trojan
-
-| sg1.example.com | Trojan |
-
-↑ 0 B
-
-↓ 0 B
-
-|
-
-|
-
-|
-|
-
-🇩🇪 DE-Reality
-
-| de1.example.com | VLESS |
-
-↑ 1.40 GB
-
-↓ 17.80 GB
-
-|
-
-已禁用
-
-|
-
-|
-
-提示:点击节点行最右侧的紫色路径图标(「路由出站」按钮)即可创建落地节点 — 落地节点会作为绿色 Badge 显示在源节点的名称下方。
+<DocDemo lang="zh" client:load />
 
 ## 出站的两种配置方式
 
@@ -127,8 +41,8 @@ Mock 演示5 个 mock 节点 · 所有操作即点即响应 · 不发任何网�
 
 底层动作（写入源服务器 xray 配置）：
 
-- 1\. 加 outbound，tag = landing-<源 inbound tag>-<时间戳>
-- 2\. 加 routing 规则：{inboundTag: \[源 inbound\], outboundTag: 上一步 tag}
+- 1\. 加 outbound，tag = landing-`<源 inbound tag>`-`<时间戳>`
+- 2\. 加 routing 规则：`{inboundTag: [源 inbound], outboundTag: 上一步 tag}`
 
 **适用场景：所有用户都该走同一出口，例如"前端入口机 → 后端落地机"统一中转、统一出口接管。**
 
@@ -199,7 +113,7 @@ Mock 演示5 个 mock 节点 · 所有操作即点即响应 · 不发任何网�
 }
 ```
 
-email 实际格式：<username>\_\_<short>\_\_<label>，管理员占位为 \_admin\_\_<short>\_\_<label>。short 是创建路由出站时随机生成的标识，用于在同 label 多次创建时区分。
+email 实际格式：`<username>`\_\_`<short>`\_\_`<label>`，管理员占位为 \_admin\_\_`<short>`\_\_`<label>`。short 是创建路由出站时随机生成的标识，用于在同 label 多次创建时区分。
 
 ## 普通用户视角（按用户私有路由出站）
 
@@ -221,10 +135,10 @@ email 实际格式：<username>\_\_<short>\_\_<label>，管理员占位为 \_adm
 1.  普通用户在节点管理页面，找到自己可见的中转节点（套餐分配的节点或自己导入的），点击行尾 「路由出站」按钮
 2.  对话框只显示「路由出站（按用户）」模式（管理员的「整个节点」radio + 服务器 Tab 都不显示）
 3.  从「从已有节点选」Tab 选一个落地节点
-4.  Label 自动填 rout-<目标 slug>，可手动改
+4.  Label 自动填 rout-`<目标 slug>`，可手动改
 5.  点「创建路由出站」
 
-系统在节点列表新增一行 <中转节点>-<label>，该行只对创建者本人可见，并自动进入用户订阅。
+系统在节点列表新增一行 `<中转节点>`-`<label>`，该行只对创建者本人可见，并自动进入用户订阅。
 
 ### 删除自己的路由出站
 
@@ -253,10 +167,10 @@ email 实际格式：<username>\_\_<short>\_\_<label>，管理员占位为 \_adm
 
 一台 HK直连 中转机 + 两个落地（HKT、HINET），通过路由出站创建出两个 routed 子节点：
 
-| 子节点名          | 父 inbound | 出站  | outbound tag               |
-| ----------------- | ---------- | ----- | -------------------------- |
-| HK直连-rout-hkt   | HK直连     | HKT   | routed:p<父 id>:rout-hkt   |
-| HK直连-rout-hinet | HK直连     | HINET | routed:p<父 id>:rout-hinet |
+| 子节点名          | 父 inbound | 出站  | outbound tag                 |
+| ----------------- | ---------- | ----- | ---------------------------- |
+| HK直连-rout-hkt   | HK直连     | HKT   | routed:p`<父 id>`:rout-hkt   |
+| HK直连-rout-hinet | HK直连     | HINET | routed:p`<父 id>`:rout-hinet |
 
 ### 效果
 
@@ -271,9 +185,9 @@ email 实际格式：<username>\_\_<short>\_\_<label>，管理员占位为 \_adm
 
 ### 创建路由出站时
 
-1\. 在父物理节点的 inbound 里加一个占位 admin client（email = \_admin\_\_<short>\_\_<label>）
+1\. 在父物理节点的 inbound 里加一个占位 admin client（email = \_admin\_\_`<short>`\_\_`<label>`）
 
-2\. 在源服务器上加一个 outbound，tag = routed:p<父节点 id>:<label>
+2\. 在源服务器上加一个 outbound，tag = routed:p`<父节点 id>`:`<label>`
 
 3\. 在 routing 规则数组顶部 prepend 一条带 marktag 的规则，user = \[admin_email\]
 
@@ -281,7 +195,7 @@ email 实际格式：<username>\_\_<short>\_\_<label>，管理员占位为 \_adm
 
 ### 套餐分配用户到该子节点时
 
-1\. 为用户在父 inbound 中加一个子账号 client（email = <username>\_\_<short>\_\_<label>，UUID 独立生成）
+1\. 为用户在父 inbound 中加一个子账号 client（email = `<username>`\_\_`<short>`\_\_`<label>`，UUID 独立生成）
 
 2\. 把该 email 追加到 routing 规则的 user\[\] 数组
 
@@ -293,7 +207,7 @@ email 实际格式：<username>\_\_<short>\_\_<label>，管理员占位为 \_adm
 
 ### 流量统计与 email 反查
 
-xray stats 上报的 user.<email> 指标，会通过 user_subaccounts.email → username 反查到 mmwx 用户名，最终归集到该用户的总流量。
+xray stats 上报的 user.`<email>` 指标，会通过 user_subaccounts.email → username 反查到 mmwx 用户名，最终归集到该用户的总流量。
 
 因此即使一个用户有多个子账号（订阅了多条路由出站子节点），流量也能正确合并到其主账号。
 

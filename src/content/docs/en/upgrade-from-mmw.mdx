@@ -6,51 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/migration";
+
 ## Full migration wizard (demo)
 
 Below is a local mock of the real master /migrate-from-mmw page — all 5 steps, every interaction, form, and scan result is clickable, but everything is mocked and no network call is made. Walk through it here to get familiar before doing it on the real master.
 
-演示Mock 数据跟主控 /migrate-from-mmw 一致,但不发任何网络请求
-
-**1概述**
-
-**2备份停服**
-
-**3导入数据**
-
-**4认领节点**
-
-**5验证完成**
-
-欢迎使用迁移向导
-
-开始前请通读以下要点,确认无误后再进入下一步。
-
-迁移保证
-
-- **客户端订阅 URL 不变** — 用户的 Clash / Shadowrocket 不用改
-- **xray UUID / password 不变** — 协议层无感切换
-- **nginx 配置不动** — 反代继续指向同一个端口
-- **SSL 证书不动** — certbot 不需要重新申请
-- **mmw 不会被删除** — systemctl 只是停掉服务,失败可回滚
-
-前置要求
-
-- 你已经把妙妙屋X 二进制装好,并通过 systemd 跑在 mmw 同一端口上
-- 当前 mmwx 数据库**是空的**(无套餐 / 节点 / 用户) — 否则会被 mmw 数据覆盖
-- 具备 root SSH 访问到部署 mmw 的机器
-- 所有 mmw 时代的远程节点服务器都已安装 `mmw-agent` 并接入 mmwx 主控
-
-### 迁移流程概览
-
-1.  **停止 mmw 并备份** — 防止数据继续变化 + 失败回滚
-2.  **导入 mmw.db** — 上传 / 填路径,主控读取并迁移 schema
-3.  **认领节点 / 用户** — 把 xray 现有 client 绑定到 mmwx 用户
-4.  **验证并完成** — 测一个客户端订阅 URL 是否仍可用
-
-读完详细文档 →[升级指南完整版](https://miaomiaowux.com/docs/upgrade-from-mmw)
-
-**我已了解,开始**
+<DocDemo lang="en" client:load />
 
 ## Who Needs This
 
@@ -72,7 +34,7 @@ This migration wizard is designed for you. All operations only touch the mmw dat
 - nginx config untouched -- reverse proxy continues pointing to same port
 - SSL certificate untouched -- certbot doesn't need re-application
 - mmw service rollbackable -- systemctl only stops, doesn't delete any files
-- User short codes / subscription short codes preserved -- previously distributed /x/<code> short links continue working
+- User short codes / subscription short codes preserved -- previously distributed /x/`<code>` short links continue working
 
 ### ! Prerequisites
 
@@ -129,7 +91,7 @@ Copy the zip to any path on the mmwx master, tell the wizard the path in the nex
 
 - Uses SQLite ATTACH DATABASE to mount mmw.db as src, each table INSERT OR IGNORE INTO main.X SELECT ... FROM src.X
 - Migrated tables: users, user_tokens, nodes, subscribe_files, user_subscriptions, user_settings, templates, custom_rules, override_scripts, external_subscriptions
-- User short codes + subscription short codes preserved as-is (from user_tokens / subscribe_files), previously distributed /x/<code> short links continue working
+- User short codes + subscription short codes preserved as-is (from user_tokens / subscribe_files), previously distributed /x/`<code>` short links continue working
 - Copy yaml template files from subscribes/ directory to mmwx subscribes/ (same-name files keep existing mmwx version, no overwrite)
 - Set created_by to the first admin username for subscribe_files / templates rows where created_by is empty
 
@@ -140,7 +102,7 @@ The entire import runs in one SQLite transaction. If any table fails -> complete
 mmw-era node configs exist as clash_config (raw vless / vmess / trojan / hy2 configs) without a 'remote server' concept -- servers were manually maintained. mmwx uses a 'Server + Inbound + Node' three-layer model, requiring mmw nodes to be linked to mmwx managed xray servers. This step does two things:
 
 1.  Add Servers -- The wizard lists all deduplicated server addresses from mmw nodes. Click 'Go Add' to auto-create a remote server in mmwx (address / name auto-filled from node info), generate agent token, and prompt you to install mmw-agent on the server.
-2.  Take Over External xray + Scan to Fill Emails -- For externally managed xray from the mmw era, if choosing embedded mode redeployment, one-click merge /etc/xray/config.json + /etc/xray/conf/\*.json to mmwx standard path /usr/local/etc/xray/config.json (originals archived as .before-mmwx-<ts>). Then scan all inbound clients in the xray config, fill in emails and bind to admin's sub-accounts (mmw era didn't have this concept; after migration, these 'custom clients' are unified under admin).
+2.  Take Over External xray + Scan to Fill Emails -- For externally managed xray from the mmw era, if choosing embedded mode redeployment, one-click merge /etc/xray/config.json + /etc/xray/conf/\*.json to mmwx standard path /usr/local/etc/xray/config.json (originals archived as .before-mmwx-`<ts>`). Then scan all inbound clients in the xray config, fill in emails and bind to admin's sub-accounts (mmw era didn't have this concept; after migration, these 'custom clients' are unified under admin).
 
 ### Smart Claiming, No Duplicate Nodes
 
@@ -168,7 +130,7 @@ mmw's /api/admin/backup/download requires mmw v0.7+. Older versions can only use
 
 ### Some inbounds lost after taking over external xray
 
-Merge logic deduplicates by tag field. Same-named tags in two confdir files keep only the first merged. If lost, restore from /etc/xray/config.json.before-mmwx-<ts> and manually merge into /usr/local/etc/xray/config.json.
+Merge logic deduplicates by tag field. Same-named tags in two confdir files keep only the first merged. If lost, restore from /etc/xray/config.json.before-mmwx-`<ts>` and manually merge into /usr/local/etc/xray/config.json.
 
 ### Same server:port mmw external node created twice, no auto-binding
 

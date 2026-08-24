@@ -63,23 +63,27 @@ Tokens can be reset on the server details page. After reset, Agent will automati
 
 ## Server Traffic Data Source
 
-The "used traffic" and quota limits in the server management list support two data sources. Switch via the "Server Traffic Source" option in the create/edit server dialog. "System NIC traffic" is the recommended default:
+The "used traffic" and quota limits in server management support two data sources. Switch via Server Traffic Source in the create/edit dialog. Xray traffic is the default; choose System NIC when you need to align with a provider's NIC meter.
 
-### System NIC Traffic (default, recommended)
+### System NIC Traffic
 
-Agent reads physical NIC RX + TX accumulation from /proc/net/dev — includes ALL traffic on the machine: Xray forwarding + SSH + apt update + monitoring/log uploads + tunnel overhead, etc. Matches the NIC billing meter shown on VPS provider panels. Excludes virtual NICs (WARP / Tailscale / Docker / wireguard).
+The Agent reads physical-NIC RX/TX from `/proc/net/dev`, including Xray forwarding, SSH, updates, monitoring, and tunnel overhead. This is usually closer to a VPS provider's NIC meter, although provider sampling can still differ. Virtual interfaces such as WARP, Tailscale, Docker, and WireGuard are excluded.
 
 ### Xray Protocol Traffic
 
-Aggregates inbound + outbound across all nodes on this server (SUM(uplink + downlink)). Only counts traffic that goes through Xray. Matches the Node View metric. Suitable for transit-only / pure-forwarding boxes — system traffic is negligible, and the number more closely reflects "actual user consumption".
+Aggregates Xray inbound and outbound counters in the server's `node_traffic` rows. Traffic · Nodes additionally performs user attribution, routed-child splitting, and parent subtraction, so the two views are not guaranteed to match.
 
 Switching = automatic history migration, continuous display value
 
 Xray → System: the master automatically copies the Xray cumulative + daily-snapshot history to the system dimension. The displayed "used traffic" stays the same the instant you switch. After that, system mode accumulates from real NIC counters and diverges naturally from Xray. Reverse (System → Xray) needs no migration — Xray daily snapshots are always captured regardless of source.
 
-The "Stats Mode" option (Upload / Download / Both) applies to both data sources — each can be filtered to one direction or summed.
+Stats Mode (Upload / Download / Both / Maximum direction) applies to either source.
+
+Live upload/download rates on the card always come from the system NIC and do not follow this source or mode.
 
 Node View, User View, and package traffic limit enforcement always use the Xray dimension (system NIC counters can't be split per tag or per user). This option does not affect them.
+
+Server cards, the home summary, Traffic views, and public probes do not all use the same time window. See [Traffic accounting](/docs/en/traffic-accounting) for formulas and page-by-page differences.
 
 ## Batch Agent Upgrade
 

@@ -1,0 +1,62 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
+@import "./theme.css";
+
+@source '../components/docs/**/*.{ts,tsx}';
+@source '../components/ui/**/*.{ts,tsx}';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+.mmwx-doc-demo,
+.mmwx-doc-demo *,
+.mmwx-doc-demo *::before,
+.mmwx-doc-demo *::after {
+  box-sizing: border-box;
+}
+
+.mmwx-doc-demo {
+  margin-block: 1.5rem 2rem;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  color: var(--foreground);
+  font-family: var(--sl-font);
+}
+
+.mmwx-doc-demo > * {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.mmwx-doc-demo table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.mmwx-doc-demo button,
+.mmwx-doc-demo input,
+.mmwx-doc-demo textarea,
+.mmwx-doc-demo select {
+  font: inherit;
+}
+
+.mmwx-doc-demo button:not(:disabled),
+.mmwx-doc-demo [role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
+.mmwx-doc-demo input,
+.mmwx-doc-demo textarea,
+.mmwx-doc-demo [contenteditable="true"] {
+  caret-color: currentColor;
+}
+
+@media (max-width: 767px) {
+  .mmwx-doc-demo input,
+  .mmwx-doc-demo select,
+  .mmwx-doc-demo textarea {
+    font-size: 16px;
+  }
+}

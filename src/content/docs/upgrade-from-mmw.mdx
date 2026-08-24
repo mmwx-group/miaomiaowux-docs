@@ -6,51 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/migration";
+
 ## 完整迁移向导(演示)
 
 下面是真实主控 /migrate-from-mmw 页面的本地 mock 复刻 — 5 个步骤、所有交互、表单、扫描结果都可点,但全部数据是写死的,不会发任何网络请求。先在文档里走一遍熟悉流程,再去主控真正操作。
 
-演示Mock 数据跟主控 /migrate-from-mmw 一致,但不发任何网络请求
-
-**1概述**
-
-**2备份停服**
-
-**3导入数据**
-
-**4认领节点**
-
-**5验证完成**
-
-欢迎使用迁移向导
-
-开始前请通读以下要点,确认无误后再进入下一步。
-
-迁移保证
-
-- **客户端订阅 URL 不变** — 用户的 Clash / Shadowrocket 不用改
-- **xray UUID / password 不变** — 协议层无感切换
-- **nginx 配置不动** — 反代继续指向同一个端口
-- **SSL 证书不动** — certbot 不需要重新申请
-- **mmw 不会被删除** — systemctl 只是停掉服务,失败可回滚
-
-前置要求
-
-- 你已经把妙妙屋X 二进制装好,并通过 systemd 跑在 mmw 同一端口上
-- 当前 mmwx 数据库**是空的**(无套餐 / 节点 / 用户) — 否则会被 mmw 数据覆盖
-- 具备 root SSH 访问到部署 mmw 的机器
-- 所有 mmw 时代的远程节点服务器都已安装 `mmw-agent` 并接入 mmwx 主控
-
-### 迁移流程概览
-
-1.  **停止 mmw 并备份** — 防止数据继续变化 + 失败回滚
-2.  **导入 mmw.db** — 上传 / 填路径,主控读取并迁移 schema
-3.  **认领节点 / 用户** — 把 xray 现有 client 绑定到 mmwx 用户
-4.  **验证并完成** — 测一个客户端订阅 URL 是否仍可用
-
-读完详细文档 →[升级指南完整版](https://miaomiaowux.com/docs/upgrade-from-mmw)
-
-**我已了解,开始**
+<DocDemo lang="zh" client:load />
 
 ## 谁需要看这篇
 
@@ -72,7 +34,7 @@ tableOfContents:
 - nginx 配置不动 — 反代继续指向同一端口
 - SSL 证书不动 — certbot 不需重新申请
 - mmw 服务可回滚 — systemctl 只是停掉，不删除任何文件
-- 用户短码 / 订阅短码保留 — 之前发出去的 /x/<code> 短链继续可用
+- 用户短码 / 订阅短码保留 — 之前发出去的 /x/`<code>` 短链继续可用
 
 ### ! 前置要求
 
@@ -129,7 +91,7 @@ scp /tmp/mmw-backup.zip 你@mmwx 主控:/tmp/
 
 - 用 SQLite ATTACH DATABASE 把 mmw.db 挂为 src，每张表 INSERT OR IGNORE INTO main.X SELECT ... FROM src.X
 - 迁移的表：users, user_tokens, nodes, subscribe_files, user_subscriptions, user_settings, templates, custom_rules, override_scripts, external_subscriptions
-- 用户短码 + 订阅短码原样保留（从 user_tokens / subscribe_files 带过来），之前分发的 /x/<code> 短链继续生效
+- 用户短码 + 订阅短码原样保留（从 user_tokens / subscribe_files 带过来），之前分发的 /x/`<code>` 短链继续生效
 - 拷贝 subscribes/ 目录里的 yaml 模板文件到 mmwx subscribes/（同名文件保留 mmwx 现有的，不覆盖）
 - 把 subscribe_files / templates 中 created_by 为空的行设为系统第一个 admin 用户名
 
@@ -140,7 +102,7 @@ scp /tmp/mmw-backup.zip 你@mmwx 主控:/tmp/
 mmw 时代的节点配置以 clash_config 形式存在（裸 vless / vmess / trojan / hy2 配置），没有"远程服务器"概念，服务器是手工运维的。mmwx 改成了「服务器 + 入站 + 节点」三层模型，需要把 mmw 节点跟 mmwx 受管 xray 服务器对接起来。这一步做两件事：
 
 1.  添加服务器 — 向导列出所有 mmw 节点指向的去重服务器地址。点旁边的「去添加」自动在 mmwx 创建一台远程服务器（地址 / 名称从节点信息自动填入），生成 agent token，提示你去服务器装 mmw-agent。
-2.  接管外部 xray + 扫描补 email — 服务器上 mmw 时代手动起的外置 xray，如果选择以 embedded 模式重新部署，可一键合并 /etc/xray/config.json + /etc/xray/conf/\*.json 到 mmwx 标准路径 /usr/local/etc/xray/config.json（原文件归档为 .before-mmwx-<ts>）。然后扫描这个 xray 配置里所有 inbound 的 client，把 email 补全并绑到管理员的子账户里（mmw 时代没有这个概念，迁移后这些"自定义 client"统一归属 admin）。
+2.  接管外部 xray + 扫描补 email — 服务器上 mmw 时代手动起的外置 xray，如果选择以 embedded 模式重新部署，可一键合并 /etc/xray/config.json + /etc/xray/conf/\*.json 到 mmwx 标准路径 /usr/local/etc/xray/config.json（原文件归档为 .before-mmwx-`<ts>`）。然后扫描这个 xray 配置里所有 inbound 的 client，把 email 补全并绑到管理员的子账户里（mmw 时代没有这个概念，迁移后这些"自定义 client"统一归属 admin）。
 
 ### 智能认领，不创建重复节点
 
@@ -168,7 +130,7 @@ mmw 的 /api/admin/backup/download 需要 mmw v0.7+ 版本。老版本只能走�
 
 ### 接管外部 xray 后某些 inbound 丢了
 
-合并逻辑按 tag 字段去重。两个 confdir 文件里同名 tag 只保留先合并的那个。如果丢失，可以从 /etc/xray/config.json.before-mmwx-<ts> 恢复后手工合并到 /usr/local/etc/xray/config.json。
+合并逻辑按 tag 字段去重。两个 confdir 文件里同名 tag 只保留先合并的那个。如果丢失，可以从 /etc/xray/config.json.before-mmwx-`<ts>` 恢复后手工合并到 /usr/local/etc/xray/config.json。
 
 ### 同 server:port 的 mmw 外部节点被新建了两次，没自动绑定
 

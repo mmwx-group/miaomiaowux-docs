@@ -6,74 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/certificates";
+
 ## 在线演示:证书管理
 
 4 个 mock 域名,可以申请新证书、续期、下载、删除。完全本地。
 
-Mock 演示4 张证书 · 一键申请 / 续期 / 删除 · 多 DNS provider
-
-2正常1即将到期1已过期
-
-**申请新证书**
-
-| 域名 | DNS 提供商 | 关联服务器 | 到期时间 | 状态 | 操作 |
-| ---- | ---------- | ---------- | -------- | ---- | ---- |
-
-|
-hk.example.com
-
-| Cloudflare |
-
-hk1.example.com
-
-|
-
-2026-09-12(97 天后到期)
-
-| 正常 |
-
-|
-|
-
-us.example.com
-
-| Cloudflare |
-
-us1.example.com
-
-|
-
-2026-07-03(26 天后到期)
-
-| 即将到期 |
-
-|
-|
-
-jp.example.com
-
-| Aliyun |
-
-jp1.example.comjp2.example.com
-
-|
-
-2026-11-28(174 天后到期)
-
-| 正常 |
-
-|
-|
-
-old.example.com
-
-| Tencent | 未关联服务器 |
-
-2026-05-15(23 天前到期)
-
-| 已过期 |
-
-|
+<DocDemo lang="zh" client:load />
 
 ## 概述
 
@@ -134,7 +73,7 @@ Method: POST
 
 URL: https://your-mmwx-host/api/admin/certificates/upload
 
-鉴权: Authorization: Bearer <token> 或 MM-Authorization: <token>（系统设置里的全局 API Token，或 admin 用户在「API Token」管理页签发的个人 Token）
+鉴权: Authorization: Bearer `<token>` 或 MM-Authorization: `<token>`（系统设置里的全局 API Token，或 admin 用户在「API Token」管理页签发的个人 Token）
 
 Content-Type: application/json
 
@@ -148,11 +87,11 @@ Content-Type: application/json
 
 - \- 同域名已存在 → 更新现有证书记录（cert_path / key_path / 有效期），并触发自动部署
 - \- 首次上传 → 新建一条 manual / no-deploy 类型的证书记录，后续可在 UI 切换 deploy target
-- \- 成功返回 {success: true, certificate_id: N}；失败返回 {success: false, message: "..."}
+- \- 成功返回 `{success: true, certificate_id: N}`；失败返回 `{success: false, message: "..."}`
 
 ### Certimate 配置示例
 
-Certimate webhook 部署器支持 ${CERTIMATE_DEPLOYER\_\*} 模板变量替换为实际证书内容（裸 PEM，无 base64）。妙妙屋X 接口自动嗅探 -----BEGIN 开头识别 PEM，与原 base64 上传两路兼容。
+Certimate webhook 部署器支持 `${CERTIMATE_DEPLOYER_*}` 模板变量替换为实际证书内容（裸 PEM，无 base64）。妙妙屋X 接口自动嗅探 -----BEGIN 开头识别 PEM，与原 base64 上传两路兼容。
 
 ```
 URL:    https://your-mmwx-host/api/admin/certificates/upload

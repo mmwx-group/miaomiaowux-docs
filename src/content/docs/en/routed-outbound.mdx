@@ -6,99 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/routed-outbound";
+
 ## Try it: nodes + routed outbound
 
 Below is a local mock of the Node Management table — every action (enable/disable, copy link, routed outbound, edit, delete) is clickable. Click the purple Route icon (the «routed outbound» button) on any row to open the «Create Routed Node» dialog, identical to what's in the master.
 
-Mock demo5 mock nodes · every action is instant · no network calls
-
-Node Management5
-
-**Add node**
-
-| Node name | Server | Protocol | Traffic | Status | Actions |
-| --------- | ------ | -------- | ------- | ------ | ------- |
-
-|
-🇭🇰 HK直连
-
-| hk1.example.com | VLESS |
-
-↑ 12.30 GB
-
-↓ 184.70 GB
-
-|
-
-|
-
-|
-|
-
-🇺🇸 US-Reality
-
-| us1.example.com | VLESS |
-
-↑ 3.10 GB
-
-↓ 46.50 GB
-
-|
-
-|
-
-|
-|
-
-🇯🇵 JP-Hy2
-
-🇯🇵 JP → HK直连
-
-| jp1.example.com | Hysteria2 |
-
-↑ 8.70 GB
-
-↓ 112.30 GB
-
-|
-
-|
-
-|
-|
-
-🇸🇬 SG-Trojan
-
-| sg1.example.com | Trojan |
-
-↑ 0 B
-
-↓ 0 B
-
-|
-
-|
-
-|
-|
-
-🇩🇪 DE-Reality
-
-| de1.example.com | VLESS |
-
-↑ 1.40 GB
-
-↓ 17.80 GB
-
-|
-
-Disabled
-
-|
-
-|
-
-Tip: click the purple Route icon (the «routed outbound» button) on a row to create a routed-outbound child node — children appear as green badges under the source node's name.
+<DocDemo lang="en" client:load />
 
 ## Two Outbound Configuration Methods
 
@@ -127,8 +41,8 @@ The source node's inbound traffic is routed entirely to one exit. All users unde
 
 Underlying actions (written to source server xray config):
 
-- 1\. Add outbound, tag = landing-<source inbound tag>-<timestamp>
-- 2\. Add routing rule: {inboundTag: \[source inbound\], outboundTag: previous step's tag}
+- 1\. Add outbound, tag = landing-`<source inbound tag>`-`<timestamp>`
+- 2\. Add routing rule: `{inboundTag: [source inbound], outboundTag: previous step's tag}`
 
 **Use case: All users should use the same exit, e.g., unified relay from frontend entry to backend landing.**
 
@@ -199,7 +113,7 @@ After the admin creates HK-Direct-rout-hinet (landing HINET) and HK-Direct-rout-
 }
 ```
 
-Actual email format: <username>\_\_<short>\_\_<label>, admin placeholder is \_admin\_\_<short>\_\_<label>. short is a randomly generated identifier when creating the routed outbound, used to distinguish multiple creations with the same label.
+Actual email format: `<username>`\_\_`<short>`\_\_`<label>`, admin placeholder is \_admin\_\_`<short>`\_\_`<label>`. short is a randomly generated identifier when creating the routed outbound, used to distinguish multiple creations with the same label.
 
 ## Regular User Perspective (Per-User Private Routed Outbound)
 
@@ -221,10 +135,10 @@ Location: Admin login -> System Settings -> MiaoMiaoWu Feature Settings card -> 
 1.  Regular user finds a visible transit node on the node management page (package-assigned or self-imported), clicks the route button
 2.  Dialog only shows Routed Outbound (Per User) mode (admin's Entire Node radio + server Tab are hidden)
 3.  Select a landing node from the Select from Existing Nodes tab
-4.  Label auto-fills as rout-<target slug>, can be manually changed
+4.  Label auto-fills as rout-`<target slug>`, can be manually changed
 5.  Click Create Routed Outbound
 
-System adds a new row <transit node>-<label> to the node list, visible only to the creator, automatically included in user subscription.
+System adds a new row `<transit node>`-`<label>` to the node list, visible only to the creator, automatically included in user subscription.
 
 ### Delete Your Routed Outbound
 
@@ -253,10 +167,10 @@ Mount multiple outbounds on a single transit inbound, reusing the transit's port
 
 One HK-Direct transit + two landings (HKT, HINET), creating two routed child nodes via routed outbound:
 
-| Child Node Name   | Parent Inbound | Outbound | Outbound Tag               |
-| ----------------- | -------------- | -------- | -------------------------- |
-| HK直连-rout-hkt   | HK直连         | HKT      | routed:p<父 id>:rout-hkt   |
-| HK直连-rout-hinet | HK直连         | HINET    | routed:p<父 id>:rout-hinet |
+| Child Node Name   | Parent Inbound | Outbound | Outbound Tag                 |
+| ----------------- | -------------- | -------- | ---------------------------- |
+| HK直连-rout-hkt   | HK直连         | HKT      | routed:p`<父 id>`:rout-hkt   |
+| HK直连-rout-hinet | HK直连         | HINET    | routed:p`<父 id>`:rout-hinet |
 
 ### Effect
 
@@ -271,9 +185,9 @@ Assign both child nodes in a package to users. Users see two routes in their sub
 
 ### When Creating Routed Outbound
 
-1\. Add a placeholder admin client to the parent physical node's inbound (email = \_admin\_\_<short>\_\_<label>)
+1\. Add a placeholder admin client to the parent physical node's inbound (email = \_admin\_\_`<short>`\_\_`<label>`)
 
-2\. Add an outbound on the source server, tag = routed:p<parent node id>:<label>
+2\. Add an outbound on the source server, tag = routed:p`<parent node id>`:`<label>`
 
 3\. Prepend a rule with marktag to the routing rules array, user = \[admin_email\]
 
@@ -281,7 +195,7 @@ Assign both child nodes in a package to users. Users see two routes in their sub
 
 ### When Package Assigns User to Child Node
 
-1\. Add a sub-account client for the user in the parent inbound (email = <username>\_\_<short>\_\_<label>, UUID independently generated)
+1\. Add a sub-account client for the user in the parent inbound (email = `<username>`\_\_`<short>`\_\_`<label>`, UUID independently generated)
 
 2\. Append the email to the routing rule's user\[\] array
 
@@ -293,7 +207,7 @@ The routed outbound child node's clash_config comes from the parent inbound. Dur
 
 ### Traffic Statistics & Email Lookup
 
-The user.<email> metric reported by xray stats is reverse-looked up via user_subaccounts.email -> username to find the mmwx username, ultimately aggregated to the user's total traffic.
+The user.`<email>` metric reported by xray stats is reverse-looked up via user_subaccounts.email -> username to find the mmwx username, ultimately aggregated to the user's total traffic.
 
 Therefore, even if a user has multiple sub-accounts (subscribed to multiple routed outbound child nodes), traffic is correctly merged to their main account.
 

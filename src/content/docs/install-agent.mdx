@@ -6,6 +6,8 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/add-server";
+
 ## 概述
 
 远程服务器的 Agent 部署无需手动下载或配置。在主控端添加服务器后，系统会自动生成一键安装命令，在远程服务器上执行即可完成全部部署。
@@ -43,7 +45,7 @@ tableOfContents:
 
 体验主控管理后台的「添加远程服务器」对话框,所有字段、单选、开关跟生产一致;点「生成 Token」立即给一个 mock 配对令牌和对应的一键安装命令(完全本地,不发任何请求)。
 
-**打开演示**
+<DocDemo lang="zh" client:load />
 
 ### 步骤 2：复制一键安装命令
 

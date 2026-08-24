@@ -6,85 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/embedded-xray";
+
 ## Try it: external vs embedded Xray
 
 Toggle the mode above and watch the «process view» of the 3 servers update live: in external mode mmw-agent and xray are two separate processes; in embedded mode xray-core is baked into mmw-agent, sharing memory and lifecycle.
 
-Mock demoPROSwitch mode → process diagram updates + compare table highlights match
-
-Xray runtime mode
-
-External Xray
-
-Standalone xray process, controlled by Agent via gRPC. Free, official layout.
-
-Embedded XrayPRO
-
-xray-core baked into Agent binary, single process. Smaller footprint, easier upgrades.
-
-Per-server process view
-
-hk1.example.com
-
-mmw-agent
-
-PID 1234
-
-Talks to master + gRPC-controls Xray
-
-gRPC
-
-xray
-
-PID 5678
-
-Standalone xray process, proxies traffic
-
-us1.example.com
-
-mmw-agent
-
-PID 1234
-
-Talks to master + gRPC-controls Xray
-
-gRPC
-
-xray
-
-PID 5678
-
-Standalone xray process, proxies traffic
-
-jp1.example.com
-
-mmw-agent
-
-PID 1234
-
-Talks to master + gRPC-controls Xray
-
-gRPC
-
-xray
-
-PID 5678
-
-Standalone xray process, proxies traffic
-
-| Aspect     | External Xray                       | Embedded Xray         |
-| ---------- | ----------------------------------- | --------------------- |
-| 进程数     | 2 (mmw-agent + xray)                | 1 (mmw-agent 含 xray) |
-| 磁盘占用   | ~30 MB(agent) + ~30 MB(xray 二进制) | ~50 MB(只装 agent)    |
-| 内存占用   | agent + xray 各自常驻               | 单进程,共享内存       |
-| Xray 升级  | 需重装 xray-core                    | 随 agent 升级         |
-| 配置文件   | /usr/local/etc/xray/config.json     | 由 agent 持有         |
-| gRPC 通讯  | 需要                                | 不需要(进程内调用)    |
-| 故障隔离   | 独立进程,互不影响                   | 同进程,一同生死       |
-| 排障熟悉度 | 官方 Xray 标准布局                  | 需通过 agent 日志     |
-| PRO 许可证 | ✓ 免费                              | ✗ 仅 PRO 可用         |
-
-Current mode:External Xraymmw-agent ↔ xray run as two separate processes
+<DocDemo lang="en" client:load />
 
 ## Overview
 

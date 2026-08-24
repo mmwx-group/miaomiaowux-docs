@@ -6,34 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/ratelimit";
+
 ## Try it: rate limiting (package + user, two layers)
 
 Click either button below to open the «package limits» or «user limits» dialog. All changes are saved locally in the demo and reflected in the «effective view» table below.
 
-Mock demoPROEdit package or user overrides → effective table updates in real time · all local
-
-Two-layer limits + per-node fine-grained control
-
-Package general applies to «every node × every user bound to it»; package per-node / user global / user per-node override it in layers. Each layer is detected by «is the input empty»; non-empty (including 0) counts as explicitly set.
-
-effective = userNode ?? userGlobal ?? packageNode ?? packageGlobal ?? unlimited
-
-\*\*Edit package limits
-
-Package edit's right node table embeds speed + device columns per row\*\*\*\*Edit user limits
-
-Unified dialog with «global override» and «per-node override» sections\*\*
-
-Effective view (via fallback chain)
-
-| Node                  | Speed    | Devices | Source       |
-| --------------------- | -------- | ------- | ------------ |
-| 🇭🇰 HK 香港 PRO B      | 30 Mbps  | ∞       | pkg per-node |
-| 🇭🇰 HK 香港家宽(HKT)   | 100 Mbps | ∞       | pkg general  |
-| 🇺🇸 US 美国家宽(ATT)   | 100 Mbps | ∞       | pkg general  |
-| 🇯🇵 JP 日本 PRO R      | 100 Mbps | ∞       | pkg general  |
-| 🇸🇬 SG 新加坡 PRO B    | 100 Mbps | ∞       | pkg general  |
-| 🇹🇼 TW 台湾家宽(HINET) | 100 Mbps | ∞       | pkg general  |
+<DocDemo lang="en" client:load />
 
 ## Overview
 
@@ -65,11 +44,60 @@ Rate limits are configured through the package management page. Each package can
 
 ### Download Speed Limit (Mbps)
 
-<table class="w-full text-sm"><tbody><tr class="border-b"><td class="py-2 pr-4 font-medium w-28">Field</td><td class="py-2"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">speed_limit_mbps</code></td></tr><tr class="border-b"><td class="py-2 pr-4 font-medium">Unit</td><td class="py-2">Mbps (megabits per second)</td></tr><tr class="border-b"><td class="py-2 pr-4 font-medium">Default</td><td class="py-2">0 (no limit)</td></tr><tr><td class="py-2 pr-4 font-medium">Description</td><td class="py-2">Limits the per-user download speed for this package. Set to 0 for no limit. Internally converted to bytes/s: Mbps x 1000000 / 8</td></tr></tbody></table>
+<table class="w-full text-sm">
+  <tbody>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium w-28">Field</td>
+      <td class="py-2">
+        <code class="bg-muted px-1.5 py-0.5 rounded text-xs">
+          speed_limit_mbps
+        </code>
+      </td>
+    </tr>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium">Unit</td>
+      <td class="py-2">Mbps (megabits per second)</td>
+    </tr>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium">Default</td>
+      <td class="py-2">0 (no limit)</td>
+    </tr>
+    <tr>
+      <td class="py-2 pr-4 font-medium">Description</td>
+      <td class="py-2">
+        Limits the per-user download speed for this package. Set to 0 for no
+        limit. Internally converted to bytes/s: Mbps x 1000000 / 8
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Connection Limit
 
-<table class="w-full text-sm"><tbody><tr class="border-b"><td class="py-2 pr-4 font-medium w-28">Field</td><td class="py-2"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">device_limit</code></td></tr><tr class="border-b"><td class="py-2 pr-4 font-medium">Default</td><td class="py-2">0 (no limit)</td></tr><tr><td class="py-2 pr-4 font-medium">Description</td><td class="py-2">Caps the maximum number of concurrent connections a user may have at any moment (note: connections, not devices). 0 means unlimited. New connections beyond the cap are rejected; existing ones are unaffected. The quota is shared per user + physical node. The field keeps its legacy name device_limit. See "Understanding the Connection Limit" below.</td></tr></tbody></table>
+<table class="w-full text-sm">
+  <tbody>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium w-28">Field</td>
+      <td class="py-2">
+        <code class="bg-muted px-1.5 py-0.5 rounded text-xs">device_limit</code>
+      </td>
+    </tr>
+    <tr class="border-b">
+      <td class="py-2 pr-4 font-medium">Default</td>
+      <td class="py-2">0 (no limit)</td>
+    </tr>
+    <tr>
+      <td class="py-2 pr-4 font-medium">Description</td>
+      <td class="py-2">
+        Caps the maximum number of concurrent connections a user may have at any
+        moment (note: connections, not devices). 0 means unlimited. New
+        connections beyond the cap are rejected; existing ones are unaffected.
+        The quota is shared per user + physical node. The field keeps its legacy
+        name device_limit. See "Understanding the Connection Limit" below.
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Understanding the Connection Limit
 

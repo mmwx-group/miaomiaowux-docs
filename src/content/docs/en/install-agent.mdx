@@ -6,6 +6,8 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/add-server";
+
 ## Overview
 
 Agent deployment on remote servers requires no manual download or configuration. After adding a server on the master, the system automatically generates a one-click install command that can be run on the remote server to complete the entire deployment.
@@ -43,7 +45,7 @@ Note: Hysteria2 / AnyTLS and other newer protocols are supported in both modes. 
 
 Walk through the master's Add Remote Server dialog — every field, radio and toggle matches production. Click Generate Token to get a mock pairing token and the matching one-click install command (fully local, no network calls).
 
-**Open demo**
+<DocDemo lang="en" client:load />
 
 ### Step 2: Copy the One-Click Install Command
 

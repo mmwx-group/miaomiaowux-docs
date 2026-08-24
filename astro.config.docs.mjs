@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import starlight from "@astrojs/starlight";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   site: "https://miaomiaowux.com",
@@ -36,7 +37,10 @@ export default defineConfig({
       pagefind: true,
       lastUpdated: true,
       pagination: true,
-      customCss: ["./src/styles/starlight.css"],
+      customCss: [
+        "./src/styles/starlight.css",
+        "./src/styles/docs-components.css",
+      ],
       sidebar: [
         {
           label: "返回产品首页",
@@ -98,7 +102,7 @@ export default defineConfig({
         {
           label: "功能说明",
           translations: { en: "Feature guides" },
-          items: ["routed-outbound", "system-settings"],
+          items: ["traffic-accounting", "routed-outbound", "system-settings"],
         },
         {
           label: "PRO 功能",
@@ -155,6 +159,7 @@ export default defineConfig({
     }),
   ],
   vite: {
+    plugins: [tailwindcss()],
     resolve: {
       alias: {
         "@": new URL("./src", import.meta.url).pathname,

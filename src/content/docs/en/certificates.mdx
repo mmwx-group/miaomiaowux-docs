@@ -6,74 +6,13 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+import { DocDemo } from "@/components/docs/islands/certificates";
+
 ## Try it: certificate management
 
 4 mock domains — request, renew, download, delete. All local.
 
-Mock demo4 certificates · request / renew / delete · multiple DNS providers
-
-2active1expiring1expired
-
-**Request new certificate**
-
-| Domain | DNS provider | Linked servers | Expires | Status | Actions |
-| ------ | ------------ | -------------- | ------- | ------ | ------- |
-
-|
-hk.example.com
-
-| Cloudflare |
-
-hk1.example.com
-
-|
-
-2026-09-12(97 days left)
-
-| Active |
-
-|
-|
-
-us.example.com
-
-| Cloudflare |
-
-us1.example.com
-
-|
-
-2026-07-03(26 days left)
-
-| Expiring |
-
-|
-|
-
-jp.example.com
-
-| Aliyun |
-
-jp1.example.comjp2.example.com
-
-|
-
-2026-11-28(174 days left)
-
-| Active |
-
-|
-|
-
-old.example.com
-
-| Tencent | no servers linked |
-
-2026-05-15(23 days overdue)
-
-| Expired |
-
-|
+<DocDemo lang="en" client:load />
 
 ## Overview
 
@@ -134,7 +73,7 @@ Method: POST
 
 URL: https://your-mmwx-host/api/admin/certificates/upload
 
-Auth: Authorization: Bearer <token> or MM-Authorization: <token> (Global API Token from System Settings, or a personal admin token issued in the API Token page)
+Auth: Authorization: Bearer `<token>` or MM-Authorization: `<token>` (Global API Token from System Settings, or a personal admin token issued in the API Token page)
 
 Content-Type: application/json
 
@@ -148,11 +87,11 @@ Content-Type: application/json
 
 - \- Existing same-domain cert → update the record (cert_path / key_path / expiry) and trigger auto-deploy
 - \- First-time upload → create a manual / no-deploy record; deploy target can be switched in the UI later
-- \- Success returns {success: true, certificate_id: N}; failure returns {success: false, message: "..."}
+- \- Success returns `{success: true, certificate_id: N}`; failure returns `{success: false, message: "..."}`
 
 ### Certimate config example
 
-Certimate's webhook deployer substitutes ${CERTIMATE_DEPLOYER\_\*} template variables with the actual cert content (raw PEM, no base64). MiaomiaowuX auto-detects the -----BEGIN prefix and accepts both raw PEM and the legacy base64 upload paths.
+Certimate's webhook deployer substitutes `${CERTIMATE_DEPLOYER_*}` template variables with the actual cert content (raw PEM, no base64). MiaomiaowuX auto-detects the -----BEGIN prefix and accepts both raw PEM and the legacy base64 upload paths.
 
 ```
 URL:    https://your-mmwx-host/api/admin/certificates/upload
