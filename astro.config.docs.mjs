@@ -112,6 +112,7 @@ export default defineConfig({
             "node-ratelimit",
             "share-server",
             "embedded-xray",
+            "custom-css",
           ],
         },
         {
