@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsr generate)",
+      "Bash(cat package.json)",
+      "Bash(timeout 15 npm run dev)",
+      "Bash(npm run build)"
+    ]
+  }
+}
