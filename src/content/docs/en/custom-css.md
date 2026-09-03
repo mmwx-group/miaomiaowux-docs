@@ -66,6 +66,10 @@ The active theme is a class on `<html>`, so you can target just one theme:
 | Premium black & gold | `.theme-premium` |
 | Dark mode | `.dark` (stacks with the above) |
 
+### Overlays render through a Portal
+
+Tooltips, dropdown menus and dialogs are rendered by Radix into `<body>`, **not inside the subtree of the element that triggered them**. So a descendant selector cannot single out one particular tooltip — you can only restyle the whole class of them. Targeting just one requires passing a custom class to that component in code, which custom CSS cannot do.
+
 ## Examples
 
 ### Switch the accent to blue
@@ -142,6 +146,28 @@ Make sure the font is installed on viewers' machines, or `@import` a web font fi
   border-radius: 4px;
 }
 ```
+
+### Recolor tooltips (including the arrow)
+
+The tooltip arrow is a square rotated 45°, so **the color you see comes from `background-color`, not the SVG `fill`** — and the component sets both, so override both to be safe:
+
+```css
+/* The bubble */
+[data-slot="tooltip-content"] {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+/* The arrow: Radix wraps it in an extra positioning span */
+[data-slot="tooltip-content"] > span > svg {
+  background-color: #1f2937;
+  fill: #1f2937;
+}
+```
+
+> Neither rule needs `!important`. The arrow selector has specificity (0,1,1), beating Tailwind's `.bg-primary` (0,1,0); the bubble rule ties on specificity but custom CSS comes after the app stylesheet, so it wins on order.
+
+Tooltips use `--primary` by default, so if you were going to change the accent anyway, overriding the variable makes bubbles and arrows follow along — at the cost of buttons and selected states changing too. Use the selectors above when you only want the tooltip.
 
 ### Hide the sidebar footer on phones
 

@@ -66,6 +66,10 @@ tableOfContents:
 | 高级黑金 | `.theme-premium` |
 | 深色模式 | `.dark`（与上面几个叠加） |
 
+### 浮层是 Portal 渲染的
+
+气泡提示、下拉菜单、对话框这些浮层由 Radix 渲染到 `<body>` 底下，**不在触发它的元素的子树里**。所以「只改某一个气泡」用后代选择器是挑不到的——只能整类一起改。想单独改一处，得改代码给那个组件传自定义 class，自定义 CSS 做不到。
+
 ## 示例
 
 ### 换成蓝色主色调
@@ -142,6 +146,28 @@ tableOfContents:
   border-radius: 4px;
 }
 ```
+
+### 改气泡提示的颜色（含箭头）
+
+气泡的箭头是一个旋转 45° 的方块，**看到的颜色来自 `background-color` 而不是 SVG 的 `fill`**，而组件两个都设了——所以两个都要覆盖才稳：
+
+```css
+/* 气泡本体 */
+[data-slot="tooltip-content"] {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+/* 箭头：Radix 在气泡里多包了一层定位用的 span */
+[data-slot="tooltip-content"] > span > svg {
+  background-color: #1f2937;
+  fill: #1f2937;
+}
+```
+
+> 这两条都不用写 `!important`。箭头那条的权重（0,1,1）高于 Tailwind 的 `.bg-primary`（0,1,0）；气泡本体那条权重相同，但自定义 CSS 排在应用样式表之后，同权重后来者胜。
+
+气泡默认用的就是 `--primary`，所以如果你本来就打算换主色调，改变量即可，气泡和箭头会跟着变——代价是按钮、选中态等也一起变。只想动气泡就用上面这组选择器。
 
 ### 手机端隐藏左侧栏的页脚
 
