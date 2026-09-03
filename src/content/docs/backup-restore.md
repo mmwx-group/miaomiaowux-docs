@@ -49,4 +49,8 @@ tar czf mmwx-files.tar.gz data subscribes rule_templates
 
 ## 数据库启动恢复
 
-主控启动时会执行 SQLite 完整性检查；数据库无法打开且存在有效的 mmwx.db.backup 时会尝试恢复。项目已移除每小时数据库自动备份任务，因此不要把该应急副本当作正式备份，仍应定期从界面下载完整备份。
+主控启动时会执行 SQLite 完整性检查；数据库无法打开且存在有效的 mmwx.db.backup 时会尝试恢复。这个应急副本不是正式备份，不要依赖它。
+
+## 自动上传到远端
+
+手工下载的备份和主控在同一台机器上——机器整机挂掉时两份一起没。配置[定时同步备份](/backup-auto-sync/)可以把完整备份按间隔自动传到 WebDAV、S3 兼容存储或 Google Drive，并自动清理旧的。

@@ -128,7 +128,7 @@ export default defineConfig({
         {
           label: "系统配置",
           translations: { en: "System configuration" },
-          items: ["custom-rules", "backup-restore", "probe-api"],
+          items: ["custom-rules", "backup-restore", "backup-auto-sync", "probe-api"],
         },
         {
           label: "AI 与工具",
