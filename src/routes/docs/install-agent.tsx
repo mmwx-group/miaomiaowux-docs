@@ -170,12 +170,12 @@ docker run -d \\
   --restart unless-stopped \\
   -e MMWX_LISTEN_PORT=12888 \\
   -e MMWX_MASTER_URL=https://master.example.com \\
-  -e MMWX_MASTER_TOKEN=<主控添加服务器时生成的 token> \\
+  -e MMWX_TOKEN=<主控添加服务器时生成的 token> \\
   -v $(pwd)/config:/etc/mmw-agent \\
   -v $(pwd)/xray-config:/usr/local/etc/xray \\
   -v $(pwd)/nginx-cert:/etc/nginx/cert \\
   -v $(pwd)/nginx-servers:/etc/nginx/servers \\
-  ghcr.io/iluobei/mmw-agent:latest`}</pre>
+  ghcr.io/mmwx-group/mmwx-agent:latest`}</pre>
               </div>
               <p className='text-xs text-muted-foreground mt-3'>{t('installAgent.docker.runNote')}</p>
             </CardContent>
@@ -189,14 +189,14 @@ docker run -d \\
                 <pre>{`version: '3.8'
 services:
   mmw-agent:
-    image: ghcr.io/iluobei/mmw-agent:latest
+    image: ghcr.io/mmwx-group/mmwx-agent:latest
     container_name: mmw-agent
     restart: unless-stopped
     network_mode: host                  # 必须 host,bridge 模式 entrypoint 会拒启
     environment:
       - MMWX_LISTEN_PORT=12888
       - MMWX_MASTER_URL=https://master.example.com
-      - MMWX_MASTER_TOKEN=<主控添加服务器时生成的 token>
+      - MMWX_TOKEN=<主控添加服务器时生成的 token>
     volumes:
       - ./config:/etc/mmw-agent
       - ./xray-config:/usr/local/etc/xray

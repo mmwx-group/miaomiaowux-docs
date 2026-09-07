@@ -662,7 +662,7 @@
       "hostAlertText2": "容器内 entrypoint 启动时会检测默认网关 IP — 命中 docker bridge 默认段(172.17.x.x / 172.18.x.x)直接退出并报错。务必 --network host 或 network_mode: host。",
       "runHeading": "docker run",
       "runText": "适合手动起 / 一次性测试。token 从主控前端「添加服务器」表单保存后生成,跟一键脚本里的 token 是同一个。",
-      "runNote": "config / xray-config / nginx-cert / nginx-servers 4 个 volume 都是可选(容器内本地也行),映射出来主要方便排查或宿主升级 agent 时不丢历史数据。",
+      "runNote": "config / xray-config / nginx-cert / nginx-servers 4 个 volume 都是可选(容器内本地也行),映射出来主要方便排查或宿主升级 agent 时不丢历史数据。 注意 ./config 不会被自动写入 config.yaml —— Docker 部署的配置来源就是上面那组环境变量,容器不会把它们落成配置文件,挂出来是空目录属于正常。token 的环境变量名是 MMWX_TOKEN,早期文档写成 MMWX_MASTER_TOKEN,照抄会一直刷 authentication failed: Token required。",
       "composeHeading": "Docker Compose",
       "composeText": "推荐生产环境用 compose,后续 docker compose pull / up -d 升级更顺。",
       "composeStartTip": "启动:",

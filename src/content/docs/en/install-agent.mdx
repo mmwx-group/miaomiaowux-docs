@@ -105,15 +105,19 @@ docker run -d \
   --restart unless-stopped \
   -e MMWX_LISTEN_PORT=12888 \
   -e MMWX_MASTER_URL=https://master.example.com \
-  -e MMWX_MASTER_TOKEN=<主控添加服务器时生成的 token> \
+  -e MMWX_TOKEN=<token generated when adding the server on the master> \
   -v $(pwd)/config:/etc/mmw-agent \
   -v $(pwd)/xray-config:/usr/local/etc/xray \
   -v $(pwd)/nginx-cert:/etc/nginx/cert \
   -v $(pwd)/nginx-servers:/etc/nginx/servers \
-  ghcr.io/iluobei/mmw-agent:latest
+  ghcr.io/mmwx-group/mmwx-agent:latest
 ```
 
 All 4 volumes (config / xray-config / nginx-cert / nginx-servers) are optional (the container has its own dirs). Mapping them out mainly helps with debugging or preserving state across image upgrades.
+
+Note that `./config` **is never populated with a config.yaml** — for Docker deployments the environment variables above *are* the configuration; the container does not write them out to a file. An empty directory here is normal and does not mean the setup failed. You only put something in it if you want to hand-write a config.yaml and point the agent at it with `-c /etc/mmw-agent/config.yaml`.
+
+The token variable is `MMWX_TOKEN`. Older docs said `MMWX_MASTER_TOKEN`, which the agent does not read — copying that leaves the container looping on `authentication failed: Token required`. Recent agents accept the old name as well, but use `MMWX_TOKEN` for new deployments.
 
 ### Docker Compose
 
@@ -123,14 +127,14 @@ Recommended for production — docker compose pull / up -d makes future upgrades
 version: '3.8'
 services:
   mmw-agent:
-    image: ghcr.io/iluobei/mmw-agent:latest
+    image: ghcr.io/mmwx-group/mmwx-agent:latest
     container_name: mmw-agent
     restart: unless-stopped
     network_mode: host                  # 必须 host,bridge 模式 entrypoint 会拒启
     environment:
       - MMWX_LISTEN_PORT=12888
       - MMWX_MASTER_URL=https://master.example.com
-      - MMWX_MASTER_TOKEN=<主控添加服务器时生成的 token>
+      - MMWX_TOKEN=<token generated when adding the server on the master>
     volumes:
       - ./config:/etc/mmw-agent
       - ./xray-config:/usr/local/etc/xray

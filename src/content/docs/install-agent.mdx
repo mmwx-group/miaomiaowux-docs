@@ -105,15 +105,19 @@ docker run -d \
   --restart unless-stopped \
   -e MMWX_LISTEN_PORT=12888 \
   -e MMWX_MASTER_URL=https://master.example.com \
-  -e MMWX_MASTER_TOKEN=<主控添加服务器时生成的 token> \
+  -e MMWX_TOKEN=<主控添加服务器时生成的 token> \
   -v $(pwd)/config:/etc/mmw-agent \
   -v $(pwd)/xray-config:/usr/local/etc/xray \
   -v $(pwd)/nginx-cert:/etc/nginx/cert \
   -v $(pwd)/nginx-servers:/etc/nginx/servers \
-  ghcr.io/iluobei/mmw-agent:latest
+  ghcr.io/mmwx-group/mmwx-agent:latest
 ```
 
 config / xray-config / nginx-cert / nginx-servers 4 个 volume 都是可选(容器内本地也行),映射出来主要方便排查或宿主升级 agent 时不丢历史数据。
+
+注意 `./config` **不会被自动写入 config.yaml** —— Docker 部署的配置来源就是上面那组环境变量,容器不会把它们落成配置文件。挂出来是空目录属于正常,不代表没配置成功;只有你想手写 config.yaml 并用 `-c /etc/mmw-agent/config.yaml` 指过去时才需要往里放东西。
+
+token 的环境变量名是 `MMWX_TOKEN`。早期文档写成 `MMWX_MASTER_TOKEN`,agent 不认那个名字,照抄的话容器起来只会一直刷 `authentication failed: Token required`。新版 agent 已同时兼容旧名,但新部署请用 `MMWX_TOKEN`。
 
 ### Docker Compose
 
@@ -123,14 +127,14 @@ config / xray-config / nginx-cert / nginx-servers 4 个 volume 都是可选(容�
 version: '3.8'
 services:
   mmw-agent:
-    image: ghcr.io/iluobei/mmw-agent:latest
+    image: ghcr.io/mmwx-group/mmwx-agent:latest
     container_name: mmw-agent
     restart: unless-stopped
     network_mode: host                  # 必须 host,bridge 模式 entrypoint 会拒启
     environment:
       - MMWX_LISTEN_PORT=12888
       - MMWX_MASTER_URL=https://master.example.com
-      - MMWX_MASTER_TOKEN=<主控添加服务器时生成的 token>
+      - MMWX_TOKEN=<主控添加服务器时生成的 token>
     volumes:
       - ./config:/etc/mmw-agent
       - ./xray-config:/usr/local/etc/xray

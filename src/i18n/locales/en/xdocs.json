@@ -662,7 +662,7 @@
       "hostAlertText2": "The container entrypoint checks the default gateway IP on startup — if it matches the Docker bridge default range (172.17.x.x / 172.18.x.x) the container exits with an error. Always use --network host or network_mode: host.",
       "runHeading": "docker run",
       "runText": "Good for manual / one-off testing. The token comes from the master \"Add Server\" form — same token as the one-click script generates.",
-      "runNote": "All 4 volumes (config / xray-config / nginx-cert / nginx-servers) are optional (the container has its own dirs). Mapping them out mainly helps with debugging or preserving state across image upgrades.",
+      "runNote": "All 4 volumes (config / xray-config / nginx-cert / nginx-servers) are optional (the container has its own dirs). Mapping them out mainly helps with debugging or preserving state across image upgrades. Note that ./config is never populated with a config.yaml — for Docker deployments the environment variables above are the configuration, and the container does not write them out to a file, so an empty directory is normal. The token variable is MMWX_TOKEN; older docs said MMWX_MASTER_TOKEN, which leaves the container looping on authentication failed: Token required.",
       "composeHeading": "Docker Compose",
       "composeText": "Recommended for production — docker compose pull / up -d makes future upgrades smoother.",
       "composeStartTip": "Start with:",
