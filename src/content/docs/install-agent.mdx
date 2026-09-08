@@ -106,6 +106,9 @@ docker run -d \
   -e MMWX_LISTEN_PORT=12888 \
   -e MMWX_MASTER_URL=https://master.example.com \
   -e MMWX_TOKEN=<主控添加服务器时生成的 token> \
+  -e MMWX_MASTER_PUBLIC_KEY=<主控身份公钥> \
+  -e TZ=Asia/Shanghai \
+  -v /etc/localtime:/etc/localtime:ro \
   -v $(pwd)/config:/etc/mmw-agent \
   -v $(pwd)/xray-config:/usr/local/etc/xray \
   -v $(pwd)/nginx-cert:/etc/nginx/cert \
@@ -116,6 +119,10 @@ docker run -d \
 config / xray-config / nginx-cert / nginx-servers 4 个 volume 都是可选(容器内本地也行),映射出来主要方便排查或宿主升级 agent 时不丢历史数据。
 
 注意 `./config` **不会被自动写入 config.yaml** —— Docker 部署的配置来源就是上面那组环境变量,容器不会把它们落成配置文件。挂出来是空目录属于正常,不代表没配置成功;只有你想手写 config.yaml 并用 `-c /etc/mmw-agent/config.yaml` 指过去时才需要往里放东西。
+
+`MMWX_MASTER_PUBLIC_KEY` 是主控身份公钥。一键脚本会自动把它写进 config.yaml,Docker 部署不走脚本,所以要手动填 —— 主控开了「强制加密」而这一项缺失时,agent 不会发起密钥交换,会一直刷 `authentication failed: Encryption required` 连不上。去哪拿:主控面板 → 服务管理 → 该服务器 → 详情 →「Docker 部署环境变量」,整段复制即可。
+
+`TZ` 与 `/etc/localtime` 决定容器内的时区。两者都不设时容器按 UTC 跑,日志时间会比本地差几个小时。挂 `/etc/localtime` 是跟宿主保持一致;想让容器用另一个时区就只设 `TZ`(两者都在时以 `TZ` 为准)。
 
 token 的环境变量名是 `MMWX_TOKEN`。早期文档写成 `MMWX_MASTER_TOKEN`,agent 不认那个名字,照抄的话容器起来只会一直刷 `authentication failed: Token required`。新版 agent 已同时兼容旧名,但新部署请用 `MMWX_TOKEN`。
 
@@ -135,7 +142,10 @@ services:
       - MMWX_LISTEN_PORT=12888
       - MMWX_MASTER_URL=https://master.example.com
       - MMWX_TOKEN=<主控添加服务器时生成的 token>
+      - MMWX_MASTER_PUBLIC_KEY=<主控身份公钥>
+      - TZ=Asia/Shanghai
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./config:/etc/mmw-agent
       - ./xray-config:/usr/local/etc/xray
       - ./nginx-cert:/etc/nginx/cert

@@ -106,6 +106,9 @@ docker run -d \
   -e MMWX_LISTEN_PORT=12888 \
   -e MMWX_MASTER_URL=https://master.example.com \
   -e MMWX_TOKEN=<token generated when adding the server on the master> \
+  -e MMWX_MASTER_PUBLIC_KEY=<master identity public key> \
+  -e TZ=Asia/Shanghai \
+  -v /etc/localtime:/etc/localtime:ro \
   -v $(pwd)/config:/etc/mmw-agent \
   -v $(pwd)/xray-config:/usr/local/etc/xray \
   -v $(pwd)/nginx-cert:/etc/nginx/cert \
@@ -116,6 +119,10 @@ docker run -d \
 All 4 volumes (config / xray-config / nginx-cert / nginx-servers) are optional (the container has its own dirs). Mapping them out mainly helps with debugging or preserving state across image upgrades.
 
 Note that `./config` **is never populated with a config.yaml** — for Docker deployments the environment variables above *are* the configuration; the container does not write them out to a file. An empty directory here is normal and does not mean the setup failed. You only put something in it if you want to hand-write a config.yaml and point the agent at it with `-c /etc/mmw-agent/config.yaml`.
+
+`MMWX_MASTER_PUBLIC_KEY` is the master identity public key. The one-click script writes it into config.yaml automatically; Docker deployments do not run that script, so you must set it by hand. If the master has force-encryption enabled and this is missing, the agent never starts a key exchange and keeps logging `authentication failed: Encryption required`. Where to get it: master panel -> Servers -> the server -> details -> "Docker deployment environment variables", and copy the whole block.
+
+`TZ` and `/etc/localtime` control the timezone inside the container. With neither set the container runs on UTC and log timestamps are hours off. Mounting `/etc/localtime` keeps it in sync with the host; set only `TZ` if you want a different timezone (when both are present, `TZ` wins).
 
 The token variable is `MMWX_TOKEN`. Older docs said `MMWX_MASTER_TOKEN`, which the agent does not read — copying that leaves the container looping on `authentication failed: Token required`. Recent agents accept the old name as well, but use `MMWX_TOKEN` for new deployments.
 
@@ -135,7 +142,10 @@ services:
       - MMWX_LISTEN_PORT=12888
       - MMWX_MASTER_URL=https://master.example.com
       - MMWX_TOKEN=<token generated when adding the server on the master>
+      - MMWX_MASTER_PUBLIC_KEY=<master identity public key>
+      - TZ=Asia/Shanghai
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./config:/etc/mmw-agent
       - ./xray-config:/usr/local/etc/xray
       - ./nginx-cert:/etc/nginx/cert
