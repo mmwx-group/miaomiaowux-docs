@@ -11,6 +11,7 @@
     "build:landing": "node scripts/generate-search-index.mjs && tsc -b && vite build && node scripts/inject-site-config.js",
     "build:docs": "astro build --config astro.config.docs.mjs && node scripts/check-doc-links.mjs",
     "check:docs": "node scripts/check-doc-links.mjs",
+    "preview:docs": "astro build --config astro.config.docs.mjs && astro preview --config astro.config.docs.mjs",
     "build:only": "npm run build",
     "lint": "eslint .",
     "preview": "npm run build && wrangler dev",
