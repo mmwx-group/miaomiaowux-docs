@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { docsUrl } from '@/lib/docs-url'
 import Fuse from 'fuse.js'
-import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { getSearchItems, type SearchItem } from '@/lib/search-data'
 import {
@@ -64,7 +64,6 @@ function tokenizeQuery(q: string): string {
 export function SearchCommandDialog() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const navigate = useNavigate()
   const { t, i18n } = useTranslation('search')
 
   const items = useMemo(() => getSearchItems(), [i18n.language])
@@ -107,9 +106,10 @@ export function SearchCommandDialog() {
     (href: string) => {
       setOpen(false)
       setQuery('')
-      navigate({ to: href })
+      // 文档由 astro 独立构建(dist/docs),不在 SPA 路由表里,必须整页跳转
+      window.location.assign(docsUrl(href))
     },
-    [navigate]
+    []
   )
 
   useEffect(() => {

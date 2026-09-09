@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { docsUrl } from '@/lib/docs-url'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -128,14 +129,14 @@ function XHomePage() {
           </div>
           <nav className="flex items-center gap-2 sm:gap-4">
             <a
-              href="/docs/tutorial"
+              href={docsUrl('/docs/tutorial')}
               className="pixel-button inline-flex items-center gap-2 px-3 py-2 h-9 text-sm font-semibold uppercase tracking-widest bg-background/75 text-foreground border-[color:rgba(137,110,96,0.45)] hover:bg-accent/35 hover:text-accent-foreground transition-all"
             >
               <BookOpen className="size-4" />
               <span className="hidden sm:inline">{t('xHome.navDocs')}</span>
             </a>
             <a
-              href="/docs/changelog"
+              href={docsUrl('/docs/changelog')}
               className="pixel-button inline-flex items-center gap-2 px-3 py-2 h-9 text-sm font-semibold uppercase tracking-widest bg-background/75 text-foreground border-[color:rgba(137,110,96,0.45)] hover:bg-accent/35 hover:text-accent-foreground transition-all"
             >
               <FileText className="size-4" />
@@ -195,13 +196,13 @@ function XHomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
-            <a href="/docs/quick-start">
+            <a href={docsUrl('/docs/quick-start')}>
               <Button size="lg" className="pixel-button w-full sm:w-auto px-8 py-6 text-lg font-semibold">
                 <Zap className="size-5 mr-2" />
                 {t('xHome.quickStart')}
               </Button>
             </a>
-            <a href="/docs">
+            <a href={docsUrl('/docs')}>
               <Button variant="outline" size="lg" className="pixel-button w-full sm:w-auto px-8 py-6 text-lg font-semibold">
                 <BookOpen className="size-5 mr-2" />
                 {t('xHome.viewDocs')}
@@ -244,7 +245,7 @@ function XHomePage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {protocolDefs.map((p) => (
-              <a key={p.key} href={p.href}>
+              <a key={p.key} href={docsUrl(p.href)}>
                 <Card className="pixel-card group hover:scale-[1.02] hover:shadow-[6px_6px_0_rgba(217,119,87,0.25)] transition-all duration-300 h-full cursor-pointer">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -388,7 +389,7 @@ function XHomePage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {quickLinkDefs.map((item) => (
-              <a key={item.href} href={item.href}>
+              <a key={item.href} href={docsUrl(item.href)}>
                 <Card className="pixel-card group hover:scale-[1.02] hover:shadow-[6px_6px_0_rgba(217,119,87,0.25)] transition-all duration-300 h-full cursor-pointer">
                   <CardHeader>
                     <div className="flex items-center justify-between">
