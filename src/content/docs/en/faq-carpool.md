@@ -16,7 +16,7 @@ MiaomiaowuX does NOT use a port-based metering scheme (the way TrafficDog does).
 
 Add a server in Server Management with name, IP, domain. The master generates a pairing token; deploy the Agent on the target machine. See the Install Agent doc for full flow.
 
-![Server Management page screenshot](/images/screenshots/doc-xray-servers-page.webp)
+![Server Management page screenshot](../../../assets/screenshots/servers-list.webp)
 
 Server Management — cards show status / live speed / traffic / Xray actions
 
@@ -24,7 +24,7 @@ Server Management — cards show status / live speed / traffic / Xray actions
 
 Nodes can be auto-synced from server inbounds (recommended) or added manually. A single server can host multiple protocols (VLESS / Trojan / Shadowsocks / Hysteria2 / AnyTLS, etc.); all of them can carpool the same set of users.
 
-![Node Management page screenshot](/images/screenshots/doc-nodes-page.webp)
+![Node Management page screenshot](../../../assets/screenshots/nodes-list.webp)
 
 Node Management — inbound nodes grouped by server, batch edit / toggle / sync
 
@@ -32,7 +32,7 @@ Node Management — inbound nodes grouped by server, batch edit / toggle / sync
 
 In Package Management, create a package with quota / cycle / metering mode (one-way / two-way), and tick the nodes this package can access on the right (unticked = all). A package is a permission group — carpool members share the same package.
 
-![Create package dialog screenshot](/images/screenshots/tutorial-step9-package-create-dialog.webp)
+![Create package dialog screenshot](../../../assets/screenshots/packages-create-dialog-top.webp)
 
 Create package dialog — params on the left, associated nodes on the right
 
@@ -40,11 +40,11 @@ Create package dialog — params on the left, associated nodes on the right
 
 Add users in User Management, then click Manage Package on a user's row to bind the package from step 3 with an expiration date. Repeat for each carpool member.
 
-![User Management page screenshot](/images/screenshots/tutorial-step10-users-list.webp)
+![User Management page screenshot](../../../assets/screenshots/users-list.webp)
 
 User Management — list of all users and their package status
 
-![Manage package dialog screenshot](/images/screenshots/tutorial-step10-bind-package-dialog.webp)
+![Manage package dialog screenshot](../../../assets/screenshots/users-manage-packages-dialog.webp)
 
 Manage package dialog — pick package + expiration + reset cycle
 
@@ -58,11 +58,11 @@ With mmwX-tgbot connected to Telegram, carpool members can check account / traff
 
 Full deployment + setup guide: [Telegram Bot](/docs/en/tool-mmwx-tgbot)
 
-![TG Bot admin view screenshot](/images/screenshots/tutorial-step12-miniapp-admin.webp)
+![TG Bot admin view screenshot](../../../assets/screenshots/tutorial-step12-miniapp-admin.webp)
 
 Admin view: redeem codes / user binding / traffic summary (mobile)
 
-![TG Bot user view screenshot](/images/screenshots/tutorial-step12-miniapp-user.webp)
+![TG Bot user view screenshot](../../../assets/screenshots/tutorial-step12-miniapp-user.webp)
 
 Regular user view: account / traffic / subscription (mobile)
 
@@ -72,6 +72,6 @@ MiaomiaowuX has a built-in MCP (Model Context Protocol) server. Any MCP-compatib
 
 Setup + tool list + security tips: [AI Agent (MCP)](/docs/en/mcp)
 
-![API Token area screenshot](/images/screenshots/system-settings-api-token.webp)
+![API Token area screenshot](../../../assets/screenshots/settings-system.webp)
 
 System Settings → API Token: paste this token into the mcp_servers config of OpenClaw / Hermes

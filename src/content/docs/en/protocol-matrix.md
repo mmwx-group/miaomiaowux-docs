@@ -8,7 +8,11 @@ tableOfContents:
 
 ## Full Matrix
 
-Below are all available combinations (17 total) that have been tested and verified with mihomo connectivity tests.
+Below are all available combinations that have been tested and verified with mihomo connectivity tests. The add-node wizard only shows the transports and security layers valid for the selected protocol:
+
+![Add node wizard protocol selection screenshot](../../../assets/screenshots/nodes-add-vless-reality.webp)
+
+The three button rows at the top of the wizard: protocol → transport → security
 
 | #   | Protocol    | Transport | Security              | Notes                                                              |
 | --- | ----------- | --------- | --------------------- | ------------------------------------------------------------------ |
@@ -38,12 +42,12 @@ Below are all available combinations (17 total) that have been tested and verifi
 
 The following combinations have been deprecated or removed in Xray-core:
 
-- \- HTTP/H2 transport: migrated to XHTTP stream-one (H2 & H3)
-- \- Trojan + Flow (XTLS-Vision): Xray-core has removed flow support for Trojan
+- HTTP/H2 transport: migrated to XHTTP stream-one (H2 & H3)
+- Trojan + Flow (XTLS-Vision): Xray-core has removed flow support for Trojan
 
 ## mihomo Compatibility Notes
 
-- \- Trojan in mihomo uses the sni field (not servername)
-- \- XHTTP requires xhttp-opts to include headers: {}, with mode at the top level
-- \- REALITY's short-id and public-key go in reality-opts
-- \- Hysteria2 uses the hysteria2 type (not hysteria)
+- Trojan in mihomo uses the sni field (not servername)
+- XHTTP requires xhttp-opts to include headers: {}, with mode at the top level
+- REALITY's short-id and public-key go in reality-opts
+- Hysteria2 uses the hysteria2 type (not hysteria)

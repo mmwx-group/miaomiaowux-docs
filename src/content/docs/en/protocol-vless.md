@@ -26,6 +26,18 @@ VLESS is Xray's primary protocol. It is lightweight with no encryption overhead 
 
 XTLS-Vision is a flow control mode exclusive to VLESS, enabled via flow: xtls-rprx-vision. It reduces TLS-in-TLS characteristics, improving detection resistance. Only supports TCP transport.
 
+## Creating it in the wizard
+
+In "Nodes → Add Node" with VLESS selected, the transport can be GRPC / TCP / WSS / XHTTP and the security REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC. The default is the recommended TCP + XTLS-Vision-REALITY:
+
+![VLESS add node wizard screenshot](../../../assets/screenshots/nodes-add-vless-reality.webp)
+
+VLESS + TCP + XTLS-Vision-REALITY: the REALITY domain is probed for the lowest latency (or entered manually); "Prevent REALITY theft" creates a dedicated tunnel that only allows the serverNames; UUID and flow xtls-rprx-vision are filled in
+
+- Simple mode: port, UUID and REALITY key pair are generated; just "Submit"
+- Expert mode: edit port, listen address, sniffing, relay address …
+- TLS / WSS combinations need a certificate on the server, otherwise step 1 shows the "SSL configuration" prompt first
+
 ## Configuration Example
 
 ### VLESS + TCP + REALITY + Vision (Recommended)

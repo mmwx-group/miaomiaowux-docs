@@ -19,7 +19,6 @@ In "Node Management", click the bidirectional arrow button on a node row. In the
 Two steps:
 
 1. Create a package: In "Package Management", create a new package - set traffic quota, reset cycle (monthly/custom), speed limit (optional), device limit (optional), and select which nodes the package includes.
-
 2. Create a user and bind: In "User Management", create a new user and bind the package. The system automatically generates a subscription link for the user - they can use any client to pull this link and see the nodes in the package.
 
 When quota is exceeded, nodes are automatically removed from subscription or speed is limited based on your package configuration.
@@ -27,6 +26,14 @@ When quota is exceeded, nodes are automatically removed from subscription or spe
 ### I migrated from MiaoMiaoWu (mmw), why can't I see the original features?
 
 You need to enable the "MiaoMiaoWu Features Toggle" in "System Settings". Once enabled, MiaoMiaoWu-related menus (subscription probe, subscription generation, etc.) will appear in the top bar, coexisting with MiaoMiaoWu X features like server management, packages, and templates.
+
+### How do I check logs when something goes wrong?
+
+Open "Logs". Four tabs — system log, Agent log, scheduled tasks, security log — with level filter, line count and clear. Agent interaction logs require the Agent log switch in "System Settings".
+
+![Logs page screenshot](../../../assets/screenshots/logs-system.webp)
+
+Logs: system / Agent / scheduled tasks / security
 
 ### I forgot the admin password — how do I reset it?
 

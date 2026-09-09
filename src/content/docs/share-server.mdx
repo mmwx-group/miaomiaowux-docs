@@ -45,6 +45,10 @@ import { DocDemo } from "@/components/docs/islands/share-server";
 3. 在弹出的对话框中点击「生成分享令牌」
 4. 复制「拥有方地址」和「分享令牌」，提供给消费方
 
+![分享服务器对话框截图](../../assets/screenshots/servers-share-dialog.webp)
+
+分享服务器：拥有方地址、「允许接收方查看/修改完整 Xray 配置」开关（默认关闭，接收方只能管理自己创建的入站）、生成分享令牌、已分享列表
+
 分享令牌仅在生成时显示一次，请立即复制保存。令牌以 SHA256 哈希形式存储，无法再次查看明文。
 
 ### 令牌管理
@@ -65,6 +69,10 @@ import { DocDemo } from "@/components/docs/islands/share-server";
 2. 填写拥有方提供的信息
 3. 点击「接入」，系统会验证令牌有效性
 4. 接入成功后，服务器出现在服务管理列表中，带有紫色「分享」标签
+
+![接入分享服务器对话框截图](../../assets/screenshots/servers-join-share-dialog.webp)
+
+接入分享服务器：拥有方地址、分享令牌、服务器名称（可选）、入站前缀
 
 ### 接入参数
 

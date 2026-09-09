@@ -16,15 +16,25 @@ Below is a local mock of the Node Management table — every action (enable/disa
 
 ## Two Outbound Configuration Methods
 
-On the node management page, the button on the right side of each node row opens the Add Landing Node dialog. The Scope selector at the top provides two distinct capabilities:
+On the node management page, the "Create chained outbound" button (double-arrow icon) on each node row opens the Add Landing Node dialog. The Scope selector at the top provides two distinct capabilities:
+
+![Add landing node dialog screenshot](../../../assets/screenshots/nodes-row-landing.webp)
+
+Add landing node: scope (entire node / child node), and the "Choose landing node / Choose server / Choose load balancer" tabs
+
+The "Routed outbound" toolbar button opens the overview listing every routed child node created so far:
+
+![Routed outbound page screenshot](../../../assets/screenshots/routed-outbounds-page.webp)
+
+Routed outbound management: explanation plus the list of created routed outbounds (empty until one is created)
 
 **Prerequisites (Regular Users)**: Routed outbound for regular users is a feature that requires admin activation. The admin can find the Allow Users to Create Routed Outbounds toggle in System Settings > MiaoMiaoWu Feature Settings. The toggle's right side allows configuring quantity limit (default 2) and daily operation limit (default 5). When disabled, both input fields are inactive.
 
 When disabled, regular users won't see the route button on node rows. If the API is called through other means:
 
-- \- Feature not enabled -> backend returns 403 'Routed outbound feature not available, contact admin to enable'
-- \- Quantity limit reached -> 403 'Routed outbound quantity limit reached (N/M)'
-- \- Daily operation limit reached -> 429 'Daily operation limit reached (N/M), please try again tomorrow'
+- Feature not enabled -> backend returns 403 'Routed outbound feature not available, contact admin to enable'
+- Quantity limit reached -> 403 'Routed outbound quantity limit reached (N/M)'
+- Daily operation limit reached -> 429 'Daily operation limit reached (N/M), please try again tomorrow'
 
 The dialog Scope has two modes:
 
@@ -41,8 +51,8 @@ The source node's inbound traffic is routed entirely to one exit. All users unde
 
 Underlying actions (written to source server xray config):
 
-- 1\. Add outbound, tag = landing-`<source inbound tag>`-`<timestamp>`
-- 2\. Add routing rule: `{inboundTag: [source inbound], outboundTag: previous step's tag}`
+1. Add outbound, tag = landing-`<source inbound tag>`-`<timestamp>`
+2. Add routing rule: `{inboundTag: [source inbound], outboundTag: previous step's tag}`
 
 **Use case: All users should use the same exit, e.g., unified relay from frontend entry to backend landing.**
 
@@ -81,12 +91,12 @@ Currently, routed outbounds can only be created by admins (API: POST /api/admin/
 
 ### Steps
 
-1.  On the node management page, find the transit node HK-Direct, click the route button at the end of the row
-2.  Select Per User (Routed Outbound) for Scope
-3.  Enter Label (only \[a-zA-Z0-9-\] allowed, length 2-32), e.g., rout-hinet
-4.  Select the target landing node (e.g., HINET), click Create Routed Outbound
-5.  System adds a child node HK-Direct-rout-hinet to the node list, node_type = routed
-6.  Check this child node in package management and assign to specified users to take effect
+1. On the node management page, find the transit node HK-Direct, click the route button at the end of the row
+2. Select Per User (Routed Outbound) for Scope
+3. Enter Label (only \[a-zA-Z0-9-\] allowed, length 2-32), e.g., rout-hinet
+4. Select the target landing node (e.g., HINET), click Create Routed Outbound
+5. System adds a child node HK-Direct-rout-hinet to the node list, node_type = routed
+6. Check this child node in package management and assign to specified users to take effect
 
 ### Generated Routing Rule Example
 
@@ -123,20 +133,20 @@ After the admin enables Allow Users to Create Routed Outbounds in System Setting
 
 Location: Admin login -> System Settings -> MiaoMiaoWu Feature Settings card -> Allow Users to Create Routed Outbounds row.
 
-- \- Off (default): Regular users don't see the route button on node rows; API POST returns 403.
-- \- On: After toggling on, the Quantity and Daily Limit input fields become enabled.
-- \- Quantity: Maximum number of routed outbounds held. Default 2; adjustable to any integer >= 1. Unlimited is not supported (each routed outbound adds an outbound + routing rule to xray, unlimited could cause config bloat).
-- \- Daily Limit: Total create + delete operations per day. Default 5; adjustable to any integer >= 1. Unlimited is not supported. Design reason: xray routing doesn't support gRPC dynamic loading, so agent auto-restarts xray after each routed outbound change. Frequent restarts affect other users' connections, hence rate limiting by operation count.
-- \- Counting window: Based on master server local timezone, from 00:00 to 24:00; not rolling.
-- \- Changes take effect immediately: Saved to system_settings table when switch is toggled or input field loses focus.
+- Off (default): Regular users don't see the route button on node rows; API POST returns 403.
+- On: After toggling on, the Quantity and Daily Limit input fields become enabled.
+- Quantity: Maximum number of routed outbounds held. Default 2; adjustable to any integer >= 1. Unlimited is not supported (each routed outbound adds an outbound + routing rule to xray, unlimited could cause config bloat).
+- Daily Limit: Total create + delete operations per day. Default 5; adjustable to any integer >= 1. Unlimited is not supported. Design reason: xray routing doesn't support gRPC dynamic loading, so agent auto-restarts xray after each routed outbound change. Frequent restarts affect other users' connections, hence rate limiting by operation count.
+- Counting window: Based on master server local timezone, from 00:00 to 24:00; not rolling.
+- Changes take effect immediately: Saved to system_settings table when switch is toggled or input field loses focus.
 
 ### Creation Steps
 
-1.  Regular user finds a visible transit node on the node management page (package-assigned or self-imported), clicks the route button
-2.  Dialog only shows Routed Outbound (Per User) mode (admin's Entire Node radio + server Tab are hidden)
-3.  Select a landing node from the Select from Existing Nodes tab
-4.  Label auto-fills as rout-`<target slug>`, can be manually changed
-5.  Click Create Routed Outbound
+1. Regular user finds a visible transit node on the node management page (package-assigned or self-imported), clicks the route button
+2. Dialog only shows Routed Outbound (Per User) mode (admin's Entire Node radio + server Tab are hidden)
+3. Select a landing node from the Select from Existing Nodes tab
+4. Label auto-fills as rout-`<target slug>`, can be manually changed
+5. Click Create Routed Outbound
 
 System adds a new row `<transit node>`-`<label>` to the node list, visible only to the creator, automatically included in user subscription.
 
@@ -148,14 +158,14 @@ The created routed outbound node row shows a delete button on the right (visible
 
 The following three situations trigger automatic suspension of user private routed outbounds (removes rule + client, retains outbound + credentials):
 
-- \- Admin deactivates the user (is_active=false)
-- \- Package expires (package_end_date < now)
-- \- Traffic limit exceeded (traffic limit enforcer blacklists)
+- Admin deactivates the user (is_active=false)
+- Package expires (package_end_date < now)
+- Traffic limit exceeded (traffic limit enforcer blacklists)
 
 Corresponding resume triggers (rebuilds rule + adds back client):
 
-- \- Enable user
-- \- Traffic drops below limit
+- Enable user
+- Traffic drops below limit
 
 Note: When package expires, the routed outbound is auto-suspended due to loss of access to the parent inbound, but won't auto-resume (requires rebinding a package).
 
@@ -185,21 +195,16 @@ Assign both child nodes in a package to users. Users see two routes in their sub
 
 ### When Creating Routed Outbound
 
-1\. Add a placeholder admin client to the parent physical node's inbound (email = \_admin\_\_`<short>`\_\_`<label>`)
-
-2\. Add an outbound on the source server, tag = routed:p`<parent node id>`:`<label>`
-
-3\. Prepend a rule with marktag to the routing rules array, user = \[admin_email\]
-
-4\. Write a child node row to the master database nodes table (node_type=routed, parent_node_id, routed_outbound_tag)
+1. Add a placeholder admin client to the parent physical node's inbound (email = \_admin\_\_`<short>`\_\_`<label>`)
+2. Add an outbound on the source server, tag = routed:p`<parent node id>`:`<label>`
+3. Prepend a rule with marktag to the routing rules array, user = \[admin_email\]
+4. Write a child node row to the master database nodes table (node_type=routed, parent_node_id, routed_outbound_tag)
 
 ### When Package Assigns User to Child Node
 
-1\. Add a sub-account client for the user in the parent inbound (email = `<username>`\_\_`<short>`\_\_`<label>`, UUID independently generated)
-
-2\. Append the email to the routing rule's user\[\] array
-
-3\. Credentials written to user_subaccounts table, reused on renewal/resume
+1. Add a sub-account client for the user in the parent inbound (email = `<username>`\_\_`<short>`\_\_`<label>`, UUID independently generated)
+2. Append the email to the routing rule's user\[\] array
+3. Credentials written to user_subaccounts table, reused on renewal/resume
 
 ### During Subscription Generation
 

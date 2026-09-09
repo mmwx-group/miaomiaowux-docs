@@ -49,6 +49,14 @@ This migration wizard is designed for you. All operations only touch the mmw dat
 
 After logging into mmwx with an admin account, click the avatar menu in the top right -> Migrate from MiaoMiaoWu to enter the 5-step wizard. This entry is invisible to regular users. All 6 /api/admin/migrate/\* endpoints are protected by RequireAdmin middleware; non-admin calls return 403.
 
+![Avatar menu screenshot](../../../assets/screenshots/user-menu.webp)
+
+Avatar menu: the "Migrate from MiaoMiaoWu" entry is only visible to admins
+
+![Migration wizard page screenshot](../../../assets/screenshots/migrate-from-mmw.webp)
+
+Step 1 of the real migration wizard: guarantees and prerequisites
+
 Estimated total time: 10-30 minutes (mainly depends on mmw data size and SSH network).
 
 ## Step 1 -- Overview & Prerequisites
@@ -59,10 +67,10 @@ The wizard homepage lists the guarantees + prerequisites above. Please review ca
 
 ### Auto Mode (Recommended)
 
-1.  Enter mmw master address, admin username / password
-2.  mmwx master logs into mmw with that account, calls mmw's /api/admin/backup/download to pull a complete backup zip (database + subscription files) to mmwx local /tmp/mmwx-migrate/
-3.  Extract, record db path, subscription file count, show for confirmation
-4.  SSH to mmw machine, systemctl stop miaomiaowu to stop service, preventing mmw data changes during migration
+1. Enter mmw master address, admin username / password
+2. mmwx master logs into mmw with that account, calls mmw's /api/admin/backup/download to pull a complete backup zip (database + subscription files) to mmwx local /tmp/mmwx-migrate/
+3. Extract, record db path, subscription file count, show for confirmation
+4. SSH to mmw machine, systemctl stop miaomiaowu to stop service, preventing mmw data changes during migration
 
 ### Manual Mode
 
@@ -101,8 +109,8 @@ The entire import runs in one SQLite transaction. If any table fails -> complete
 
 mmw-era node configs exist as clash_config (raw vless / vmess / trojan / hy2 configs) without a 'remote server' concept -- servers were manually maintained. mmwx uses a 'Server + Inbound + Node' three-layer model, requiring mmw nodes to be linked to mmwx managed xray servers. This step does two things:
 
-1.  Add Servers -- The wizard lists all deduplicated server addresses from mmw nodes. Click 'Go Add' to auto-create a remote server in mmwx (address / name auto-filled from node info), generate agent token, and prompt you to install mmw-agent on the server.
-2.  Take Over External xray + Scan to Fill Emails -- For externally managed xray from the mmw era, if choosing embedded mode redeployment, one-click merge /etc/xray/config.json + /etc/xray/conf/\*.json to mmwx standard path /usr/local/etc/xray/config.json (originals archived as .before-mmwx-`<ts>`). Then scan all inbound clients in the xray config, fill in emails and bind to admin's sub-accounts (mmw era didn't have this concept; after migration, these 'custom clients' are unified under admin).
+1. Add Servers -- The wizard lists all deduplicated server addresses from mmw nodes. Click 'Go Add' to auto-create a remote server in mmwx (address / name auto-filled from node info), generate agent token, and prompt you to install mmw-agent on the server.
+2. Take Over External xray + Scan to Fill Emails -- For externally managed xray from the mmw era, if choosing embedded mode redeployment, one-click merge /etc/xray/config.json + /etc/xray/conf/\*.json to mmwx standard path /usr/local/etc/xray/config.json (originals archived as .before-mmwx-`<ts>`). Then scan all inbound clients in the xray config, fill in emails and bind to admin's sub-accounts (mmw era didn't have this concept; after migration, these 'custom clients' are unified under admin).
 
 ### Smart Claiming, No Duplicate Nodes
 
@@ -112,9 +120,9 @@ After scanning, the master syncs xray inbounds to the mmwx node table. If an inb
 
 ### 3 Required Verifications
 
-1.  Client subscription works -- Refresh a subscription URL from an original mmw user (unchanged) in Clash, verify nodes are still there and connectable.
-2.  Node speed test -- Open the node speed test workbench in Node Management, test a few migrated nodes to confirm they work.
-3.  User login -- Try logging into mmwx with a regular user account using the original mmw password, check if the personal subscription page is accessible.
+1. Client subscription works -- Refresh a subscription URL from an original mmw user (unchanged) in Clash, verify nodes are still there and connectable.
+2. Node speed test -- Open the node speed test workbench in Node Management, test a few migrated nodes to confirm they work.
+3. User login -- Try logging into mmwx with a regular user account using the original mmw password, check if the personal subscription page is accessible.
 
 All three pass, migration complete. Keep the mmw binary / data directory, clean up after 1-2 weeks of stable operation.
 
@@ -144,9 +152,9 @@ No. All 6 /api/admin/migrate/\* endpoints are protected by RequireAdmin middlewa
 
 Any step that goes wrong can be reverted to mmw:
 
-1.  SSH to mmw machine: systemctl stop miaomiaowux && systemctl start miaomiaowu
-2.  Original nginx reverse proxy config doesn't need changes -- it points to the same port, whoever starts up takes over
-3.  SSL certificates / client subscription URLs all stay as-is, clients seamlessly switch back to mmw
-4.  Clean up mmwx residual data: rm /path/to/mmwx/data/mmwx.db (next restart rebuilds empty database)
+1. SSH to mmw machine: systemctl stop miaomiaowux && systemctl start miaomiaowu
+2. Original nginx reverse proxy config doesn't need changes -- it points to the same port, whoever starts up takes over
+3. SSL certificates / client subscription URLs all stay as-is, clients seamlessly switch back to mmw
+4. Clean up mmwx residual data: rm /path/to/mmwx/data/mmwx.db (next restart rebuilds empty database)
 
 Therefore migration is a low-risk operation: even if it goes wrong, you can switch back in 30 seconds.

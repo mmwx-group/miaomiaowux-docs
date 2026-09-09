@@ -30,13 +30,13 @@
 
 @font-face {
   font-family: "OPlus Sans 3";
-  src: url("/fonts/OPlusSans3-Medium.woff2") format("woff2");
+  src: url("/docs/fonts/OPlusSans3-Medium.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "JetBrains Mono";
-  src: url("/fonts/JetBrainsMono[wght].woff2") format("woff2");
+  src: url("/docs/fonts/JetBrainsMono[wght].woff2") format("woff2");
   font-display: swap;
 }
 
@@ -62,4 +62,18 @@
     overflow-x: auto;
     overscroll-behavior-inline: contain;
   }
+}
+
+/* 文档配图:图片段落后紧跟的段落视为图注 */
+.sl-markdown-content p:has(> img:only-child) {
+  margin-bottom: 0.35rem;
+}
+
+.sl-markdown-content p:has(> img:only-child) + p {
+  margin-top: 0 !important;
+  margin-bottom: 1.75rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--sl-color-gray-3);
+  text-align: center;
 }

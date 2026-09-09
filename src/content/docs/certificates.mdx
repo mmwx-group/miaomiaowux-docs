@@ -8,6 +8,10 @@ tableOfContents:
 
 import { DocDemo } from "@/components/docs/islands/certificates";
 
+![证书管理页面截图](../../assets/screenshots/certificates-list.webp)
+
+证书管理 — 证书列表：域名 / CA / 服务器 / 验证方式 / 状态 / 过期时间 / 部署 / 自动续期 / 自动部署
+
 ## 在线演示:证书管理
 
 4 个 mock 域名,可以申请新证书、续期、下载、删除。完全本地。
@@ -16,7 +20,7 @@ import { DocDemo } from "@/components/docs/islands/certificates";
 
 ## 概述
 
-证书管理模块通过 ACME 协议自动申请和续期 TLS 证书。支持多种 DNS 提供商，证书自动同步到远程服务器。
+证书管理模块通过 ACME 协议自动申请和续期 TLS 证书。支持多种 DNS 提供商，证书自动同步到远程服务器。页面有两个选项卡：「证书列表」和「DNS 提供商」；顶部按钮为「刷新」「申请证书」「上传证书」。
 
 ## 支持的 DNS 提供商
 
@@ -27,19 +31,35 @@ import { DocDemo } from "@/components/docs/islands/certificates";
 | 腾讯云 DNSPod | SecretId + SecretKey  |
 | Namesilo      | API Key               |
 
+在「DNS 提供商」选项卡点「添加 DNS 提供商」，选择类型后按提示填入凭证即可；系统会自动生成并校验配置：
+
+![添加 DNS 提供商对话框截图](../../assets/screenshots/certificates-dns-provider-dialog.webp)
+
+添加 DNS 提供商：名称 + 提供商类型 + API 凭证
+
 ## 申请证书
 
-1\. 进入「证书管理」页面
+1. 进入「证书管理」页面，点击「申请证书」
+2. 输入域名（支持通配符，如 \*.example.com）
+3. 填写邮箱，选择 CA 提供商（默认 Let's Encrypt）
+4. 验证方式选 DNS-01（通配符必须）并选择已添加的 DNS 提供商
+5. 申请泛域名时可开启「同时申请根域名和泛域名」，系统会把 example.com 与 \*.example.com 作为同一张证书的 SAN
+6. 按需开启「自动续期」「自动部署」
+7. 提交后系统完成 DNS 验证；签发结果同时保存到数据库与证书目录
 
-2\. 点击「申请证书」
+![申请证书对话框截图](../../assets/screenshots/certificates-apply-dialog.webp)
 
-3\. 选择 DNS 提供商并填写凭证
+申请 SSL/TLS 证书：域名、邮箱、CA、验证方式、DNS 提供商、根域名 + 泛域名、自动续期、自动部署
 
-4\. 输入域名（支持通配符，如 \*.example.com）
+## 上传证书
 
-5\. 申请泛域名时可同时勾选根域名，系统会把 example.com 与 \*.example.com 作为同一张证书的 SAN
+已有证书（例如由 Certimate 或其他 ACME 客户端签发）可以直接粘贴 PEM 上传：
 
-6\. 提交后系统完成 DNS 验证；签发结果同时保存到数据库与证书目录
+![上传证书对话框截图](../../assets/screenshots/certificates-upload-dialog.webp)
+
+上传证书：域名 + 证书内容（PEM）+ 私钥内容（PEM）；对话框顶部也给出了 API 上传方式
+
+上传后证书出现在列表中，CA 显示为 manual，同样可以下载、部署到服务器。
 
 ## 下载与自动部署
 
@@ -59,9 +79,11 @@ import { DocDemo } from "@/components/docs/islands/certificates";
 
 ## 使用场景
 
-- \- VLESS/VMess/Trojan + TLS 入站需要 TLS 证书
-- \- Hysteria2 / AnyTLS 入站需要 TLS 证书
-- \- REALITY 入站不需要证书（使用目标站点证书）
+- VLESS/VMess/Trojan + TLS 入站需要 TLS 证书
+- Hysteria2 / AnyTLS 入站需要 TLS 证书
+- REALITY 入站不需要证书（使用目标站点证书）
+
+添加节点向导在服务器 443 端口尚未配好证书时会弹出「SSL 配置」提示，可从那里一键为服务器配置证书与 Nginx 443。
 
 ## Webhook 上传证书（Certimate 集成）
 
@@ -79,15 +101,15 @@ Content-Type: application/json
 
 ### 请求字段
 
-- \- domain — 证书绑定的主域名（如 \*.example.com 或 a.example.com）
-- \- cert_pem — 证书 PEM 文本，兼容两种格式：裸 PEM（以 -----BEGIN 开头）或 base64 编码（旧 UI 上传格式）
-- \- key_pem — 私钥 PEM 文本，同样兼容裸 PEM 或 base64
+- domain — 证书绑定的主域名（如 \*.example.com 或 a.example.com）
+- cert_pem — 证书 PEM 文本，兼容两种格式：裸 PEM（以 -----BEGIN 开头）或 base64 编码（旧 UI 上传格式）
+- key_pem — 私钥 PEM 文本，同样兼容裸 PEM 或 base64
 
 ### 行为
 
-- \- 同域名已存在 → 更新现有证书记录（cert_path / key_path / 有效期），并触发自动部署
-- \- 首次上传 → 新建一条 manual / no-deploy 类型的证书记录，后续可在 UI 切换 deploy target
-- \- 成功返回 `{success: true, certificate_id: N}`；失败返回 `{success: false, message: "..."}`
+- 同域名已存在 → 更新现有证书记录（cert_path / key_path / 有效期），并触发自动部署
+- 首次上传 → 新建一条 manual / no-deploy 类型的证书记录，后续可在 UI 切换 deploy target
+- 成功返回 `{success: true, certificate_id: N}`；失败返回 `{success: false, message: "..."}`
 
 ### Certimate 配置示例
 

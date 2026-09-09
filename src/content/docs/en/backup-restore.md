@@ -6,9 +6,28 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
-New backups have no password
-
+:::note[New backups have no password]
 Current exports are regular ZIP files and require no password. Only legacy encrypted .zip.enc backups require their original password. Treat every backup as sensitive data.
+:::
+
+## Entry points
+
+- **Manual backup / restore**: avatar menu at the top right → "Backup data" to download the full ZIP or upload one to restore
+- **Auto backup**: "System Settings → System → Auto backup" packs data, certificates and subscription files (optionally the database) on a schedule and uploads it remotely, keeping N copies
+- **Restore during setup**: the first-run setup wizard has "Restore from backup" at the bottom
+- **Database switch**: "System Settings → Database" migrates between SQLite and PostgreSQL
+
+![User menu screenshot](../../../assets/screenshots/user-menu.webp)
+
+Avatar menu: backup data, migrate from MiaoMiaoWu, check for updates …
+
+![System Settings "System" tab screenshot](../../../assets/screenshots/settings-system.webp)
+
+System Settings → System: auto backup (enable, target, interval, remote copies to keep, include database)
+
+![System Settings "Database" tab screenshot](../../../assets/screenshots/settings-database.webp)
+
+System Settings → Database: view the current database type, migrate to PostgreSQL or back to SQLite
 
 ## Included data
 
@@ -26,15 +45,15 @@ Issued certificates, self-signed certificates, and private keys.
 
 ## Restore workflow
 
-1.  Download a fresh backup from the system menu and ensure the ZIP finishes saving.
-2.  Keep a separate copy of current data; upload the backup and wait for validation and replacement.
-3.  Sign in again, verify servers, nodes, certificates, and subscriptions, then allow Agents to reconnect.
+1. Download a fresh backup from the system menu and ensure the ZIP finishes saving.
+2. Keep a separate copy of current data; upload the backup and wait for validation and replacement.
+3. Sign in again, verify servers, nodes, certificates, and subscriptions, then allow Agents to reconnect.
 
-## PostgreSQL 备份
+## PostgreSQL backups
 
-ZIP 备份仅适用于 SQLite
-
-主控切换到 PostgreSQL 后会拒绝生成不包含数据库的 ZIP。数据库使用 pg_dump/pg_restore，data 与 subscribes 目录仍需单独备份。
+:::caution[ZIP backups apply to SQLite only]
+Once the master runs on PostgreSQL it refuses to produce a ZIP without the database. Use pg_dump/pg_restore for the database; the data and subscribes directories still need separate backups. Ticking "Include database" in auto backup packs PostgreSQL as well.
+:::
 
 ```
 # Docker Compose 数据库备份

@@ -8,7 +8,11 @@ tableOfContents:
 
 ## 完整矩阵
 
-以下是经过测试验证的所有可用组合（19 种），均已通过 mihomo 连通性测试。
+以下是经过测试验证的所有可用组合，均已通过 mihomo 连通性测试。添加节点向导会根据所选协议只显示可用的传输与安全层：
+
+![添加节点向导协议选择截图](../../assets/screenshots/nodes-add-vless-reality.webp)
+
+向导顶部三行按钮：选择协议 → 传输协议 → 安全协议
 
 | #   | 协议        | 传输  | 安全层                | 备注                                              |
 | --- | ----------- | ----- | --------------------- | ------------------------------------------------- |
@@ -38,12 +42,12 @@ tableOfContents:
 
 以下组合在 Xray-core 中已被废弃或移除：
 
-- \- HTTP/H2 传输：已迁移到 XHTTP stream-one（H2 & H3）
-- \- Trojan + Flow（XTLS-Vision）：Xray-core 已移除 Trojan 的 flow 支持
+- HTTP/H2 传输：已迁移到 XHTTP stream-one（H2 & H3）
+- Trojan + Flow（XTLS-Vision）：Xray-core 已移除 Trojan 的 flow 支持
 
 ## mihomo 兼容性说明
 
-- \- Trojan 在 mihomo 中使用 sni 字段（非 servername）
-- \- XHTTP 需要 xhttp-opts 包含 headers: {}，mode 放在顶层
-- \- REALITY 的 short-id 和 public-key 放在 reality-opts 中
-- \- Hysteria2 使用 hysteria2 类型（非 hysteria）
+- Trojan 在 mihomo 中使用 sni 字段（非 servername）
+- XHTTP 需要 xhttp-opts 包含 headers: {}，mode 放在顶层
+- REALITY 的 short-id 和 public-key 放在 reality-opts 中
+- Hysteria2 使用 hysteria2 类型（非 hysteria）

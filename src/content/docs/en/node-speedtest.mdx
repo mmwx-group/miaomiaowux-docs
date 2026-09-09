@@ -16,6 +16,10 @@ import { DocDemo } from "@/components/docs/islands/speedtest";
 
 ## Overview
 
+![Speed test workbench screenshot](../../../assets/screenshots/nodes-toolbar-speedtest.webp)
+
+The real workbench in the master: choose the source (master / home endpoint), threads and packet size at the top; one node per row with speed test, latency test and exit IP
+
 Node speed testing uses the mihomo core to measure actual download throughput and latency through single-node proxies. Test source, thread count, and test type can be freely combined, with results saved on the server for historical review.
 
 ### Master Local
@@ -44,15 +48,15 @@ Trigger: Click the Zap icon button in the latency column. Click again to re-test
 
 ### Start Speed Test
 
-1.  Go to "Node Management", click the "Node Speed Test" button at the top to open the speed test workbench.
-2.  Select the test source at the top (default "Master Local"; if you've configured a home test endpoint, you can select it). The selection is saved in browser local storage and auto-restored next time.
-3.  Select thread mode (single/multi-thread, 8 concurrent): single thread shows worst-path performance; multi-thread aggregates bandwidth, closer to actual available bandwidth. Thread selection is also cached locally.
-4.  Each table row shows protocol / node name / server / speed / latency / exit IP.
+1. Go to "Node Management", click the "Node Speed Test" button at the top to open the speed test workbench.
+2. Select the test source at the top (default "Master Local"; if you've configured a home test endpoint, you can select it). The selection is saved in browser local storage and auto-restored next time.
+3. Select thread mode (single/multi-thread, 8 concurrent): single thread shows worst-path performance; multi-thread aggregates bandwidth, closer to actual available bandwidth. Thread selection is also cached locally.
+4. Each table row shows protocol / node name / server / speed / latency / exit IP.
     - Click the inline Gauge icon for speed test (includes latency).
     - Click the Zap button in the latency column for real connection latency (Cloudflare 204); tested values show ms, click again to re-test.
     - Check multiple + click top "Batch Speed Test" to run multiple speed tests at once.
-5.  Speed tests are asynchronous: clicking returns immediately, shows spinner while running, auto-refreshes results on completion (1.5s polling, near-instant response). Results persist even if you leave and return.
-6.  Click inline "History" to view the node's historical speed test records.
+5. Speed tests are asynchronous: clicking returns immediately, shows spinner while running, auto-refreshes results on completion (1.5s polling, near-instant response). Results persist even if you leave and return.
+6. Click inline "History" to view the node's historical speed test records.
 
 The speed test workbench collapses to a floating button on the right side when clicking outside or pressing Esc (preventing accidental closure and lost progress). Click to re-expand; click the X in the top right to actually close. Re-opening returns to the main view (not stuck on the "manage test endpoints" subpage).
 
@@ -60,8 +64,8 @@ The speed test workbench collapses to a floating button on the right side when c
 
 ### Steps
 
-1.  In the speed test workbench, click "Test Endpoint Management" -> enter a name -> click "Create" to get a one-time pairing token and one-click install commands (Linux/macOS + Windows). The token is shown only once - be sure to copy and save it first.
-2.  Run the command on your home machine:
+1. In the speed test workbench, click "Test Endpoint Management" -> enter a name -> click "Create" to get a one-time pairing token and one-click install commands (Linux/macOS + Windows). The token is shown only once - be sure to copy and save it first.
+2. Run the command on your home machine:
 
     ```
     # Linux / macOS
@@ -73,8 +77,8 @@ The speed test workbench collapses to a floating button on the right side when c
     .\install.ps1 -Master https://你的主控.example.com -Token <令牌>
     ```
 
-3.  The test endpoint automatically connects to the master via reverse WebSocket (WSS) after startup - no public IP needed at home. Once connected, it appears as "Online" in the test source list, select it to use.
-4.  The test endpoint auto-reconnects after disconnection. When marked "Offline", it cannot be selected (already-selected will auto-fallback to master local).
+3. The test endpoint automatically connects to the master via reverse WebSocket (WSS) after startup - no public IP needed at home. Once connected, it appears as "Online" in the test source list, select it to use.
+4. The test endpoint auto-reconnects after disconnection. When marked "Offline", it cannot be selected (already-selected will auto-fallback to master local).
 
 ### Test Endpoint Capabilities
 

@@ -8,9 +8,9 @@ tableOfContents:
 
 import { DocDemo } from "@/components/docs/islands/system-settings";
 
-![系统设置完整页面截图](/images/screenshots/doc-system-settings-overview.webp)
+![系统设置「功能」选项卡截图](../../assets/screenshots/settings-features.webp)
 
-系统设置完整页面 — 按 Card 划分各功能区(订阅同步 / 系统设置 / 安全阈值 / Turnstile / 定时配置 / 主控地址 / API Token / 许可证)
+系统设置 — 顶部 13 个选项卡（订阅 / 功能 / 用户 / 推送 / 安全 / 探针 / 外观 / 公告 / TG Bot / 验证 / 系统 / 数据库 / 许可证），图为「功能」选项卡
 
 ## 在线演示:系统设置
 
@@ -43,6 +43,58 @@ import { DocDemo } from "@/components/docs/islands/system-settings";
 | 许可证 | 查看许可证状态、套餐、有效期和服务器/节点/用户额度，更新许可证密钥并确认 PRO 功能。                               | 保存后生效     |
 
 「关闭公网访问」会让主控仅监听 127.0.0.1，必须重启主控后生效。它只适合同机反向代理；Docker 端口映射、跨服务器反代和 IP:端口直连会失效。API Token 重新生成后，旧 Token 会立即失效。
+
+## 各选项卡一览
+
+下面按选项卡顺序给出每一页的截图与用途，后文再逐项解释重点配置。
+
+![订阅选项卡截图](../../assets/screenshots/settings-subscription.webp)
+
+订阅：外部订阅同步设置（流量信息、节点名过滤 / 追加）、外部节点探测、掉线自动重同步
+
+![用户选项卡截图](../../assets/screenshots/settings-users.webp)
+
+用户：妙妙屋功能（订阅探针 / 生成订阅等菜单）、用户菜单可见项、用户配额（如允许用户创建路由出站及数量 / 每日次数）、用户自建子节点
+
+![推送选项卡截图](../../assets/screenshots/settings-notify.webp)
+
+推送：启用通知、Telegram Bot Token / Chat ID、各类事件开关、每日推送文案
+
+![安全选项卡截图](../../assets/screenshots/settings-security.webp)
+
+安全：登录限流、暴力破解防护、订阅请求频率等自定义安全阈值，失焦自动保存
+
+![探针选项卡截图](../../assets/screenshots/settings-probe.webp)
+
+探针：把站点伪装成公开监控页，配置标题 / Logo / 隐蔽登录 / 展示的服务器与采集项，接口字段见 [探针 API](/docs/probe-api)
+
+![外观选项卡截图](../../assets/screenshots/settings-appearance.webp)
+
+外观：自定义品牌（PRO）、面板壁纸、菜单排序、自定义 CSS、默认主题、登录页壁纸与登录框透明度
+
+![公告选项卡截图](../../assets/screenshots/settings-announcement.webp)
+
+公告：节点被墙 / 恢复 / 维护 / 订阅更新等公告模板，选择 Bot / Mini App 渠道并发布
+
+![TG Bot 选项卡截图](../../assets/screenshots/settings-tgbot.webp)
+
+TG Bot：启停内置 Bot 与 Mini App、Bot Token、管理员 Telegram ID、兑换码复制文案，详见 [Telegram 机器人](/docs/tool-mmwx-tgbot)
+
+![验证选项卡截图](../../assets/screenshots/settings-captcha.webp)
+
+验证：Cloudflare Turnstile 人机验证的 Site Key / Secret Key，详见 [Cloudflare Turnstile](/docs/tool-cloudflare-turnstile)
+
+![系统选项卡截图](../../assets/screenshots/settings-system.webp)
+
+系统：自动备份、自定义代理组配置、定时配置、主服务器地址 / 订阅域名、关闭公网访问、HTTPS 故障自愈、API Token
+
+![数据库选项卡截图](../../assets/screenshots/settings-database.webp)
+
+数据库：查看当前数据库类型，在 SQLite 与 PostgreSQL 之间迁移，详见 [备份与恢复](/docs/backup-restore)
+
+![许可证选项卡截图](../../assets/screenshots/settings-license.webp)
+
+许可证：填入许可证密钥保存后显示套餐、配额（服务器 / 节点 / 用户）与已解锁的 PRO 功能，并可配置称号展示位
 
 ## 外部订阅同步设置
 

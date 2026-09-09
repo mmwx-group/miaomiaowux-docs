@@ -1,136 +1,143 @@
 ---
 title: "Xray Routing Management"
-description: "Manage Xray routing rules, control traffic forwarding policies"
+description: "Manage Xray routing rules and traffic forwarding policies"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
 ---
 
+![Routing panel screenshot](../../../assets/screenshots/servers-xray-manage-routing.webp)
+
+Xray management → Routing: drag-sortable rule list with "Quick add / Custom rule / Load balancer" at the top
+
 ## Overview
 
-The Xray routing module uses first-match semantics: rules are matched top to bottom, stopping at the first hit. Unmatched traffic goes to the default outbound (outbounds\[0\]). MiaoMiaoWu X provides two entry points for managing routing rules:
+Xray routing is first-match: rules are evaluated top to bottom, the first hit wins, and unmatched traffic goes to the default outbound (outbounds\[0\]). MiaoMiaoWu X offers two entry points:
 
-| Entry         | Location                              | Description                                                |
-| ------------- | ------------------------------------- | ---------------------------------------------------------- |
-| Node Routing  | Node Management -> Node Action Button | View and manage routing rules for a single node (inbound)  |
-| Routing Panel | Xray Server -> Routing Tab            | Manage all server routing rules with drag-and-drop sorting |
+| Entry           | Location                                             | Description                                              |
+| --------------- | ---------------------------------------------------- | -------------------------------------------------------- |
+| Node routing    | Nodes → the "Node routing" button on a node row      | View and manage rules for a single node (inbound)        |
+| Routing panel   | Servers → Xray Config → Routing tab                  | Manage all rules of a server, drag to reorder            |
 
-## Routing Match Semantics
+## Matching semantics
 
-Xray routing rules follow these semantics:
+- Rules match top to bottom; the first hit stops evaluation (first-match)
+- Conditions inside one rule are AND (e.g. domain + protocol must both match)
+- A rule with only inboundTag + outboundTag is a catch-all matching 100 % of that inbound
+- Global rules after a catch-all no longer apply to that inbound
+- Unmatched traffic uses outbounds\[0\] (default outbound)
 
-- \- Rules match top to bottom, stopping at first hit (first-match)
-- \- Multiple conditions in a single rule are AND (e.g., domain + protocol must both match)
-- \- A rule with only inboundTag + outboundTag and no other conditions = catch-all, matching 100% of that inbound's traffic
-- \- Global rules after catch-all no longer apply to that inbound
-- \- When no rule matches, traffic goes to outbounds\[0\] (default outbound)
+Order therefore matters: specific rules first, catch-all last.
 
-Therefore, rule order is critical. More specific rules should come first, catch-all rules last.
+## Node routing
 
-## Node Routing
+Every remote server node in Nodes has a routing button opening the node routing dialog.
 
-On the node management page, each remote server node has a routing button. Click to open the node routing dialog.
+![Node routing dialog screenshot](../../../assets/screenshots/nodes-row-routing.webp)
 
-### Exclusive Rules vs Global Rules
+Node routing: dedicated rules for this inbound on top, global rules and the default outbound below
 
-The dialog categorizes routing rules into two types:
+### Dedicated vs global rules
 
-- \- Exclusive rules: Rules containing the current node's inboundTag, only effective for this inbound
-- \- Global rules: Rules without inboundTag, effective for all inbounds
+- Dedicated: rules containing the node's inboundTag, effective for this inbound only
+- Global: rules without inboundTag, effective for all inbounds
 
-### Catch-all Detection
+### Catch-all detection
 
-If a catch-all rule exists in exclusive rules (only inboundTag + outboundTag, no domain/ip/protocol conditions), the system auto-hides the global rules and default outbound sections, showing a warning:
+If a dedicated catch-all exists (inboundTag + outboundTag only), the global rules and default outbound are hidden with a notice:
 
-All traffic has been routed to \[outboundTag\], subsequent global rules and default outbound no longer take effect
+⚠ All traffic is routed to \[outboundTag\]; later global rules and the default outbound no longer apply
 
-### Outbound Name Resolution
+### Outbound name resolution
 
-The outboundTag in routing rules is automatically resolved to the corresponding node name. The system maps by matching the server:port in outbound config with the node's clash_config address.
+outboundTag values are resolved to node names by matching the outbound's server:port with node clash_config addresses.
 
-## Routing Panel
+## Routing panel
 
-In the Routing Tab of the Xray server management page, you can manage all routing rules for the remote server.
+Open a server card's "Xray Config" and switch to "Routing" to manage all rules. The screenshot shows rules added automatically by the system:
 
-### Split Layout
+- **REALITY anti-theft**: inbounds with "Prevent REALITY theft" get two rules — allow the serverNames domain to direct, block everything else coming through the anti-theft tunnel
+- **Block BT / Block mainland IPs / geoip:private → block**: default safety rules, removable
 
-The routing panel uses a left-right split design:
+### Two-pane layout
 
-- \- Left (40%): Rule list, drag-and-drop sortable, click to select
-- \- Right (60%): Selected rule detailed fields + JSON preview + delete button
+- Left (40 %): rule list, drag to sort, click to select
+- Right (60 %): fields of the selected rule + JSON preview + delete
 
-### Drag and Drop Sorting
+### Drag to sort
 
-Since Xray routing uses first-match semantics, rule order directly affects matching results. Drag the handle on the left side of rule cards to reorder. Changes auto-save and restart Xray on release.
+Because routing is first-match, order changes results. Drag the handle on the left of a rule card; the order is saved and Xray restarts on drop.
 
-Sorting is implemented via action: 'set' to fully replace routing rules. API rules (outboundTag = api) are automatically kept at the top.
+Sorting uses action: 'set' to replace the whole rule list; API rules (outboundTag api) stay at the top automatically.
 
-## Quick Rules
+## Quick rules
 
-Built-in common quick rules that can be added with one click:
+Built-in quick rules, added with one click from "Quick add":
 
-| Rule                  | Match Condition        | Outbound        | Description                                 |
-| --------------------- | ---------------------- | --------------- | ------------------------------------------- |
-| Block BT              | protocol: bittorrent   | block           | Block BitTorrent download traffic           |
-| Block China IP        | ip: geoip:cn           | block           | Block access to mainland China IPs          |
-| OpenAI Direct         | domain: geosite:openai | direct          | OpenAI related domains direct connection    |
-| Block Private Network | ip: geoip:private      | block           | Block access to private network addresses   |
-| RFC EMBY              | domain: rfc.uhdnow.com | Select required | EMBY unlock, requires specifying outbound   |
-| TikTok Unlock         | domain: geosite:tiktok | Select required | TikTok unlock, requires specifying outbound |
+| Rule                     | Condition              | Outbound  | Description                                  |
+| ------------------------ | ---------------------- | --------- | -------------------------------------------- |
+| Block BT                 | protocol: bittorrent   | block     | Block BitTorrent                             |
+| Block mainland IPs       | ip: geoip:cn           | block     | Block mainland China IPs                     |
+| OpenAI direct            | domain: geosite:openai | direct    | OpenAI domains direct                        |
+| Block private networks   | ip: geoip:private      | block     | Block private addresses                      |
+| RFC EMBY                 | domain: rfc.uhdnow.com | choose    | EMBY unlock, needs an outbound               |
+| TikTok unlock            | domain: geosite:tiktok | choose    | TikTok unlock, needs an outbound             |
+| Avoid China redirection  | geosite:google + meta  | warp-v4   | Only on servers with WARP installed          |
 
-## Outbound Load Balancing
+## Outbound load balancing
 
-Create a balancer to distribute traffic matching a routing rule across a group of outbounds, enabling multi-landing distribution / failover. Creation is available in Service Management routing config and Node Management routing dialog.
+Create a balancer to spread traffic matching a rule across a group of outbounds for multi-landing splitting / failover. Available from the Servers routing panel and the Nodes routing dialog.
 
-### Creation Steps
+### Steps
 
-1\. Click Create Load Balancer in routing config.
+1. Click "Load balancer" in the routing panel.
+2. Use an outbound prefix (selector) to choose the participating outbounds (matched by tag prefix).
+3. Choose a strategy (table below).
+4. Add a routing rule whose balancerTag points at the balancer instead of a single outboundTag.
+5. When created from the node routing dialog, the default rule's inboundTag is the node's tag; it can be widened to all nodes.
 
-2\. Use outbound prefix (selector) to select a group of outbounds (matched by tag prefix).
+| Strategy   | Description                                                     |
+| ---------- | --------------------------------------------------------------- |
+| random     | Pick a random outbound                                          |
+| roundRobin | Rotate through the outbounds                                    |
+| leastPing  | Lowest latency (needs observation; observatory is enabled automatically) |
+| leastLoad  | Lowest load (needs observation)                                 |
 
-3\. Select distribution strategy (see table below).
+leastPing / leastLoad automatically configure observatory / burstObservatory to probe candidates; random / roundRobin need none.
 
-4\. Add a routing rule pointing balancerTag to the balancer (not a single outboundTag).
+## Custom rules
 
-5\. When creating from node management routing dialog, default rule's inboundTag = node's TAG, can be changed to apply to all nodes.
+Custom rules support every Xray routing field; empty fields are omitted. Separate multiple values with commas.
 
-| Strategy   | Description                                                                     |
-| ---------- | ------------------------------------------------------------------------------- |
-| random     | Randomly pick one outbound                                                      |
-| roundRobin | Round-robin through outbounds                                                   |
-| leastPing  | Select lowest latency outbound (requires observation, auto-enables observatory) |
-| leastLoad  | Select lowest load outbound (requires observation)                              |
+| Field      | Type   | Example                     | Description                                                     |
+| ---------- | ------ | --------------------------- | --------------------------------------------------------------- |
+| domain     | array  | geosite:openai, example.com | Domain match, supports geosite:, domain:, full:, regexp:        |
+| ip         | array  | geoip:cn, 10.0.0.0/8        | IP match, supports geoip:, CIDR, plain IP                       |
+| protocol   | array  | bittorrent, http, tls       | Protocol match                                                  |
+| port       | string | 80, 443, 1000-2000          | Target port, ranges allowed                                     |
+| sourcePort | string | 1234                        | Source port                                                     |
+| network    | string | tcp / udp / tcp,udp         | Network type                                                    |
+| source     | array  | 10.0.0.1                    | Source IP                                                       |
+| user       | array  | user@example.com            | User identifier                                                 |
+| inboundTag | array  | inbound-tag-1               | Inbound tag limiting the rule's scope                           |
+| attrs      | string | attrs\[':method'\] == 'GET' | Attribute expression                                            |
 
-When selecting leastPing / leastLoad, the system auto-configures observatory / burstObservatory for candidate outbound probing; random / roundRobin don't need probing.
+### Example: send only one inbound's Netflix traffic to a US landing
 
-## Custom Rules
+1. In Nodes, "Create chained outbound" on the node and pick the US landing node; a proxy outbound tagged `landing-<inbound tag>-<timestamp>` is created
+2. Open the node's "Node routing" → "Custom rule"
+3. domain `geosite:netflix`, inboundTag = this inbound, outboundTag = the landing outbound just created
+4. Save; Xray restarts and the rule appears under "Dedicated rules"; other traffic still follows global rules and the default outbound
 
-Custom rules support all Xray routing fields. Empty fields are not submitted. Multiple values separated by commas.
+## Auto restart
 
-| Field      | Type   | Example                     | Description                                                 |
-| ---------- | ------ | --------------------------- | ----------------------------------------------------------- |
-| domain     | Array  | geosite:openai, example.com | Domain matching, supports geosite:, domain:, full:, regexp: |
-| ip         | Array  | geoip:cn, 10.0.0.0/8        | IP matching, supports geoip:, CIDR, plain IP                |
-| protocol   | Array  | bittorrent, http, tls       | Protocol matching                                           |
-| port       | String | 80, 443, 1000-2000          | Target port, supports ranges                                |
-| sourcePort | String | 1234                        | Source port                                                 |
-| network    | String | tcp / udp / tcp,udp         | Network type                                                |
-| source     | Array  | 10.0.0.1                    | Source IP                                                   |
-| user       | Array  | user@example.com            | User identifier                                             |
-| inboundTag | Array  | inbound-tag-1               | Inbound tag, limits rule scope                              |
-| attrs      | String | attrs\[':method'\] == 'GET' | Attribute matching expression                               |
+Adding, deleting or reordering rules on a remote server restarts Xray automatically and shows a toast when done.
 
-## Auto Restart
+## API reference
 
-After adding, deleting, or reordering routing rules on remote servers, the system automatically restarts Xray to apply changes. A toast notification is shown after completion.
-
-## API Reference
-
-| Endpoint                                       | Method | Description                                  |
-| ---------------------------------------------- | ------ | -------------------------------------------- |
-| /api/admin/remote/routing?server_id=N          | GET    | Get remote server routing config             |
-| /api/admin/remote/routing?server_id=N          | POST   | Modify routing: add_rule / remove_rule / set |
-| /api/admin/remote/outbounds?server_id=N        | GET    | Get remote server outbound list              |
-| /api/admin/remote/services/control?server_id=N | POST   | Service control (restart Xray)               |
-
-[< Xray Outbound Management](/docs/en/xray-outbounds)[\> Xray System Config](/docs/en/xray-system-config)
+| Endpoint                                       | Method | Description                                   |
+| ---------------------------------------------- | ------ | --------------------------------------------- |
+| /api/admin/remote/routing?server_id=N          | GET    | Get the server's routing config               |
+| /api/admin/remote/routing?server_id=N          | POST   | Modify routing: add_rule / remove_rule / set  |
+| /api/admin/remote/outbounds?server_id=N        | GET    | List the server's outbounds                   |
+| /api/admin/remote/services/control?server_id=N | POST   | Service control (restart Xray)                |

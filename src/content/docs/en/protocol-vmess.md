@@ -19,6 +19,14 @@ VMess is the native V2Ray protocol with built-in encryption. Compared to VLESS, 
 | WebSocket | None     | Suitable for CDN relay |
 | WebSocket | TLS      | WSS + VMess            |
 
+## Creating it in the wizard
+
+In "Nodes → Add Node" with VMESS selected, the transport can be TCP / WEBSOCKET and the security none / TLS; simple mode generates the port and UUID:
+
+![VMess add node wizard screenshot](../../../assets/screenshots/nodes-add-vmess.webp)
+
+VMess + TCP (no TLS): the JSON preview shows the generated clients[].id
+
 ## Configuration Example
 
 ### VMess + WS + TLS

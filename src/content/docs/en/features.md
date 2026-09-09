@@ -6,9 +6,17 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+![Traffic home screenshot](../../../assets/screenshots/dashboard.webp)
+
+Admin home "Traffic": KPI cards, daily trend, node / user views, server overview
+
 ### Remote Server Management
 
-Master-Agent architecture with WebSocket/HTTP/Pull modes for managing remote servers. Supports auto-reconnect, token rotation, and status monitoring.
+Master-Agent architecture with WebSocket/HTTP/Pull modes for managing remote servers. Supports auto-reconnect, token rotation, and status monitoring. See [Remote Servers](/docs/en/remote-servers).
+
+![Servers page screenshot](../../../assets/screenshots/servers-list.webp)
+
+Servers: one card per server
 
 ### Xray Service Management
 
@@ -16,7 +24,11 @@ Remote install/uninstall Xray and Nginx, service start/stop control, SSE streami
 
 ### Xray Inbound Management
 
-Visual inbound configuration wizard supporting VLESS/VMess/Trojan/Shadowsocks/Hysteria2 protocols, TCP/WS/gRPC/XHTTP transport, TLS/REALITY security.
+Visual inbound configuration wizard supporting VLESS/VMess/Trojan/Shadowsocks/Hysteria2/AnyTLS/Snell/Mieru protocols, TCP/WS/gRPC/XHTTP transport, TLS/REALITY security. See [Node Management](/docs/en/nodes).
+
+![Add node wizard screenshot](../../../assets/screenshots/nodes-add-vless-reality.webp)
+
+Add node wizard: protocol / transport / security with live JSON preview
 
 ### Protocol Matrix
 

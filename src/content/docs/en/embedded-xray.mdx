@@ -104,10 +104,22 @@ Embedded mode replaces the default Xray dispatcher with a custom dispatcher that
 
 On the master's server management page, you can directly switch the server's Xray mode. After switching, the Agent will automatically restart and run in the new mode.
 
-1. Go to the "Remote Servers" page
-2. Click settings on the target server
-3. Switch Xray mode to "Embedded"
-4. Agent restarts automatically, switch complete
+1. Go to the "Servers" page
+2. Click "Edit server" (pencil icon) on the target server card
+3. Choose "Embedded Xray" under "Xray mode"
+4. Save; the Agent restarts automatically and the switch is complete
+
+The mode can also be chosen when creating a server in the "Add Server" dialog:
+
+![Xray mode in the add server dialog screenshot](../../../assets/screenshots/add-server-dialog-filled.webp)
+
+Add / edit server → Xray mode: External Xray or Embedded Xray (PRO); embedded supports auto rate limiting, device limits, Snell and AnyTLS nodes
+
+After switching, the server card shows a blue "Embedded Xray" badge:
+
+![Embedded Xray server card screenshot](../../../assets/screenshots/servers-card-online.webp)
+
+A server card in embedded Xray mode
 
 ### Method 2: Agent Configuration File
 
@@ -123,13 +135,13 @@ Restart the Agent service after modification: `systemctl restart mmw-agent`
 
 When the Agent starts in embedded mode, it performs the following steps:
 
-1.  **1\. Stop external Xray - automatically runs systemctl stop xray to avoid port conflicts**
-2.  **2\. Config migration - if external Xray confdir config exists, auto-merge to standard path**
-3.  **3\. Ensure geodata - check if geoip.dat / geosite.dat exist**
-4.  **4\. Inject runtime components - inject custom dispatcher, stats module, and policy config into Xray config**
-5.  **5\. Register Vision Hook - register XTLS Vision zero-copy connection rate limit interceptor**
-6.  **6\. Start core - create and start embedded Xray instance**
-7.  **7\. Connect to master - establish WebSocket connection, start receiving rate limit config push**
+1. **Stop external Xray - automatically runs systemctl stop xray to avoid port conflicts**
+2. **Config migration - if external Xray confdir config exists, auto-merge to standard path**
+3. **Ensure geodata - check if geoip.dat / geosite.dat exist**
+4. **Inject runtime components - inject custom dispatcher, stats module, and policy config into Xray config**
+5. **Register Vision Hook - register XTLS Vision zero-copy connection rate limit interceptor**
+6. **Start core - create and start embedded Xray instance**
+7. **Connect to master - establish WebSocket connection, start receiving rate limit config push**
 
 ## Traffic Statistics
 

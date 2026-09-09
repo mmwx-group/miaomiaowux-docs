@@ -19,6 +19,14 @@ VMess 是 V2Ray 原生协议，自带加密。相比 VLESS 有额外的加密开
 | WebSocket | None   | 适合 CDN 中转     |
 | WebSocket | TLS    | WSS + VMess       |
 
+## 在向导中创建
+
+「节点管理 → 添加节点」选择 VMESS 后，传输可选 TCP / WEBSOCKET，安全协议可选无 / TLS；简易模式自动生成端口与 UUID：
+
+![VMess 添加节点向导截图](../../assets/screenshots/nodes-add-vmess.webp)
+
+VMess + TCP（无 TLS）：右侧 JSON 预览显示自动生成的 clients[].id
+
 ## 配置示例
 
 ### VMess + WS + TLS

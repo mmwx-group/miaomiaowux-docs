@@ -8,9 +8,9 @@ tableOfContents:
 
 import { DocDemo } from "@/components/docs/islands/system-settings";
 
-![System Settings page screenshot](/images/screenshots/doc-system-settings-overview.webp)
+![System Settings "Features" tab screenshot](../../../assets/screenshots/settings-features.webp)
 
-System Settings full page — function areas grouped as Cards (sync / system / security / Turnstile / scheduling / master URL / API token / license)
+System Settings — 13 tabs at the top (Subscription / Features / Users / Notifications / Security / Probe / Appearance / Announcements / TG Bot / Captcha / System / Database / License); shown here: "Features"
 
 ## Try it: System Settings
 
@@ -43,6 +43,58 @@ This overview follows the current /system-settings implementation in the MiaoMia
 | License       | Review license status, plan, expiry, and server/node/user quotas; update the key and verify PRO feature availability.                                                | Effective after saving        |
 
 Block Public Access makes the master listen only on 127.0.0.1 and requires a restart. It only suits a reverse proxy on the same host; Docker port mapping, cross-server proxying, and direct IP:port access will stop working. Regenerating the API Token invalidates the old token immediately.
+
+## Tab overview
+
+Screenshots and purpose of every tab in order; key settings are explained in detail further down.
+
+![Subscription tab screenshot](../../../assets/screenshots/settings-subscription.webp)
+
+Subscription: external subscription sync (traffic info, node-name filter / append), external node probe, auto re-sync when nodes go offline
+
+![Users tab screenshot](../../../assets/screenshots/settings-users.webp)
+
+Users: MiaoMiaoWu features (probe / generator menus), user menu items, user quotas (e.g. allow users to create routed outbounds, count and daily limit), user-created child nodes
+
+![Notifications tab screenshot](../../../assets/screenshots/settings-notify.webp)
+
+Notifications: enable push, Telegram Bot Token / Chat ID, per-event switches, daily message text
+
+![Security tab screenshot](../../../assets/screenshots/settings-security.webp)
+
+Security: login rate limit, brute-force protection, subscription request frequency and other thresholds, auto-saved on blur
+
+![Probe tab screenshot](../../../assets/screenshots/settings-probe.webp)
+
+Probe: disguise the site as a public monitor page, configure title / logo / hidden login / shown servers and collected metrics, API fields in [Probe API](/docs/en/probe-api)
+
+![Appearance tab screenshot](../../../assets/screenshots/settings-appearance.webp)
+
+Appearance: custom branding (PRO), panel wallpaper, menu order, custom CSS, default theme, login wallpaper and login box opacity
+
+![Announcements tab screenshot](../../../assets/screenshots/settings-announcement.webp)
+
+Announcements: templates for node blocked / recovered / maintenance / subscription update, choose Bot / Mini App channels and publish
+
+![TG Bot tab screenshot](../../../assets/screenshots/settings-tgbot.webp)
+
+TG Bot: enable the built-in Bot and Mini App, Bot Token, admin Telegram IDs, redeem-code copy text, see [Telegram Bot](/docs/en/tool-mmwx-tgbot)
+
+![Captcha tab screenshot](../../../assets/screenshots/settings-captcha.webp)
+
+Captcha: Cloudflare Turnstile Site Key / Secret Key, see [Cloudflare Turnstile](/docs/en/tool-cloudflare-turnstile)
+
+![System tab screenshot](../../../assets/screenshots/settings-system.webp)
+
+System: auto backup, custom proxy-group source, scheduler intervals, master address / subscription domain, disable public access, HTTPS self-healing, API Token
+
+![Database tab screenshot](../../../assets/screenshots/settings-database.webp)
+
+Database: view the current database type and migrate between SQLite and PostgreSQL, see [Backup & Restore](/docs/en/backup-restore)
+
+![License tab screenshot](../../../assets/screenshots/settings-license.webp)
+
+License: after saving the license key it shows the plan, quotas (servers / nodes / users) and unlocked PRO features, plus where the license title is displayed
 
 ## External Subscription Sync Settings
 

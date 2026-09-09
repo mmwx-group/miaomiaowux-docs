@@ -6,9 +6,17 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
-![检查更新对话框截图](/images/screenshots/doc-update-dialog.webp)
+![检查更新对话框截图](../../assets/screenshots/about-dialog.webp)
 
-检查更新对话框 — 显示当前版本与最新 GitHub Release,可一键升级
+检查更新对话框 — 显示当前版本，可选稳定版 / 预发布版通道，有新版本时一键升级，也可「强制重新安装」
+
+## 面板内更新（推荐）
+
+一键脚本或二进制部署的主控可以直接在面板里升级：右上角头像菜单 →「检查更新」，选择更新通道后点升级，主控下载新版本、校验签名并自动重启。Docker 部署请用下面的镜像方式更新。
+
+![用户菜单截图](../../assets/screenshots/user-menu.webp)
+
+头像菜单里的「检查更新」与当前版本号
 
 ## Docker 更新
 
@@ -64,4 +72,12 @@ systemctl start miaomiaowux
 
 ## Agent 更新
 
-Agent 更新方式与主控端相同，下载新版本替换后重启即可。Agent 与主控端版本建议保持一致。
+Agent 不需要 SSH 到服务器：在「服务管理」里，有新版本的服务器卡片版本徽标会带红点，点它升级这一台；顶部「一键升级 Agent」批量升级所有可升级的服务器。升级过程中 Agent 会重启，服务短暂中断。Agent 与主控端版本建议保持一致。
+
+![升级单台 Agent 确认框截图](../../assets/screenshots/servers-version-menu.webp)
+
+升级单台 Agent
+
+![一键升级 Agent 确认框截图](../../assets/screenshots/servers-upgrade-agents-dialog.webp)
+
+一键升级全部 Agent

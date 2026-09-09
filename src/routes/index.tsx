@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -128,20 +127,20 @@ function XHomePage() {
             </span>
           </div>
           <nav className="flex items-center gap-2 sm:gap-4">
-            <Link
-              to="/docs/tutorial"
+            <a
+              href="/docs/tutorial"
               className="pixel-button inline-flex items-center gap-2 px-3 py-2 h-9 text-sm font-semibold uppercase tracking-widest bg-background/75 text-foreground border-[color:rgba(137,110,96,0.45)] hover:bg-accent/35 hover:text-accent-foreground transition-all"
             >
               <BookOpen className="size-4" />
               <span className="hidden sm:inline">{t('xHome.navDocs')}</span>
-            </Link>
-            <Link
-              to="/docs/changelog"
+            </a>
+            <a
+              href="/docs/changelog"
               className="pixel-button inline-flex items-center gap-2 px-3 py-2 h-9 text-sm font-semibold uppercase tracking-widest bg-background/75 text-foreground border-[color:rgba(137,110,96,0.45)] hover:bg-accent/35 hover:text-accent-foreground transition-all"
             >
               <FileText className="size-4" />
               <span className="hidden sm:inline">{t('xHome.navChangelog')}</span>
-            </Link>
+            </a>
             <a
               href="https://license.miaomiaowux.com/pricing"
               target="_blank"
@@ -196,18 +195,18 @@ function XHomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
-            <Link to="/docs/quick-start">
+            <a href="/docs/quick-start">
               <Button size="lg" className="pixel-button w-full sm:w-auto px-8 py-6 text-lg font-semibold">
                 <Zap className="size-5 mr-2" />
                 {t('xHome.quickStart')}
               </Button>
-            </Link>
-            <Link to="/docs">
+            </a>
+            <a href="/docs">
               <Button variant="outline" size="lg" className="pixel-button w-full sm:w-auto px-8 py-6 text-lg font-semibold">
                 <BookOpen className="size-5 mr-2" />
                 {t('xHome.viewDocs')}
               </Button>
-            </Link>
+            </a>
           </div>
 
           <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
@@ -245,7 +244,7 @@ function XHomePage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {protocolDefs.map((p) => (
-              <Link key={p.key} to={p.href}>
+              <a key={p.key} href={p.href}>
                 <Card className="pixel-card group hover:scale-[1.02] hover:shadow-[6px_6px_0_rgba(217,119,87,0.25)] transition-all duration-300 h-full cursor-pointer">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -269,7 +268,7 @@ function XHomePage() {
                     </CardDescription>
                   </CardContent>
                 </Card>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
@@ -389,7 +388,7 @@ function XHomePage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {quickLinkDefs.map((item) => (
-              <Link key={item.href} to={item.href}>
+              <a key={item.href} href={item.href}>
                 <Card className="pixel-card group hover:scale-[1.02] hover:shadow-[6px_6px_0_rgba(217,119,87,0.25)] transition-all duration-300 h-full cursor-pointer">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -402,7 +401,7 @@ function XHomePage() {
                     <CardDescription>{t(`xHome.quickLinks.${item.key}.desc`)}</CardDescription>
                   </CardHeader>
                 </Card>
-              </Link>
+              </a>
             ))}
           </div>
         </div>

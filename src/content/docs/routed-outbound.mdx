@@ -16,15 +16,25 @@ import { DocDemo } from "@/components/docs/islands/routed-outbound";
 
 ## 出站的两种配置方式
 
-在节点管理页面，每个节点行右侧的 「路由出站」按钮可以打开「新增落地节点」对话框。对话框顶部「作用范围」提供两种完全不同的能力：
+在节点管理页面，每个节点行的「创建链式出站」按钮（双向箭头图标）可以打开「新增落地节点」对话框。对话框顶部「作用范围」提供两种完全不同的能力：
+
+![新增落地节点对话框截图](../../assets/screenshots/nodes-row-landing.webp)
+
+新增落地节点：作用范围（整个节点 / 子节点）、选择落地节点 / 选择服务器 / 选择负载均衡器三个选项卡
+
+顶部工具栏的「路由出站」按钮则打开路由出站总览，列出已创建的全部 routed 子节点：
+
+![路由出站管理页面截图](../../assets/screenshots/routed-outbounds-page.webp)
+
+路由出站管理：说明区 + 已创建的路由出站列表（尚未创建时为空）
 
 **使用前提（普通用户）**：路由出站对普通用户是一个需要管理员开启的功能。管理员在「系统设置 → 妙妙屋功能设置」找到「允许用户创建路由出站」开关。开关右侧可配置 数量上限（默认 2）和 每日操作次数（默认 5），未开启时两个输入框都被禁用。
 
 未开启时，普通用户的节点行不会出现 「路由出站」按钮；如果通过其他途径调用接口：
 
-- \- 功能未启用 → 后端返回 403「路由出站功能未开放，请联系管理员开启」
-- \- 数量达上限 → 403「已达到路由出站数量上限 (N/M)」
-- \- 今日操作次数达上限 → 429「今日操作次数已达上限 (N/M)，请明天再试」
+- 功能未启用 → 后端返回 403「路由出站功能未开放，请联系管理员开启」
+- 数量达上限 → 403「已达到路由出站数量上限 (N/M)」
+- 今日操作次数达上限 → 429「今日操作次数已达上限 (N/M)，请明天再试」
 
 对话框「作用范围」两种模式：
 
@@ -41,8 +51,8 @@ import { DocDemo } from "@/components/docs/islands/routed-outbound";
 
 底层动作（写入源服务器 xray 配置）：
 
-- 1\. 加 outbound，tag = landing-`<源 inbound tag>`-`<时间戳>`
-- 2\. 加 routing 规则：`{inboundTag: [源 inbound], outboundTag: 上一步 tag}`
+1. 加 outbound，tag = landing-`<源 inbound tag>`-`<时间戳>`
+2. 加 routing 规则：`{inboundTag: [源 inbound], outboundTag: 上一步 tag}`
 
 **适用场景：所有用户都该走同一出口，例如"前端入口机 → 后端落地机"统一中转、统一出口接管。**
 
@@ -81,12 +91,12 @@ import { DocDemo } from "@/components/docs/islands/routed-outbound";
 
 ### 具体步骤
 
-1.  在节点管理页面，找到中转节点 HK直连，点击行尾的 「路由出站」按钮
-2.  「作用范围」选择 按用户（路由出站）
-3.  填写 Label（仅允许 \[a-zA-Z0-9-\]，长度 2-32），例如 rout-hinet
-4.  选择目标落地节点（如 HINET），点击「创建路由出站」
-5.  系统在节点列表新增子节点 HK直连-rout-hinet，node_type = routed
-6.  在套餐管理中勾选这个子节点，分配给指定用户即可生效
+1. 在节点管理页面，找到中转节点 HK直连，点击行尾的 「路由出站」按钮
+2. 「作用范围」选择 按用户（路由出站）
+3. 填写 Label（仅允许 \[a-zA-Z0-9-\]，长度 2-32），例如 rout-hinet
+4. 选择目标落地节点（如 HINET），点击「创建路由出站」
+5. 系统在节点列表新增子节点 HK直连-rout-hinet，node_type = routed
+6. 在套餐管理中勾选这个子节点，分配给指定用户即可生效
 
 ### 生成的 routing 规则示例
 
@@ -123,20 +133,20 @@ email 实际格式：`<username>`\_\_`<short>`\_\_`<label>`，管理员占位为
 
 位置：管理员账号登录 → 「系统设置」 → 「妙妙屋功能设置」卡片 → 「允许用户创建路由出站」一行。
 
-- \- 关闭（默认）：普通用户节点行不显示 「路由出站」按钮；接口 POST 返回 403。
-- \- 开启：右侧 Switch 打开后，「数量」「每日次数」两个输入框启用。
-- \- 数量：当前持有的路由出站上限。默认 2；可调到任意 ≥1 的整数。不支持"不限"（每条路由出站都会在 xray 上新增 outbound + routing rule，无限制可能导致配置膨胀）。
-- \- 每日次数：今日内 create + delete 操作次数总和上限。默认 5；可调到任意 ≥1 的整数。不支持"不限"。设计原因：xray routing 不支持 gRPC 动态加载，每次新增 / 删除路由出站后 agent 都会自动重启 xray。频繁触发重启会影响其他用户连接，所以"按操作次数限速"。
-- \- 计数窗口：按主控服务器本地时区当日 0:00 起算，到 24:00 重置；不滚动。
-- \- 修改即生效：Switch 切换 / 输入框失焦时立即保存到 system_settings 表。
+- 关闭（默认）：普通用户节点行不显示 「路由出站」按钮；接口 POST 返回 403。
+- 开启：右侧 Switch 打开后，「数量」「每日次数」两个输入框启用。
+- 数量：当前持有的路由出站上限。默认 2；可调到任意 ≥1 的整数。不支持"不限"（每条路由出站都会在 xray 上新增 outbound + routing rule，无限制可能导致配置膨胀）。
+- 每日次数：今日内 create + delete 操作次数总和上限。默认 5；可调到任意 ≥1 的整数。不支持"不限"。设计原因：xray routing 不支持 gRPC 动态加载，每次新增 / 删除路由出站后 agent 都会自动重启 xray。频繁触发重启会影响其他用户连接，所以"按操作次数限速"。
+- 计数窗口：按主控服务器本地时区当日 0:00 起算，到 24:00 重置；不滚动。
+- 修改即生效：Switch 切换 / 输入框失焦时立即保存到 system_settings 表。
 
 ### 创建步骤
 
-1.  普通用户在节点管理页面，找到自己可见的中转节点（套餐分配的节点或自己导入的），点击行尾 「路由出站」按钮
-2.  对话框只显示「路由出站（按用户）」模式（管理员的「整个节点」radio + 服务器 Tab 都不显示）
-3.  从「从已有节点选」Tab 选一个落地节点
-4.  Label 自动填 rout-`<目标 slug>`，可手动改
-5.  点「创建路由出站」
+1. 普通用户在节点管理页面，找到自己可见的中转节点（套餐分配的节点或自己导入的），点击行尾 「路由出站」按钮
+2. 对话框只显示「路由出站（按用户）」模式（管理员的「整个节点」radio + 服务器 Tab 都不显示）
+3. 从「从已有节点选」Tab 选一个落地节点
+4. Label 自动填 rout-`<目标 slug>`，可手动改
+5. 点「创建路由出站」
 
 系统在节点列表新增一行 `<中转节点>`-`<label>`，该行只对创建者本人可见，并自动进入用户订阅。
 
@@ -148,14 +158,14 @@ email 实际格式：`<username>`\_\_`<short>`\_\_`<label>`，管理员占位为
 
 以下三种情况触发用户私有路由出站自动暂停（拆 rule + client，保留 outbound + 凭据）：
 
-- \- 管理员在用户管理停用该用户（is_active=false）
-- \- 套餐到期（package_end_date < now）
-- \- 流量超限（traffic limit enforcer 拉黑）
+- 管理员在用户管理停用该用户（is_active=false）
+- 套餐到期（package_end_date < now）
+- 流量超限（traffic limit enforcer 拉黑）
 
 对应恢复触发点（重建 rule + 加回 client）：
 
-- \- 启用用户
-- \- 流量恢复到限额以下
+- 启用用户
+- 流量恢复到限额以下
 
 注意：套餐到期时由于失去对父 inbound 的访问权，路由出站会被自动暂停，但不会自动恢复（要求重新绑定套餐）。
 
@@ -185,21 +195,16 @@ email 实际格式：`<username>`\_\_`<short>`\_\_`<label>`，管理员占位为
 
 ### 创建路由出站时
 
-1\. 在父物理节点的 inbound 里加一个占位 admin client（email = \_admin\_\_`<short>`\_\_`<label>`）
-
-2\. 在源服务器上加一个 outbound，tag = routed:p`<父节点 id>`:`<label>`
-
-3\. 在 routing 规则数组顶部 prepend 一条带 marktag 的规则，user = \[admin_email\]
-
-4\. 在主控数据库 nodes 表写入子节点行（node_type=routed，parent_node_id，routed_outbound_tag）
+1. 在父物理节点的 inbound 里加一个占位 admin client（email = \_admin\_\_`<short>`\_\_`<label>`）
+2. 在源服务器上加一个 outbound，tag = routed:p`<父节点 id>`:`<label>`
+3. 在 routing 规则数组顶部 prepend 一条带 marktag 的规则，user = \[admin_email\]
+4. 在主控数据库 nodes 表写入子节点行（node_type=routed，parent_node_id，routed_outbound_tag）
 
 ### 套餐分配用户到该子节点时
 
-1\. 为用户在父 inbound 中加一个子账号 client（email = `<username>`\_\_`<short>`\_\_`<label>`，UUID 独立生成）
-
-2\. 把该 email 追加到 routing 规则的 user\[\] 数组
-
-3\. 凭据写入 user_subaccounts 表，续费 / 恢复时复用同一组凭据
+1. 为用户在父 inbound 中加一个子账号 client（email = `<username>`\_\_`<short>`\_\_`<label>`，UUID 独立生成）
+2. 把该 email 追加到 routing 规则的 user\[\] 数组
+3. 凭据写入 user_subaccounts 表，续费 / 恢复时复用同一组凭据
 
 ### 订阅生成时
 

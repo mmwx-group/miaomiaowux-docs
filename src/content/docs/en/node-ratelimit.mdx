@@ -42,6 +42,10 @@ Agent 在 Xray 内核层面实施速度和设备限制
 
 Rate limits are configured through the package management page. Each package can set the following rate limit parameters:
 
+![Speed limit and connection limit fields in the package dialog screenshot](../../../assets/screenshots/packages-create-dialog.webp)
+
+Packages → create / edit package: "Speed limit (Mbps)" and "Connection limit" (PRO) at the bottom
+
 ### Download Speed Limit (Mbps)
 
 <table class="w-full text-sm">
@@ -124,7 +128,11 @@ These are starting points. After assigning a package, watch a user's live concur
 
 ## User-Level Override
 
-In addition to package-level rate limit configuration, individual user-level rate limit overrides are supported, with higher priority than package settings.
+In addition to package-level rate limit configuration, individual user-level rate limit overrides are supported, with higher priority than package settings. Open it from "Users" → row action menu "…" → "Rate limit":
+
+![Edit rate limit override dialog screenshot](../../../assets/screenshots/users-menu-ratelimit.webp)
+
+Edit rate limit override: "Global override" applies to all of the user's nodes; "Per-node override" has the highest priority, 0 = explicitly unlimited, empty = inherit
 
 | Priority | Source               | Description                                                                                |
 | -------- | -------------------- | ------------------------------------------------------------------------------------------ |

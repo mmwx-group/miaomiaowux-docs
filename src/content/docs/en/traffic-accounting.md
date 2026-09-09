@@ -8,6 +8,14 @@ tableOfContents:
 
 MiaoMiaoWu X exposes server capacity usage, raw Xray node traffic, and billable user-package traffic. They answer different questions and are not expected to match. UI values labelled `GB` are converted with `1024³` bytes.
 
+![Traffic home screenshot](../../../assets/screenshots/dashboard.webp)
+
+Traffic (admin): KPI cards, daily trend, today / this week / this month, node view, user view, server overview
+
+![Server overview screenshot](../../../assets/screenshots/dashboard-server-overview.webp)
+
+Server overview: increments within the selected range, excluding "used traffic corrections", so it may differ from the billing-period totals on the Servers cards
+
 ## Core definitions
 
 Let raw server upload and download be `U` and `D`. The server mode `M(U,D)` is:

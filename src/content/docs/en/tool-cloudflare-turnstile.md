@@ -53,23 +53,27 @@ Sign in to MiaomiaowuX as admin and open 'System Settings' from the sidebar.
 
 ### 2\. Find the Cloudflare Turnstile card
 
-Scroll to the 'Cloudflare Turnstile' card (below the 'Security thresholds' card).
+Switch to the 'Captcha' tab; it contains only the 'Cloudflare Turnstile' card.
 
-![Empty Turnstile card screenshot](/images/screenshots/system-settings-turnstile-empty.webp)
+![Captcha tab screenshot](../../../assets/screenshots/settings-captcha.webp)
 
-The 'Cloudflare Turnstile' card in System Settings — keys empty by default
+System Settings → Captcha: the Cloudflare Turnstile card with both keys empty
+
+:::caution[Locked out after a wrong key?]
+Turnstile only checks that both keys are non-empty. Once they are set, a wrong Secret or a server that cannot reach Cloudflare locks you out of the panel — and fixing the setting requires logging in. Set the environment variable `MMWX_DISABLE_CAPTCHA=1` on the master and restart to bypass the check temporarily.
+:::
 
 ### 3\. Paste keys & save
 
 Paste Site Key into the Site Key field and Secret Key into the Secret Key field. Blur the input to auto-save — no button needed, takes effect immediately without restart.
 
-![Filled Turnstile card screenshot](/images/screenshots/system-settings-turnstile-filled.webp)
+![Filled Turnstile card screenshot](../../../assets/screenshots/system-settings-turnstile-filled.webp)
 
 Site Key shown as-is after save; Secret Key shown masked on next load
 
 ## Step 3 — Verify it's working
 
-![Login page with Turnstile widget screenshot](/images/screenshots/login-page-with-widget.webp)
+![Login page with Turnstile widget screenshot](../../../assets/screenshots/login-page-with-widget.webp)
 
 MiaomiaowuX login page with the Turnstile widget at the bottom (CF test key shown — auto-passes with the 'Success' badge)
 

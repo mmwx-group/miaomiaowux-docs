@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="430" viewBox="0 0 1440 430" role="img" aria-labelledby="title desc">
+  <title id="title">GitHub Sync fork 更新分支示意图</title>
+  <desc id="desc">在 fork 仓库点击 Sync fork，然后选择 Update branch，保留自己的提交并合并上游更新。</desc>
+  <rect width="1440" height="430" fill="#f6f8fa"/>
+  <rect x="30" y="28" width="1380" height="72" rx="8" fill="#fff" stroke="#d0d7de"/>
+  <text x="58" y="72" fill="#1f2328" font-family="Arial, sans-serif" font-size="24" font-weight="700">main</text>
+  <text x="190" y="72" fill="#57606a" font-family="Arial, sans-serif" font-size="22">你的分支落后于 mmwx-group/mmwx-probe:main</text>
+  <rect x="1160" y="43" width="220" height="44" rx="7" fill="#f6f8fa" stroke="#afb8c1"/>
+  <text x="1203" y="72" fill="#24292f" font-family="Arial, sans-serif" font-size="20" font-weight="700">↻  Sync fork  ▾</text>
+  <rect x="300" y="124" width="1080" height="266" rx="14" fill="#fff" stroke="#d0d7de"/>
+  <circle cx="355" cy="178" r="24" fill="#57606a"/>
+  <text x="344" y="187" fill="#fff" font-family="Arial, sans-serif" font-size="24">↻</text>
+  <text x="400" y="174" fill="#1f2328" font-family="Arial, sans-serif" font-size="25" font-weight="700">This branch is out-of-date</text>
+  <text x="400" y="210" fill="#57606a" font-family="Arial, sans-serif" font-size="19">Update branch 会合并上游最新代码，并保留你的提交。</text>
+  <text x="400" y="248" fill="#cf222e" font-family="Arial, sans-serif" font-size="18" font-weight="700">不要点击 Discard commits：它会丢弃你在 fork 中的提交。</text>
+  <rect x="345" y="292" width="455" height="60" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="492" y="330" fill="#cf222e" font-family="Arial, sans-serif" font-size="21" font-weight="700">Discard commits</text>
+  <rect x="825" y="292" width="510" height="60" rx="8" fill="#1f883d"/>
+  <text x="1005" y="330" fill="#fff" font-family="Arial, sans-serif" font-size="21" font-weight="700">Update branch</text>
+</svg>

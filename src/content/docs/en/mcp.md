@@ -14,9 +14,12 @@ Tool calls reuse the master's existing API and authentication. Permissions are i
 
 ## Step 1: Generate API Token
 
-1\. Log in to the master, go to "Settings -> API Tokens".
+1. Log in to the master, click the avatar at the top right -> "Profile settings" and scroll to "API Tokens" at the bottom.
+2. Enter a name (e.g. `openclaw`) and click "Generate Token".
 
-2\. Enter a name (e.g. `openclaw`) and click "Generate Token".
+![Profile settings page screenshot](../../../assets/screenshots/personal-settings.webp)
+
+Profile settings: profile, UI style, two-factor auth, password, subscription credentials and "API Tokens" at the bottom
 
 **The plaintext is shown only once** - copy and save it immediately. The page also provides ready-to-copy client configuration snippets.
 

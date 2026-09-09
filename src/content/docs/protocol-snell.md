@@ -20,7 +20,11 @@ Snell 是 Surge 推出的轻量加密代理协议(salt + AES-GCM 记录层)。�
 
 ## 添加节点(向导)
 
-在「节点管理 → 添加节点」选择 Snell 协议,版本按钮为「v4/v5」或「v6」。保存后默认存 Clash 配置进节点表。
+在「节点管理 → 添加节点」选择 Snell 协议,版本按钮为「v4/v5」或「v6」。保存后默认存 Clash 配置进节点表。Snell 只有内联 Xray 模式的服务器支持。
+
+![Snell 添加节点向导截图](../../assets/screenshots/nodes-add-snell.webp)
+
+Snell：协议特定配置里选版本（v4/v5 或 v6）、混淆（none / http / tls）与混淆域名、v6 整形模式；每个用户一条独立 PSK
 
 ### 简易模式
 
@@ -32,17 +36,17 @@ Snell 是 Surge 推出的轻量加密代理协议(salt + AES-GCM 记录层)。�
 
 ## 客户端兼容性
 
-- \- Surge:原生支持 Snell(v1–v6),Snell 的原始客户端
-- \- mihomo / Clash.Meta:支持 Snell v1–v5(v6 需较新内核);妙妙屋X 的 Clash 订阅输出 v4 / v5
-- \- sing-box:较新版本支持 Snell;妙妙屋X 的 sing-box 订阅输出 v4–v6(v5 归一为 v4)
-- \- 妙妙屋X 订阅转换目前仅覆盖 Clash 与 sing-box 两类客户端(其余客户端对 Snell 支持有限)
+- Surge:原生支持 Snell(v1–v6),Snell 的原始客户端
+- mihomo / Clash.Meta:支持 Snell v1–v5(v6 需较新内核);妙妙屋X 的 Clash 订阅输出 v4 / v5
+- sing-box:较新版本支持 Snell;妙妙屋X 的 sing-box 订阅输出 v4–v6(v5 归一为 v4)
+- 妙妙屋X 订阅转换目前仅覆盖 Clash 与 sing-box 两类客户端(其余客户端对 Snell 支持有限)
 
 ## 注意事项
 
-- \- 鉴权字段为 settings.users\[\].psk(不是 clients\[\] / password);添加入站「简易模式」会自动生成 PSK,无需手填
-- \- v4 与 v5 线格式一致(salt 明文 + AES-128-GCM 记录),多用户按「每用户独立 PSK」逐一试解;v6 改为「共享 PSK + clientID」并隐藏 salt(靠 PSK 派生的置换 / 掩码),因此每用户需一个 clientID(简易模式自动生成)
-- \- v6 支持三种流量整形模式:default(默认整形)、unshaped(不整形)、unsafe-raw(裸核,仅调试);v4 / v5 支持 obfs 混淆(none / http / tls),v6 不再使用 obfs
-- \- Snell 走标准 TCP 传输,无 TLS / streamSettings;per-user 流量统计 / 限速与 VLESS / Trojan 共享同一套 xray dispatcher 通路
+- 鉴权字段为 settings.users\[\].psk(不是 clients\[\] / password);添加入站「简易模式」会自动生成 PSK,无需手填
+- v4 与 v5 线格式一致(salt 明文 + AES-128-GCM 记录),多用户按「每用户独立 PSK」逐一试解;v6 改为「共享 PSK + clientID」并隐藏 salt(靠 PSK 派生的置换 / 掩码),因此每用户需一个 clientID(简易模式自动生成)
+- v6 支持三种流量整形模式:default(默认整形)、unshaped(不整形)、unsafe-raw(裸核,仅调试);v4 / v5 支持 obfs 混淆(none / http / tls),v6 不再使用 obfs
+- Snell 走标准 TCP 传输,无 TLS / streamSettings;per-user 流量统计 / 限速与 VLESS / Trojan 共享同一套 xray dispatcher 通路
 
 ## 配置示例
 

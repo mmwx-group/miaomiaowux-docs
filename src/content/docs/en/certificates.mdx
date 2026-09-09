@@ -8,64 +8,86 @@ tableOfContents:
 
 import { DocDemo } from "@/components/docs/islands/certificates";
 
+![Certificates page screenshot](../../../assets/screenshots/certificates-list.webp)
+
+Certificates — the list: domain / CA / server / validation / status / expiry / deployment / auto-renew / auto-deploy
+
 ## Try it: certificate management
 
-4 mock domains — request, renew, download, delete. All local.
+4 mock domains; request, renew, download, delete. Entirely local.
 
 <DocDemo lang="en" client:load />
 
 ## Overview
 
-The certificate management module automatically issues and renews TLS certificates via the ACME protocol. It supports multiple DNS providers and automatically syncs certificates to remote servers.
+The certificate module requests and renews TLS certificates through ACME. Several DNS providers are supported and certificates are synced to remote servers automatically. The page has two tabs, "Certificate List" and "DNS Providers", and three buttons: "Refresh", "Request Certificate", "Upload Certificate".
 
-## Supported DNS Providers
+## Supported DNS providers
 
-| Provider             | Required Credentials  |
-| -------------------- | --------------------- |
-| Cloudflare           | API Token             |
-| Alibaba Cloud DNS    | AccessKey ID + Secret |
-| Tencent Cloud DNSPod | SecretId + SecretKey  |
-| Namesilo             | API Key               |
+| Provider       | Credentials             |
+| -------------- | ----------------------- |
+| Cloudflare     | API Token               |
+| Alibaba Cloud  | AccessKey ID + Secret   |
+| Tencent DNSPod | SecretId + SecretKey    |
+| Namesilo       | API Key                 |
 
-## Apply for Certificate
+In the "DNS Providers" tab click "Add DNS Provider", choose the type and enter the credentials; the config is generated and validated automatically:
 
-1\. Go to the "Certificate Management" page
+![Add DNS provider dialog screenshot](../../../assets/screenshots/certificates-dns-provider-dialog.webp)
 
-2\. Click "Apply for Certificate"
+Add DNS provider: name + type + API credentials
 
-3\. Select a DNS provider and enter credentials
+## Request a certificate
 
-4\. Enter the domain (wildcards supported, e.g. \*.example.com)
+1. Open "Certificates" and click "Request Certificate"
+2. Enter the domain (wildcards such as \*.example.com are supported)
+3. Enter the email and choose the CA (Let's Encrypt by default)
+4. Choose DNS-01 (required for wildcards) and the DNS provider you added
+5. For wildcards enable "Root + wildcard" to put example.com and \*.example.com in one certificate's SAN
+6. Enable "Auto renew" / "Auto deploy" as needed
+7. Submit; DNS validation runs and the result is stored in the database and certificate directory
 
-5\. For a wildcard request, optionally include the apex domain so example.com and \*.example.com become SANs on one certificate
+![Request certificate dialog screenshot](../../../assets/screenshots/certificates-apply-dialog.webp)
 
-6\. The system completes DNS validation and stores the issued certificate in both the database and certificate directory
+Request SSL/TLS certificate: domain, email, CA, validation, DNS provider, root + wildcard, auto renew, auto deploy
 
-## Download and automatic deployment
+## Upload a certificate
 
-Download creates an archive containing fullchain.pem and privkey.pem. After renewal, re-issuance, or webhook updates, the system replaces the certificate in every referenced Nginx and Xray directory. Restoring a historical Xray config from an Agent also deploys its referenced certificates first.
+Existing certificates (from Certimate or any other ACME client) can be pasted as PEM:
 
-## Auto Renewal
+![Upload certificate dialog screenshot](../../../assets/screenshots/certificates-upload-dialog.webp)
 
-The system automatically renews certificates before expiration. After successful renewal, certificate files are automatically updated on all remote servers using the certificate.
+Upload certificate: domain + certificate PEM + private key PEM; the dialog header also shows the API upload method
 
-## Certificate Storage
+Uploaded certificates appear in the list with CA "manual" and can be downloaded and deployed like any other.
+
+## Download and auto deploy
+
+"Download" in the list produces a zip with fullchain.pem and privkey.pem. After renewal, reissue or a webhook update the files are pushed again to every Nginx and Xray directory referencing the certificate; restoring a historical Xray config from the Agent also pushes the referenced certificates first.
+
+## Auto renew
+
+Certificates are renewed before expiry and the new files are updated on every remote server using them.
+
+## Storage
 
 ```
-证书文件路径（远程服务器）：
-  证书: /root/cert/{domain}/fullchain.pem
-  私钥: /root/cert/{domain}/privkey.pem
+Certificate paths (remote server):
+  cert: /root/cert/{domain}/fullchain.pem
+  key:  /root/cert/{domain}/privkey.pem
 ```
 
-## Use Cases
+## Use cases
 
-- \- VLESS/VMess/Trojan + TLS inbounds require a TLS certificate
-- \- Hysteria2 / AnyTLS inbounds require a TLS certificate
-- \- REALITY inbounds do not need certificates (uses target site's certificate)
+- VLESS/VMess/Trojan + TLS inbounds need a certificate
+- Hysteria2 / AnyTLS inbounds need a certificate
+- REALITY inbounds need none (they use the target site's certificate)
 
-## Webhook certificate upload (Certimate integration)
+When a server's port 443 has no certificate yet, the add-node wizard shows an "SSL configuration" prompt from which the certificate and Nginx 443 can be set up in one click.
 
-MiaomiaowuX exposes an HTTP endpoint that accepts certificates pushed from external issuance systems (e.g. Certimate) via webhook. Once stored, it auto-deploys to all remote servers tagged with that domain.
+## Webhook upload (Certimate integration)
+
+MiaoMiaoWu X accepts certificates pushed by external issuers such as Certimate through a webhook, stores them and deploys them to every remote server marked with the domain.
 
 ### Endpoint
 
@@ -73,25 +95,25 @@ Method: POST
 
 URL: https://your-mmwx-host/api/admin/certificates/upload
 
-Auth: Authorization: Bearer `<token>` or MM-Authorization: `<token>` (Global API Token from System Settings, or a personal admin token issued in the API Token page)
+Auth: Authorization: Bearer `<token>` or MM-Authorization: `<token>` (the global API token from System Settings, or a personal token issued by an admin in "API Tokens")
 
 Content-Type: application/json
 
 ### Request fields
 
-- \- domain — main domain bound to the certificate (e.g. \*.example.com or a.example.com)
-- \- cert_pem — certificate PEM text; accepts raw PEM (starts with -----BEGIN) or base64 (legacy UI format)
-- \- key_pem — private key PEM text; same dual format support
+- domain — the certificate's primary domain (e.g. \*.example.com or a.example.com)
+- cert_pem — certificate PEM, either raw PEM (starting with -----BEGIN) or base64 (legacy UI format)
+- key_pem — private key PEM, raw or base64
 
 ### Behavior
 
-- \- Existing same-domain cert → update the record (cert_path / key_path / expiry) and trigger auto-deploy
-- \- First-time upload → create a manual / no-deploy record; deploy target can be switched in the UI later
-- \- Success returns `{success: true, certificate_id: N}`; failure returns `{success: false, message: "..."}`
+- Domain exists → updates the record (cert_path / key_path / validity) and triggers auto deploy
+- First upload → creates a manual / no-deploy record; the deploy target can be changed in the UI
+- Success returns `{success: true, certificate_id: N}`; failure `{success: false, message: "..."}`
 
-### Certimate config example
+### Certimate example
 
-Certimate's webhook deployer substitutes `${CERTIMATE_DEPLOYER_*}` template variables with the actual cert content (raw PEM, no base64). MiaomiaowuX auto-detects the -----BEGIN prefix and accepts both raw PEM and the legacy base64 upload paths.
+Certimate's webhook deployer substitutes `${CERTIMATE_DEPLOYER_*}` variables with raw PEM. The endpoint detects -----BEGIN and accepts both raw PEM and base64.
 
 ```
 URL:    https://your-mmwx-host/api/admin/certificates/upload
@@ -107,9 +129,9 @@ Body:
   }
 ```
 
-### curl verification (raw PEM)
+### curl check (raw PEM)
 
-POST the file contents directly without base64 transcoding. Replace the paths with your actual cert locations.
+POST the file contents directly, no base64 needed.
 
 ```
 curl -X POST https://your-mmwx-host/api/admin/certificates/upload \

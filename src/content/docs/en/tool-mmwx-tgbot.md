@@ -18,7 +18,11 @@ Open @BotFather in Telegram, send /newbot, follow the prompts, and save the resu
 
 ### 2 . Open TGBot settings
 
-Sign in to MiaoMiaoWu X as an administrator and open System Settings → TGBot.
+Sign in to MiaoMiaoWu X as an administrator and open System Settings → TG Bot.
+
+![System Settings TG Bot tab screenshot](../../../assets/screenshots/settings-tgbot.webp)
+
+System Settings → TG Bot: enable switch, Bot Token, admin Telegram IDs, Mini App options and redeem-code copy text
 
 ### 3 . Enter the Bot Token
 
@@ -70,15 +74,19 @@ After opt-in (/notify on) the bot pushes at 20:00 daily:
 
 The Mini App is now part of the master and automatically uses master URL + /tg-app. Telegram initData verifies users opened from the Bot menu, so they do not enter their MiaoMiaoWu X credentials again.
 
+### Binding users
+
+The "Telegram" column in the Users list has a "Bind" button that generates a `/start <code>` command; the user sends it to the Bot to link their Telegram. Admins can also generate redeem codes in the Bot for self-registration.
+
 ### Admin view
 
-![MiaomiaowuX Telegram Mini App admin screenshot](/images/screenshots/tutorial-step12-miniapp-admin.webp)
+![MiaomiaowuX Telegram Mini App admin screenshot](../../../assets/screenshots/tutorial-step12-miniapp-admin.webp)
 
 Admins see the global overview plus user / traffic / redemption-code management in the Mini App.
 
 ### User view
 
-![MiaomiaowuX Telegram Mini App user screenshot](/images/screenshots/tutorial-step12-miniapp-user.webp)
+![MiaomiaowuX Telegram Mini App user screenshot](../../../assets/screenshots/tutorial-step12-miniapp-user.webp)
 
 Regular users see their own plan, used traffic, subscription URL and available nodes in the Mini App.
 

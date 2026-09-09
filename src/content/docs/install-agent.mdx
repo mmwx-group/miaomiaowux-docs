@@ -10,13 +10,17 @@ import { DocDemo } from "@/components/docs/islands/add-server";
 
 ## 概述
 
-远程服务器的 Agent 部署无需手动下载或配置。在主控端添加服务器后，系统会自动生成一键安装命令，在远程服务器上执行即可完成全部部署。
+远程服务器的 Agent 部署无需手动下载或配置。在主控端添加服务器后，系统会自动生成一键安装命令，在远程服务器上执行即可完成全部部署。安装成功后，服务管理页的服务器卡片会变为在线：
 
-重要约束：每台服务器必须使用独立的 agent_token
+![Agent 在线的服务器卡片截图](../../assets/screenshots/servers-card-online.webp)
 
+Agent 连上后：在线、锁图标（加密通信）、WS 连接、Xray 运行中、Agent 版本
+
+:::caution[重要约束：每台服务器必须使用独立的 agent_token]
 不要把同一份 agent 配置（同 token）复制到多台服务器同时使用。每个 token 在主控侧绑定唯一服务器记录，多台机器复用会触发抢占式重连风暴：两台 agent 反复互相踢掉对方，主控每秒被迫处理数次数据库写入。
 
 后果不只影响这台冲突服务器：写入风暴会打满主控的 SQLite 写队列，让无关服务器的心跳上报失败，最终被误判离线并整体降级到 HTTP/Pull 模式。主控会自动锁定先连上的 IP 60 秒，期间拒绝其它 IP 的同 token 连接 — 看到日志中的 "agent_token reuse detected" 警告说明命中此问题，请为每台服务器单独添加并使用独立 token。
+:::
 
 ## Xray 模式选择
 
@@ -33,13 +37,18 @@ import { DocDemo } from "@/components/docs/islands/add-server";
 
 ### 步骤 1：在主控端添加服务器
 
-1\. 登录主控端管理面板
+1. 登录主控端管理面板
+2. 进入「服务管理」页面
+3. 点击「添加服务器」，填写服务器名称和服务器地址，选择 Xray 模式
+4. 点「生成 Token」，系统自动生成该服务器的安装命令
 
-2\. 进入「Xray 服务器」页面
+![添加远程服务器对话框截图](../../assets/screenshots/add-server-dialog-filled.webp)
 
-3\. 点击「添加服务器」，填写服务器名称和 IP
+添加远程服务器：填名称、地址，选外置 / 内联 Xray
 
-4\. 保存后，系统自动生成该服务器的安装命令
+![生成 Token 后的安装命令截图](../../assets/screenshots/add-server-result.webp)
+
+生成 Token 后：一键安装命令与 Docker 环境变量（含 MMWX_MASTER_PUBLIC_KEY）
 
 ### 在线演示:添加服务器
 
@@ -85,13 +94,13 @@ SSH 登录到远程服务器，以 root 权限执行复制的命令。脚本会�
 
 ## Docker 部署
 
-除了一键脚本(裸机 + systemd),也可以直接拉镜像。镜像内置 embedded xray-core + nginx + 全套依赖,拉起即用,不需要在容器内现装任何东西。
+除了一键脚本(裸机 + systemd),也可以直接拉镜像。镜像内置 embedded xray-core + nginx + 全套依赖,拉起即用,不需要在容器内现装任何东西。「生成 Token」对话框下半部分就是 Docker 部署所需的环境变量,直接复制进 compose 的 environment 即可。
 
-必须用 host 网络模式启动
-
+:::caution[必须用 host 网络模式启动]
 xray 入站端口是主控前端动态加的,bridge 模式得跟着改 -p 映射,新增端口都要改 compose;agent 监听端口给主控反向连接也走宿主网络。
 
 容器内 entrypoint 启动时会检测默认网关 IP — 命中 docker bridge 默认段(172.17.x.x / 172.18.x.x)直接退出并报错。务必 --network host 或 network_mode: host。
+:::
 
 ### docker run
 
@@ -156,10 +165,10 @@ services:
 
 ### 强制约束 / 常见问题
 
-- \- **host 网络:** 强制。bridge 模式 entrypoint 直接拒启,不建议绕过。
-- \- **Xray 模式:** 镜像里没有外部 xray binary,只支持 embedded 模式。主控前端「添加服务器」时勾选 embedded(需 PRO 许可证;agent 端本身不验签)。
-- \- **Nginx:** 镜像已 apt 预装 nginx + symlink 兼容业务代码硬编码路径,主控发起的「安装 nginx」请求会被 agent 直接返回「已预装」,不触发任何安装动作。
-- \- **调试绕过 host 检查:** 不推荐。有概率端口冲突。仅 debug 用: `-e MMWX_REQUIRE_HOST_NETWORK=0`
+- **host 网络:** 强制。bridge 模式 entrypoint 直接拒启,不建议绕过。
+- **Xray 模式:** 镜像里没有外部 xray binary,只支持 embedded 模式。主控前端「添加服务器」时勾选 embedded(需 PRO 许可证;agent 端本身不验签)。
+- **Nginx:** 镜像已 apt 预装 nginx + symlink 兼容业务代码硬编码路径,主控发起的「安装 nginx」请求会被 agent 直接返回「已预装」,不触发任何安装动作。
+- **调试绕过 host 检查:** 不推荐。有概率端口冲突。仅 debug 用: `-e MMWX_REQUIRE_HOST_NETWORK=0`
 
 ## 自动安装 Xray
 
@@ -247,9 +256,15 @@ systemctl stop mmw-agent
 #   tail -f /var/log/mmw-agent.log
 ```
 
-## 重新安装
+## 升级与重新安装
 
-如果 Agent 出现问题，可以在服务器详情中找到「重新安装命令」，再次执行即可。脚本会自动停止旧服务、覆盖安装并重新启动。
+主控发布新版本后，服务管理页的卡片版本徽标会带红点，点它或顶部「一键升级 Agent」即可远程升级，无需 SSH；卡片「Agent」菜单里还有「卸载 Agent」。
+
+![Agent 菜单截图](../../assets/screenshots/servers-agent-menu.webp)
+
+Agent 菜单：同步节点 / 同步节点地址 / 配置历史 / 下发默认配置 / 网站管理 / 升级 Agent / 卸载 Agent
+
+如果 Agent 出现问题，可以重新打开「编辑服务器」拿到安装命令再次执行。脚本会自动停止旧服务、覆盖安装并重新启动。
 
 ## 支持的架构
 

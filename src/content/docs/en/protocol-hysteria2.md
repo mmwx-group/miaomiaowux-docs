@@ -12,13 +12,21 @@ Hysteria2 is based on QUIC (UDP), optimized for high-latency, high-packet-loss n
 
 ## Prerequisites
 
-- \- TLS certificate required (can be auto-issued via certificate management)
-- \- UDP port must be open
-- \- Client must support Hysteria2 (mihomo/Clash.Meta supported)
+- TLS certificate required (can be auto-issued via certificate management)
+- UDP port must be open
+- Client must support Hysteria2 (mihomo/Clash.Meta supported)
 
 ## Xray Configuration Notes
 
 In Xray-core, Hysteria2 uses protocol: "hysteria" with version: 2. Authentication uses the auth field (not password).
+
+## Creating it in the wizard
+
+In "Nodes → Add Node" with HYSTERIA2 selected, the security is always TLS, so the server needs a certificate covering its domain first (step 1 shows the "SSL configuration" prompt otherwise). Simple mode generates the port and auth password:
+
+![Hysteria2 add node wizard screenshot](../../../assets/screenshots/nodes-add-hysteria2.webp)
+
+Hysteria2: auth password generated; the JSON preview shows protocol hysteria with version 2
 
 ## Configuration Example
 

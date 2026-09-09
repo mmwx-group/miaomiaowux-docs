@@ -192,4 +192,4 @@ Docker 和二进制部署方式
 
 如果你需要管理多台远程服务器、精确控制用户流量和权限、自动化证书管理，或者需要通过页面配置 Xray 而无需手动登录服务器，那么妙妙屋X 是更好的选择。妙妙屋X 的大部分功能都继承自妙妙屋，升级迁移非常简单。
 
-[→ 查看核心特性](/docs/features)[→ 快速开始](/docs/quick-start)[→ 从妙妙屋迁移](/docs/upgrade-from-mmw)
+[→ 查看核心特性](/docs/features) · [→ 快速开始](/docs/quick-start) · [→ 从妙妙屋迁移](/docs/upgrade-from-mmw)

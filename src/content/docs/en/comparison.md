@@ -192,4 +192,4 @@ If you only need subscription management and node import, MiaoMiaoWu is sufficie
 
 If you need to manage multiple remote servers, precisely control user traffic and permissions, automate certificate management, or configure Xray through a UI without logging into servers, MiaoMiaoWu X is the better choice. Most of MMW-X's features are inherited from MMW, making the upgrade migration very straightforward.
 
-[→ View Core Features](/docs/en/features)[→ Quick Start](/docs/en/quick-start)[→ Upgrade from MMW](/docs/en/upgrade-from-mmw)
+[→ View Core Features](/docs/en/features) · [→ Quick Start](/docs/en/quick-start) · [→ Upgrade from MMW](/docs/en/upgrade-from-mmw)

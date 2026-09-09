@@ -6,6 +6,14 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+## Enabling the probe
+
+The probe is enabled in "System Settings → Probe": disguise the site as a public monitor page, configure title, logo, hidden login, which servers are shown and which metrics (CPU / memory / disk / ping) Agents collect. Region, provider and renewal price shown per server are entered in "Servers → Edit server → Probe display info".
+
+![System Settings Probe tab screenshot](../../../assets/screenshots/settings-probe.webp)
+
+System Settings → Probe: disguised probe switches
+
 ## Access and authentication
 
 The built-in probe uses same-origin browser requests. A protected standalone probe must send X-MMwx-Probe-Token. Disabled probe channels normally return 404.
