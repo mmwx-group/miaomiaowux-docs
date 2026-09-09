@@ -12,7 +12,6 @@
     "build:docs": "astro build --config astro.config.docs.mjs && node scripts/check-doc-links.mjs",
     "check:docs": "node scripts/check-doc-links.mjs",
     "build:only": "npm run build",
-    "migrate:docs": "node scripts/migrate-docs-to-markdown.mjs",
     "lint": "eslint .",
     "preview": "npm run build && wrangler dev",
     "format:check": "prettier --check .",
