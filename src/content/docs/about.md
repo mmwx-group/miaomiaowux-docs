@@ -12,6 +12,10 @@ tableOfContents:
 
 采用 Master-Agent 架构，主控端（Master）通过 WebSocket/HTTP 与远程服务器上的 Agent 通信，实现对多台服务器的统一管理。
 
+![流量信息首页截图](../../assets/screenshots/dashboard.webp)
+
+登录后的首页「流量信息」
+
 ## 架构概览
 
 ```
@@ -50,4 +54,4 @@ tableOfContents:
 
 ## 下一步
 
-[→ 查看核心特性](/docs/features)[→ 快速开始](/docs/quick-start)
+[→ 查看核心特性](/docs/features) · [→ 快速开始](/docs/quick-start)

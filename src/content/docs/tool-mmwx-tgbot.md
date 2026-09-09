@@ -18,7 +18,11 @@ tableOfContents:
 
 ### 2 . 打开 TGBot 设置
 
-使用管理员账号登录妙妙屋X，进入「系统设置」→「TGBot」。
+使用管理员账号登录妙妙屋X，进入「系统设置」→「TG Bot」。
+
+![系统设置 TG Bot 选项卡截图](../../assets/screenshots/settings-tgbot.webp)
+
+系统设置 → TG Bot：启用开关、Bot Token、管理员 Telegram ID、Mini App 相关选项与兑换码复制文案
 
 ### 3 . 填写 Bot Token
 
@@ -70,15 +74,19 @@ tableOfContents:
 
 Mini App 已合并到主控，地址自动使用「主控地址 + /tg-app」。用户从机器人菜单打开后，通过 Telegram initData 完成身份校验，无需再次输入妙妙屋X用户名和密码。
 
+### 绑定用户
+
+用户管理列表的「Telegram」列有「绑定」按钮，点击生成一条 `/start <code>` 命令发给用户，用户在 Telegram 里发给 Bot 即完成绑定；也可以由管理员在 Bot 里生成兑换码让用户自助注册。
+
 ### 管理员视图
 
-![妙妙屋X Telegram Mini App 管理员界面截图](/images/screenshots/tutorial-step12-miniapp-admin.webp)
+![妙妙屋X Telegram Mini App 管理员界面截图](../../assets/screenshots/tutorial-step12-miniapp-admin.webp)
 
 管理员在 Mini App 里查看全局概览,以及用户 / 流量 / 兑换码等管理操作。
 
 ### 用户视图
 
-![妙妙屋X Telegram Mini App 用户界面截图](/images/screenshots/tutorial-step12-miniapp-user.webp)
+![妙妙屋X Telegram Mini App 用户界面截图](../../assets/screenshots/tutorial-step12-miniapp-user.webp)
 
 普通用户在 Mini App 里查看自己的套餐、已用流量、订阅地址与可用节点。
 

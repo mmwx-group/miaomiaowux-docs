@@ -19,10 +19,10 @@ AnyTLS is a TLS-based proxy protocol that layers padding + framing + built-in mu
 
 ## Client compatibility
 
-- \- sing-box ≥ 1.12.0 (production stable, per-user stats + email)
-- \- mihomo / Clash.Meta (TLS only; REALITY explicitly NOT planned per upstream docs)
-- \- Shadowrocket ≥ v2.2.65 (iOS)
-- \- NekoBox ≥ v1.3.8 (Android)
+- sing-box ≥ 1.12.0 (production stable, per-user stats + email)
+- mihomo / Clash.Meta (TLS only; REALITY explicitly NOT planned per upstream docs)
+- Shadowrocket ≥ v2.2.65 (iOS)
+- NekoBox ≥ v1.3.8 (Android)
 
 Mihomo AnyTLS reference: [wiki.metacubex.one/config/proxies/anytls](https://wiki.metacubex.one/config/proxies/anytls/)
 
@@ -44,10 +44,18 @@ stop=8
 
 ## Notes
 
-- \- Auth field is settings.users\[\].password (NOT clients\[\]); both mmw-agent and the master subscription generator handle this distinction
-- \- AnyTLS-REALITY is not on any major client's roadmap (Clash/Mihomo/sing-box); Simple mode defaults the security layer to TLS
-- \- Inbound wizard Simple mode + TLS auto-matches the server's domain against wildcard certs in Certificate Management (e.g. a.example.com matches \*.example.com)
-- \- Mihomo node fields use password + sni (same as Trojan), produced automatically by the master's inboundToClashProxy
+- Auth field is settings.users\[\].password (NOT clients\[\]); both mmw-agent and the master subscription generator handle this distinction
+- AnyTLS-REALITY is not on any major client's roadmap (Clash/Mihomo/sing-box); Simple mode defaults the security layer to TLS
+- Inbound wizard Simple mode + TLS auto-matches the server's domain against wildcard certs in Certificate Management (e.g. a.example.com matches \*.example.com)
+- Mihomo node fields use password + sni (same as Trojan), produced automatically by the master's inboundToClashProxy
+
+## Creating it in the wizard
+
+In "Nodes → Add Node" with ANYTLS selected, the security can be TLS / REALITY. AnyTLS is only available on servers in embedded Xray mode; TLS needs a certificate and the wizard fills in the paddingScheme automatically:
+
+![AnyTLS add node wizard screenshot](../../../assets/screenshots/nodes-add-anytls.webp)
+
+AnyTLS + TLS: user password generated; the JSON preview shows the paddingScheme (traffic shaping)
 
 ## Config example
 

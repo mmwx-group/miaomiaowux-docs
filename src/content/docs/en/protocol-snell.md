@@ -20,7 +20,11 @@ Snell is a lightweight encrypted proxy protocol from Surge (salt + AES-GCM recor
 
 ## Adding a node (wizard)
 
-In Node Management → Add Node, pick the Snell protocol; the version buttons are 'v4/v5' or 'v6'. On save the Clash config is stored into the node table by default.
+In Node Management → Add Node, pick the Snell protocol; the version buttons are 'v4/v5' or 'v6'. On save the Clash config is stored into the node table by default. Snell is only available on servers in embedded Xray mode.
+
+![Snell add node wizard screenshot](../../../assets/screenshots/nodes-add-snell.webp)
+
+Snell: protocol-specific settings choose the version (v4/v5 or v6), obfs (none / http / tls) with obfs host, and the v6 shaping mode; each user has its own PSK
 
 ### Simple mode
 
@@ -32,17 +36,17 @@ Additionally configure obfs / shaping and multiple users: v4 / v5 set obfs (none
 
 ## Client compatibility
 
-- \- Surge: native Snell support (v1–v6), the original Snell client
-- \- mihomo / Clash.Meta: Snell v1–v5 (v6 needs a newer core); MiaomiaowuX's Clash subscription outputs v4 / v5
-- \- sing-box: recent versions support Snell; MiaomiaowuX's sing-box subscription outputs v4–v6 (v5 folded to v4)
-- \- MiaomiaowuX subscription conversion currently covers only Clash and sing-box clients (other clients have limited Snell support)
+- Surge: native Snell support (v1–v6), the original Snell client
+- mihomo / Clash.Meta: Snell v1–v5 (v6 needs a newer core); MiaomiaowuX's Clash subscription outputs v4 / v5
+- sing-box: recent versions support Snell; MiaomiaowuX's sing-box subscription outputs v4–v6 (v5 folded to v4)
+- MiaomiaowuX subscription conversion currently covers only Clash and sing-box clients (other clients have limited Snell support)
 
 ## Notes
 
-- \- Auth field is settings.users\[\].psk (not clients\[\] / password); Add-Inbound 'Simple mode' auto-generates the PSK
-- \- v4 and v5 share the same wire format (plaintext salt + AES-128-GCM records); multi-user works by trial-decrypting per PSK. v6 switches to shared PSK + clientID and hides the salt (via PSK-derived shuffle / mask), so each user needs a clientID (auto-generated in Simple mode)
-- \- v6 supports three shaping modes: default (shaped), unshaped, unsafe-raw (raw core, debug only); v4 / v5 support obfs (none / http / tls), v6 no longer uses obfs
-- \- Snell uses plain TCP transport, no TLS / streamSettings; per-user traffic stats / rate-limit share the same xray dispatcher path as VLESS / Trojan
+- Auth field is settings.users\[\].psk (not clients\[\] / password); Add-Inbound 'Simple mode' auto-generates the PSK
+- v4 and v5 share the same wire format (plaintext salt + AES-128-GCM records); multi-user works by trial-decrypting per PSK. v6 switches to shared PSK + clientID and hides the salt (via PSK-derived shuffle / mask), so each user needs a clientID (auto-generated in Simple mode)
+- v6 supports three shaping modes: default (shaped), unshaped, unsafe-raw (raw core, debug only); v4 / v5 support obfs (none / http / tls), v6 no longer uses obfs
+- Snell uses plain TCP transport, no TLS / streamSettings; per-user traffic stats / rate-limit share the same xray dispatcher path as VLESS / Trojan
 
 ## Config examples
 

@@ -19,10 +19,10 @@ AnyTLS 是基于 TLS 的代理协议，在 TLS 之上叠加 padding + framing + 
 
 ## 客户端兼容性
 
-- \- sing-box ≥ 1.12.0（生产稳定，per-user 统计 + email）
-- \- mihomo / Clash.Meta（TLS only，REALITY 官方文档明确不会支持）
-- \- Shadowrocket ≥ v2.2.65（iOS）
-- \- NekoBox ≥ v1.3.8（Android）
+- sing-box ≥ 1.12.0（生产稳定，per-user 统计 + email）
+- mihomo / Clash.Meta（TLS only，REALITY 官方文档明确不会支持）
+- Shadowrocket ≥ v2.2.65（iOS）
+- NekoBox ≥ v1.3.8（Android）
 
 Mihomo AnyTLS 配置参考： [wiki.metacubex.one/config/proxies/anytls](https://wiki.metacubex.one/config/proxies/anytls/)
 
@@ -44,10 +44,18 @@ stop=8
 
 ## 注意事项
 
-- \- 鉴权字段为 settings.users\[\].password（不是 clients\[\]），妙妙屋X 已在 mmw-agent 和主控订阅生成器中区分处理
-- \- AnyTLS-REALITY 在所有主流客户端(Clash/Mihomo/sing-box)中均无支持计划，简易模式安全协议默认 TLS
-- \- 添加入站「简易模式」+ TLS 时，妙妙屋X 自动用服务器域名匹配证书管理里的泛域名证书（如 \*.example.com 匹配 a.example.com）
-- \- mihomo 节点字段使用 password + sni（与 Trojan 同源），由主控的 inboundToClashProxy 自动产出
+- 鉴权字段为 settings.users\[\].password（不是 clients\[\]），妙妙屋X 已在 mmw-agent 和主控订阅生成器中区分处理
+- AnyTLS-REALITY 在所有主流客户端(Clash/Mihomo/sing-box)中均无支持计划，简易模式安全协议默认 TLS
+- 添加入站「简易模式」+ TLS 时，妙妙屋X 自动用服务器域名匹配证书管理里的泛域名证书（如 \*.example.com 匹配 a.example.com）
+- mihomo 节点字段使用 password + sni（与 Trojan 同源），由主控的 inboundToClashProxy 自动产出
+
+## 在向导中创建
+
+「节点管理 → 添加节点」选择 ANYTLS，安全协议可选 TLS / REALITY。AnyTLS 只有内联 Xray 模式的服务器支持；TLS 组合需要证书，向导会自动填入 paddingScheme：
+
+![AnyTLS 添加节点向导截图](../../assets/screenshots/nodes-add-anytls.webp)
+
+AnyTLS + TLS：用户密码自动生成，JSON 预览里可见 paddingScheme（流量整形）
 
 ## 配置示例
 

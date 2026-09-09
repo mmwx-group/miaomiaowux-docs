@@ -6,9 +6,17 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
+![流量信息首页截图](../../assets/screenshots/dashboard.webp)
+
+管理员首页「流量信息」：KPI 卡、每日趋势、节点 / 用户视图、服务器概览
+
 ### 远程服务器管理
 
-Master-Agent 架构，通过 WebSocket/HTTP/Pull 三种模式管理远程服务器。支持自动重连、Token 轮换、状态监控。
+Master-Agent 架构，通过 WebSocket/HTTP/Pull 三种模式管理远程服务器。支持自动重连、Token 轮换、状态监控。见 [远程服务器](/docs/remote-servers)。
+
+![服务管理页面截图](../../assets/screenshots/servers-list.webp)
+
+服务管理：每台服务器一张卡片
 
 ### Xray 服务管理
 
@@ -16,7 +24,11 @@ Master-Agent 架构，通过 WebSocket/HTTP/Pull 三种模式管理远程服务�
 
 ### Xray 入站管理
 
-可视化入站配置向导，支持 VLESS/VMess/Trojan/Shadowsocks/Hysteria2 全协议，TCP/WS/gRPC/XHTTP 传输，TLS/REALITY 安全层。
+可视化入站配置向导，支持 VLESS/VMess/Trojan/Shadowsocks/Hysteria2/AnyTLS/Snell/Mieru 全协议，TCP/WS/gRPC/XHTTP 传输，TLS/REALITY 安全层。见 [节点管理](/docs/nodes)。
+
+![添加节点向导截图](../../assets/screenshots/nodes-add-vless-reality.webp)
+
+添加节点向导：协议 / 传输 / 安全层三选一，右侧实时 JSON 预览
 
 ### 协议矩阵
 

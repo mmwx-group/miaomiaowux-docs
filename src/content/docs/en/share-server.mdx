@@ -45,6 +45,10 @@ The owner generates a share token for their managed server and provides the owne
 3. In the popup dialog, click Generate Share Token
 4. Copy the Owner Address and Share Token, provide to consumer
 
+![Share server dialog screenshot](../../../assets/screenshots/servers-share-dialog.webp)
+
+Share server: owner address, the "allow receiver to view/edit the full Xray config" switch (off by default — the receiver only manages inbounds it created), generate share token, shared list
+
 The share token is displayed only once when generated. Copy and save it immediately. Tokens are stored as SHA256 hashes and cannot be viewed again in plaintext.
 
 ### Token Management
@@ -65,6 +69,10 @@ The consumer uses the address and token provided by the owner to join the server
 2. Fill in the information provided by the owner
 3. Click Join, the system validates the token
 4. After successful join, the server appears in the service management list with a purple Shared label
+
+![Join shared server dialog screenshot](../../../assets/screenshots/servers-join-share-dialog.webp)
+
+Join shared server: owner address, share token, server name (optional), inbound prefix
 
 ### Join Parameters
 

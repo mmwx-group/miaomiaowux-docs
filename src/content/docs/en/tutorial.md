@@ -6,147 +6,120 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
-1
+This tutorial follows the real order of operations in 12 steps: preparation → DNS → install the master → initialization → HTTPS → add a server → install the Agent → add a node → create a package → bind the package → traffic info → tools. Every step comes with a screenshot of the master UI. Following it once gives you the minimal loop of "one master + one node server + one user".
 
-Preparation
-
-2
-
-DNS Resolution
-
-3
-
-Install Master
-
-4
-
-Initialize
-
-5
-
-HTTPS
-
-6
-
-Add Server
-
-7
-
-Install Agent
-
-8
-
-Add Node
-
-9
-
-Create Package
-
-10
-
-Bind Package
-
-11
-
-Traffic Info
-
-12
-
-Tools
-
-Steal Yourself is not recommended for the master
-
-Sharing port 443 between the master and REALITY Steal Yourself increases routing complexity and troubleshooting cost. Prefer a direct Nginx reverse proxy for the master with a separate subscription domain; Steal Yourself is better suited to regular Agent nodes.
+:::caution[Do not deploy the master with "steal self"]
+Sharing port 443 between the master and REALITY steal-self adds complexity and makes troubleshooting harder. Let Nginx reverse-proxy the master directly and use a separate domain for subscriptions; steal-self is better suited to ordinary Agent nodes.
+:::
 
 ## 1 Preparation
 
-Before starting, make sure you have the following resources ready:
+Before you start, make sure you have:
 
-| Item   | Quantity                                        |
-| ------ | ----------------------------------------------- |
-| Domain | 1 (master domain) (if using REALITY steal-self) |
-| Server | 1                                               |
+| Item   | Quantity                                         |
+| ------ | ------------------------------------------------ |
+| Domain | 1 (master domain) (required for REALITY steal-self) |
+| Server | 1                                                |
 
-If you need to use the REALITY steal-self feature, you must prepare a domain for the steal-self target website. This website can be MiaoMiaoWu X.
+If you want to use REALITY steal-self, you must prepare a domain for the steal-self target site; that site can be MiaoMiaoWu X itself.
 
-## 2 Add DNS Resolution
+## 2 Add DNS Records
 
-### Master Domain (Required)
+### Master domain (required)
 
-Add a DNS resolution for the MiaoMiaoWu X master, e.g., mmwx.example.com, replacing example.com with your actual domain.
+Add a DNS record for the MiaoMiaoWu X master, e.g. mmwx.example.com, replacing example.com with your real domain.
 
-### Server Domain (Recommended)
+### Server domains (recommended)
 
-It's recommended to add independent domains for each server, e.g., jp.example.com, us.example.com.
+Give each server its own domain, e.g. jp.example.com, us.example.com.
 
 ## 3 Install MiaoMiaoWu X
 
-Run the one-click install script on the server:
+Run the one-click installer on the server:
 
 ```
 curl -sL https://raw.githubusercontent.com/iluobei/miaomiaowuX/main/install.sh | sudo bash
 ```
 
-For more installation methods, see [Docker Installation](/docs/en/install-docker) or [Direct Installation](/docs/en/install-direct)
+For other methods see [Docker Install](/docs/en/install-docker) or [Direct Install](/docs/en/install-direct).
 
-## 4 Initialize
+## 4 Initialization
 
-Access the master panel in your browser:
+Open the master panel in a browser:
 
 ```
 http://mmwx.example.com:12889
 ```
 
-Enter username and password to complete registration. For domain, enter the master domain added in step 2 (e.g., mmwx.example.com).
+The first launch goes straight to the setup wizard. Enter a username and password; the domain field takes the master domain from step 2 (e.g. mmwx.example.com). Nickname, email and avatar are optional.
 
-![Initialization wizard screenshot](/images/screenshots/tutorial-step4-setup-wizard.webp)
+![Setup wizard screenshot](../../../assets/screenshots/tutorial-setup-wizard.webp)
 
-First-launch initialization wizard for creating the admin account
+The first-run setup wizard: fill in the admin credentials; the first registered user automatically becomes the administrator
+
+Two optional items sit at the bottom of the wizard:
+
+- **Use PostgreSQL**: the default is `data/mmwx.db` (SQLite). High-concurrency or multi-server deployments can enter PostgreSQL connection details here and skip a later migration.
+- **Restore from backup**: if you have a backup ZIP exported from an old master, upload it here to skip rebuilding by hand.
+
+After initialization you are redirected to the login page. Sign in with the account you just created to land on the "Traffic" home page.
+
+![Login page screenshot](../../../assets/screenshots/login-page.webp)
+
+Login page: switch between 中文 / English at the top right
 
 ## 5 Enable HTTPS
 
-### 5.1 Configure DNS Provider
+### 5.1 Configure a DNS provider
 
-1. Click Certificate Management -> DNS Providers -> Add Provider
-2. Enter DNS provider name, select provider type
-3. Enter API Key / API Secret (required fields vary by provider)
+1. Click "Certificates" → "DNS Providers" → "Add DNS Provider"
+2. Enter a name and choose the provider type
+3. Fill in the API key / secret (fields differ per provider)
 
-### 5.2 Apply for Certificate
+![Add DNS provider dialog screenshot](../../../assets/screenshots/certificates-dns-provider-dialog.webp)
 
-Click Certificate List -> Apply Certificate, fill in the following:
+Add DNS provider: for Cloudflare only an API Token is needed
 
-![Certificate management page screenshot](/images/screenshots/tutorial-step5-certificates-list.webp)
+### 5.2 Request a certificate
 
-Certificate management page, listing applied certificates
+Click "Certificate List" → "Request Certificate" and fill in:
 
-![Apply certificate dialog screenshot](/images/screenshots/tutorial-step5-apply-cert-dialog.webp)
+![Certificates page screenshot](../../../assets/screenshots/certificates-list.webp)
 
-Apply certificate dialog — fill in domain, email, DNS provider, etc.
+Certificates page listing issued certificates with CA, validation method, expiry, auto-renew and deployment status
 
-| Input               | Content               | Note                                   |
-| ------------------- | --------------------- | -------------------------------------- |
-| Domain              | `*.example.com`       | Apply for wildcard certificate         |
-| Email               | Your email            | For certificate notifications          |
-| CA Provider         | Let's Encrypt         | Default option                         |
-| Target Server       | Master                | Default is fine                        |
-| Verification Method | DNS-01                | Wildcard certificates must use DNS-01  |
-| DNS Provider        | Select added provider |                                        |
-| Auto Renew          | Enabled               | Enabled by default                     |
-| Auto Deploy         | Disabled              | When enabled, auto-redeploy on renewal |
+![Request certificate dialog screenshot](../../../assets/screenshots/certificates-apply-dialog.webp)
 
-After filling in, click Apply and wait for success.
+Request certificate dialog: domain, email, CA, validation method and DNS provider
 
-### 5.3 Deploy Certificate
+| Field                       | Value                       | Notes                                                  |
+| --------------------------- | --------------------------- | ------------------------------------------------------ |
+| Domain                      | `example.com`               | A wildcard certificate is recommended                  |
+| Email                       | Your email                  | Used for certificate notifications                     |
+| CA provider                 | Let's Encrypt               | Default                                                |
+| Validation                  | DNS-01                      | Required for wildcard certificates                     |
+| DNS provider                | The provider you added      |                                                        |
+| Root + wildcard             | On                          | Entering example.com also issues \*.example.com        |
+| Auto renew                  | On                          | Default on                                             |
+| Auto deploy                 | Off                         | When on, renewals are redeployed to referencing servers |
 
-Only a one-click installation can configure HTTPS automatically. For Docker installations, install Nginx or a similar tool to manage master HTTPS yourself; skip this step and see section 5.4.
+Click "Request Certificate" and wait for success.
 
-After successful application, a prompt appears at the top. Click Deploy Certificate to Master to enable HTTPS. You can also manually click deploy in the certificate list.
+:::tip[Already have a certificate?]
+If your certificate is issued by an external system such as Certimate, paste the PEM via "Upload Certificate" or push it through the webhook, see [Certificates](/docs/en/certificates).
+:::
 
-Nginx will be installed during deployment. Wait time depends on server performance and network conditions.
+### 5.3 Deploy the certificate
+
+Only one-click installs can configure HTTPS automatically. For Docker installs, manage master HTTPS yourself with Nginx or similar, skip this step and read 5.4.
+
+After the request succeeds a banner appears at the top; click "Deploy certificate to master" to enable HTTPS. You can also click deploy from the certificate list.
+
+Deployment installs Nginx, which may take a while depending on server performance and network.
 
 ### 5.4 Recommended: reverse-proxy the master with Nginx
 
-Configure HTTPS separately for the master and subscription domains. The master domain proxies the full panel, while the subscription domain permits only subscription paths and returns 404 elsewhere. Point both domains to the master server and prepare their certificates first.
+Configure HTTPS separately for the master domain and the subscription domain: the master domain proxies the whole panel, the subscription domain only allows subscription paths and returns 404 for everything else. Make sure both domains resolve to the master server and certificates are ready.
 
 #### Install Nginx
 
@@ -154,22 +127,22 @@ Configure HTTPS separately for the master and subscription domains. The master d
 curl -fsSL https://raw.githubusercontent.com/iluobei/miaomiaowuX/main/install-nginx.sh | bash
 ```
 
-Use the one-click script from the MiaoMiaoWu X master repository. It installs to /usr/local/nginx by default; additional server blocks can be placed in /usr/local/nginx/servers/.
+Uses the one-click script from the MiaoMiaoWu X repository. The default install directory is /usr/local/nginx; extra server configs go in /usr/local/nginx/servers/.
 
-#### Download and place certificates from the master
+#### Download the certificate from the master and place it
 
-Open Certificate Management on the master, locate the certificate for the domain, and click Download. Extract the downloaded archive to obtain these two files:
+Open "Certificates" on the master, find the domain and click download. Unzip to get two files:
 
-- `fullchain.pem`: the domain certificate and complete certificate chain.
-- `privkey.pem`: the certificate private key; never publish it or send it to others.
+- `fullchain.pem`: the domain certificate with the full chain.
+- `privkey.pem`: the private key, never publish or share it.
 
-Use a separate directory for each domain. The example below uploads both files to the master server and places them under /usr/local/nginx/cert/{domain}/. Replace {server_ip} and {domain} with actual values. Repeat this process for the subscription domain.
+Use one directory per domain. The example uploads both files to the master server and moves them into /usr/local/nginx/cert/{domain}/; replace {server_ip} and {domain}. Repeat for the subscription domain.
 
 ```
-# 先在本地执行，将解压后的证书上传到主控服务器
+# Run locally: upload the extracted certificate to the master server
 scp fullchain.pem privkey.pem root@{server_ip}:/tmp/
 
-# 再登录主控服务器执行；将 {domain} 替换为对应域名
+# Then on the master server; replace {domain}
 sudo mkdir -p /usr/local/nginx/cert/{domain}
 sudo cp /tmp/fullchain.pem /usr/local/nginx/cert/{domain}/fullchain.pem
 sudo cp /tmp/privkey.pem /usr/local/nginx/cert/{domain}/privkey.pem
@@ -177,9 +150,9 @@ sudo chmod 644 /usr/local/nginx/cert/{domain}/fullchain.pem
 sudo chmod 600 /usr/local/nginx/cert/{domain}/privkey.pem
 ```
 
-#### Master domain configuration
+#### Master domain config
 
-Replace {domain} with the master domain and confirm that fullchain.pem and privkey.pem exist in its directory. Save this as, for example, /usr/local/nginx/servers/master.conf.
+Replace {domain} with the master domain and confirm fullchain.pem and privkey.pem exist. Save as e.g. /usr/local/nginx/servers/master.conf.
 
 ```
 server {
@@ -215,9 +188,9 @@ server {
 }
 ```
 
-#### Separate subscription domain
+#### Dedicated subscription domain config
 
-Replace {domain} with the subscription domain and confirm that its certificate files are in the corresponding directory. This server exposes only short links and subscription APIs, not the administration panel.
+Replace {domain} with the subscription domain and place its certificate accordingly. This config only exposes short links and subscription APIs, never the admin panel.
 
 ```
 server {
@@ -257,17 +230,21 @@ server {
 }
 ```
 
-After configuring Nginx, open [System Settings](/docs/en/system-settings) and enter the full subscription domain in the master address section (for example, https://sub.example.com). Otherwise generated links will continue using the master domain.
+Afterwards you must go to [System Settings](/docs/en/system-settings) → "System" tab and enter the full subscription domain (e.g. https://sub.example.com) in the "Master address / Subscription domain" area, otherwise generated subscription links keep using the master domain.
 
-Finally, run /usr/local/nginx/sbin/nginx -t to validate the configuration, then systemctl reload nginx to reload it.
+![System Settings "System" tab screenshot](../../../assets/screenshots/settings-system.webp)
+
+System Settings → System: master address, subscription domain, disable public access and HTTPS self-healing all live here
+
+Finally run /usr/local/nginx/sbin/nginx -t to check the config, then systemctl reload nginx.
 
 ### 5.5 Optional: reverse-proxy the master with Caddy
 
-Caddy automatically obtains and renews HTTPS certificates and handles WebSocket connections and common forwarding headers. Point both domains to the master server and ensure ports 80 and 443 are reachable.
+Caddy requests and renews HTTPS certificates automatically and handles WebSocket and the usual forwarding headers. Make sure both domains resolve to the master and ports 80/443 are reachable.
 
 #### Install Caddy
 
-These commands use Caddy's official stable Debian/Ubuntu repository. The package creates and starts the caddy systemd service.
+The commands below use Caddy's official Debian/Ubuntu stable repository; the install creates and starts the caddy systemd service.
 
 ```
 sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
@@ -281,7 +258,7 @@ sudo apt install caddy
 
 #### Configure /etc/caddy/Caddyfile
 
-Replace {master_domain} and {subscription_domain} with the actual domains. The master domain exposes the full panel; the subscription domain permits only short links and subscription APIs and returns 404 elsewhere.
+Replace {master_domain} and {subscription_domain}. The master domain exposes the full panel; the subscription domain only allows short links and subscription APIs.
 
 ```
 {master_domain} {
@@ -303,175 +280,205 @@ Replace {master_domain} and {subscription_domain} with the actual domains. The m
 }
 ```
 
-Certificate paths are not required by default: Caddy obtains and renews certificates automatically. To use existing certificates, add tls /absolute/path/cert.pem /absolute/path/key.pem to the relevant site block.
+No certificate paths are needed by default; Caddy requests and renews them. To use existing certificates add tls /abs/path/cert.pem /abs/path/key.pem to the site block.
 
-When using a separate subscription domain, you must also open [System Settings](/docs/en/system-settings) and enter its full URL. Otherwise generated subscription links will continue using the master domain.
+With a dedicated subscription domain you must likewise enter it in [System Settings](/docs/en/system-settings).
 
-After saving the Caddyfile, validate it and reload the service:
+Validate and reload after saving:
 
 ```
 sudo caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl reload caddy
 ```
 
-We recommend enabling Block Public Network Access under System Settings → System.
+We recommend enabling "Disable public access" in the "System" tab so the master listens on 127.0.0.1 only.
 
-### 5.6 Optional: provide HTTPS with Cloudflare Tunnel
+### 5.6 Optional: publish over Cloudflare Tunnel
 
-If your domain is managed by Cloudflare, Tunnel can publish the master without installing Nginx/Caddy, managing certificates, or opening inbound ports 80 and 443. Use separate panel and subscription domains, and restrict the subscription domain to subscription paths at the Cloudflare edge.
+If the domain is on Cloudflare, publish the master through a Tunnel without Nginx/Caddy, certificates or open 80/443 ports. Use separate panel and subscription domains and restrict the subscription domain to subscription paths on the Cloudflare side.
 
-See [Publish the master with Cloudflare Tunnel](/docs/en/cloudflare-tunnel) for complete setup steps, Docker notes, and verification commands.
+Full steps, Docker notes and verification commands: [Publish the master with Cloudflare Tunnel](/docs/en/cloudflare-tunnel).
 
-## 6 Add Server
+## 6 Add a Server
 
-In this example, we use the MiaoMiaoWu X master server simultaneously as an Agent server.
+In this example the master server doubles as an Agent server.
 
-Click Service Management -> Add Server, fill in the following:
+Click "Servers" → "Add Server", enter a name, adjust the options as needed and click "Generate Token":
 
-| Input              | Content                     | Note                                                   |
-| ------------------ | --------------------------- | ------------------------------------------------------ |
-| Server Name        | Custom name                 |                                                        |
-| Server Address     | Domain or IP                |                                                        |
-| Traffic Limit      | Server monthly traffic      |                                                        |
-| Used Traffic       | Server used traffic         |                                                        |
-| Reset Date         | Traffic reset date          |                                                        |
-| Steal Self         | Enable REALITY steal-self   | Disabled by default, requires a domain before enabling |
-| Frontend Selection | Xray                        | Currently only supports Xray                           |
-| Deploy Mode        | Tunnel / Fallback           | Default Tunnel mode                                    |
-| Deploy on Port 443 | 443                         | Cannot be modified by default                          |
-| Domain             | Steal-self service domain   | e.g., steal.example.com                                |
-| Website Type       | Static Page / Reverse Proxy |                                                        |
-| Static Page        | Static page path            |                                                        |
-| Reverse Proxy      | Reverse proxy address       |                                                        |
+![Add remote server dialog screenshot](../../../assets/screenshots/add-server-dialog-filled.webp)
 
-When deploying on port 443, ensure that the server's port 443 is not occupied by other programs.
+Add remote server dialog: name, server address, Xray mode, traffic counting rule and more
 
-Don't worry about deploying other services. Click Agent Management -> Add Website to reuse port 443 for other services.
+| Field                  | Value                                     | Notes                                                                                   |
+| ---------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------- |
+| Server name            | Any name                                  | e.g. "Tokyo 01"                                                                         |
+| Server address         | Domain or IP                              | With a domain, nodes use the domain; DDNS can keep the record updated                   |
+| Agent port             | 23889                                     | Local Agent listening port, keep the default                                            |
+| Agent auth token       | Empty                                     | Auto-generated when empty                                                               |
+| Traffic limit / used   | Monthly quota / already used              | For matching the provider's meter, empty = unlimited                                    |
+| Reset day              | 1–31                                      | Monthly traffic reset day                                                               |
+| Enable IPv6            | As needed                                 | When off, v6 is hidden and cannot be chosen when adding nodes                           |
+| Xray mode              | External Xray / Embedded Xray (PRO)       | Embedded ships xray-core inside the Agent; supports rate limits, device limits, Snell, AnyTLS |
+| Traffic counting rule  | Up + Down / Up only / Down only / Max     | Direction used for this server's node traffic                                           |
+| Traffic data source    | Xray protocol traffic / System NIC traffic | The latter is closer to VPS billing                                                     |
+| Steal self             | Enable REALITY steal-self                 | Off by default, needs a domain, see 6.1                                                 |
 
-When enabling Steal Self, you must prepare a domain and resolve it to this server beforehand, to fill in the Domain field below. This domain will serve as the REALITY steal-self target website.
+Field details: [Remote Servers](/docs/en/remote-servers).
 
-![Server Management page screenshot](/images/screenshots/tutorial-step6-servers-list.webp)
+### 6.1 Agent steal-self
 
-Server Management page, with added servers shown as cards
+Note: once the master has HTTPS it occupies port 443, so do not enable "steal self" for an Agent installed on the master server.
 
-### 6.1 Agent Steal Yourself
+Turning on "Steal self" reveals another group of fields:
 
-Important: Deploying HTTPS for the MiaoMiaoWu X master occupies port 443. Do not enable Steal Yourself for an Agent installed on the master server.
+![Add server dialog with steal-self enabled screenshot](../../../assets/screenshots/add-server-steal-self.webp)
 
-Enable Steal Yourself when adding the Agent server. For Tunnel mode, use the following settings:
+With "Steal self" on: front-end xray, Tunnel / Fallback mode, port 443, domain and site type
 
-- Domain: the domain of the service being deployed
-- Website type: Reverse Proxy or Static Page
-- Reverse proxy address: 127.0.0.1:8080 (for example, proxy local port 8080); static page directory: /usr/local/nginx/html (the static asset directory on the host)
+| Field           | Value                    | Notes                                                                              |
+| --------------- | ------------------------ | ---------------------------------------------------------------------------------- |
+| Front end       | xray                     | Only Xray for now; Xray + Nginx are installed automatically after the Agent installs |
+| Deploy mode     | Tunnel / Fallback        | Default Tunnel: Xray listens on 443 and tunnels to Nginx                           |
+| Deploy on 443   | 443                      | Fixed                                                                              |
+| Domain          | Steal-self site domain   | e.g. steal.example.com, must resolve to this server                                |
+| Site type       | Static / Reverse proxy   | Static takes a directory path, reverse proxy takes an upstream such as 127.0.0.1:8080 |
 
-After saving the configuration, continue to the next step and install the Agent.
+Make sure port 443 is free on the server. You can still host other services: after the Agent connects, "Agent" → "Websites" → "Add website" reuses port 443.
 
-## 7 Install Agent
+Continue to the next step to install the Agent.
 
-1. Click Generate Token on the server card
-2. Copy the one-click install command at the bottom
-3. Run the command on the target server, wait for installation to complete
-4. After successful installation, the server card name shows Connected
+## 7 Install the Agent
 
-For detailed instructions, see [Agent Deployment](/docs/en/install-agent)
+After "Generate Token" the dialog shows the one-click install command and the Docker environment variables:
 
-After installation, the Agent automatically configures a tunnel-in inbound and routes traffic to the domain of the deployed service. You can then access that service at https://your-service-domain.
+![Install command after token generation screenshot](../../../assets/screenshots/add-server-result.webp)
 
-## 8 Add Node
+After generating the token: the install command on top, Docker environment variables (including the master public key) below
 
-For Steal Yourself, add a VLESS REALITY Vision node.
+1. Copy the install command
+2. SSH into the target server and run it as root; wait for it to finish
+3. Back on the Servers page, the dot on the card turns green and the status reads "Online"
 
-Click Node Management -> Add Node, select server and fill in the following:
+![Servers page screenshot](../../../assets/screenshots/servers-list.webp)
 
-### First Reality Node After Enabling Steal Yourself
+Servers page: once the Agent connects the card shows Online, Xray mode, connection (WS), Xray / Nginx status and the Agent version
 
-The first Reality node is forced to use port 443 and automatically selects the deployed website as its dest.
+Details: [Agent Deployment](/docs/en/install-agent).
 
-The port shown while creating the node may not be 443 because Steal Yourself uses settings.port from the tunnel-in inbound, which defaults to 46174. You can ignore this value and check the node after it has been added.
+Servers with steal-self enabled automatically get a tunnel-in inbound after the Agent installs and route to the deployed site domain; https://your-site-domain then serves the deployed site.
 
-| Input          | Content                       | Note                           |
-| -------------- | ----------------------------- | ------------------------------ |
-| Protocol Type  | Choose yourself               |                                |
-| Node Name      | Name displayed in the list    |                                |
-| REALITY Domain | Defaults to steal-self domain | Can also enter a custom domain |
-| Select User    | Select an existing user       |                                |
+## 8 Add a Node
 
-After saving, the node appears in the node management list and users can use it via subscription links.
+Click "Nodes" → "Add Node". The wizard has two steps: pick a server, then configure the inbound.
 
-![Node Management page screenshot](/images/screenshots/tutorial-step8-nodes-list.webp)
+![Add node step 1: choose server](../../../assets/screenshots/add-node-step1-selected.webp)
 
-Node Management page, listing all inbounds and their status
+Step 1: choose the server and IPv4 / IPv6; green "Xray ready" means you can create nodes right away
 
-### Check the Node
+![Add node step 2: inbound parameters](../../../assets/screenshots/nodes-add-vless-reality.webp)
 
-After adding the node, confirm that its port is 443 in Node Management. Then open https://your-service-domain in a browser. If the deployed website loads successfully, the configuration is working.
+Step 2: choose protocol / transport / security, enter the node name and REALITY domain; the generated inbound JSON is previewed on the right
 
-## 9 Create Package
+For steal-self add a VLESS + TCP + XTLS-Vision-REALITY node:
 
-Open the Package Management page and click "Create Package Template" to set traffic quota, billing period, billing mode (one-way/two-way), speed limit, and device limit; on the right, select nodes included in the package and set per-node multipliers.
+| Field          | Value                        | Notes                                                        |
+| -------------- | ---------------------------- | ------------------------------------------------------------ |
+| Protocol       | VLESS                        | Transport TCP, security XTLS-Vision-REALITY                  |
+| Config mode    | Simple                       | Expert mode exposes port, listen address, sniffing and more  |
+| Node name      | Name shown in the list       | The flag is added automatically from the server IP           |
+| REALITY domain | Defaults to the steal-self domain | Any domain works; the wizard probes latency automatically |
+| User           | Current admin by default     | UUID auto-generated                                          |
 
-![Package Management page screenshot](/images/screenshots/tutorial-step9-packages-list.webp)
+### The first REALITY node with steal-self
 
-Package Management page — created packages displayed as cards
+The first REALITY node is forced onto port 443 and automatically uses the deployed site as dest.
 
-![Create package dialog screenshot](/images/screenshots/tutorial-step9-package-create-dialog.webp)
+The port shown while creating may not be 443 because steal-self uses the tunnel-in inbound's settings.port (default 46174); ignore it and check the node afterwards.
 
-Create package dialog — parameters on the left, associated nodes on the right
+Click "Submit" and the wizard creates the inbound on the server and syncs it as a node:
 
-## 10 Bind Package
+![Nodes page screenshot](../../../assets/screenshots/nodes-list.webp)
 
-Open the User Management page, click "Manage Package" in the row of the target user, choose a created package and set an expiration date — the user gains access to the package's nodes after saving.
+Nodes page: new nodes carry a "Remote:server name" tag and the address column shows domain and port
 
-![User Management page screenshot](/images/screenshots/tutorial-step10-users-list.webp)
+### Check the node
 
-User Management page, listing all users and their package status
+Confirm the node's port is 443 in Nodes, then open https://your-site-domain in a browser; if the deployed site loads, the setup works.
 
-![Manage package dialog screenshot](/images/screenshots/tutorial-step10-bind-package-dialog.webp)
+## 9 Create a Package
 
-Manage package dialog — pick package + expiration + reset cycle
+Open "Packages" and click "Create Package Template" to set the traffic quota, billing cycle, counting mode (one-way / two-way), speed limit and connection limit, then tick the nodes included in the package and set node multipliers on the right.
 
-## 11 Traffic Info
+![Create package dialog screenshot](../../../assets/screenshots/packages-create-dialog-top.webp)
 
-Open the Traffic Info page to view usage from three angles: by user, by node, and by server.
+Create package template: parameters on the left, associated nodes on the right
 
-### User View
+If no node is ticked, a confirmation reminds you that "empty = all nodes":
 
-See used traffic for every user. Click a username to expand and view that user's per-node breakdown.
+![No nodes selected confirmation screenshot](../../../assets/screenshots/packages-create-confirm-no-nodes.webp)
 
-![User view screenshot](/images/screenshots/tutorial-step11-user-view.webp)
+Confirmation when no associated node is selected: empty means the package can use all nodes
 
-Sorted by per-cycle usage; click a username to expand by node
+![Packages page screenshot](../../../assets/screenshots/packages-list.webp)
 
-### Node View
+Packages page: each package is a card with edit / delete / publish carpool
 
-See used traffic for every node. Click a node name to expand and view that node's per-user breakdown.
+## 10 Bind the Package
 
-![Node view screenshot](/images/screenshots/tutorial-step11-node-view.webp)
+Open "Users" and click "Add User" (the initial password is random by default and can be changed before creating):
 
-Sorted by per-cycle usage; click a node name to expand by user
+![Add user dialog screenshot](../../../assets/screenshots/users-create-dialog.webp)
 
-### Server View
+Add user: username, email, nickname, initial password, remark
 
-See each server's current network speed, used/remaining traffic and utilization.
+Then click "Bind Package" on the user's row (for already bound users open the "…" menu and click the package name to reach "Manage Packages"), choose a package, set the expiry and save. The user then has access to the package's nodes.
 
-![Server view screenshot](/images/screenshots/tutorial-step11-server-view.webp)
+![Manage packages dialog screenshot](../../../assets/screenshots/users-manage-packages-dialog.webp)
 
-Per-server speed / used / total / remaining / utilization overview
+Manage packages: choose a package + expiry (+30 / +60 / +90 days) + monthly reset + traffic override
+
+![Users page screenshot](../../../assets/screenshots/users-list.webp)
+
+Users page: one row per user with Telegram binding, user short code, copy subscription and package usage bar
+
+## 11 Traffic
+
+The "Traffic" page shows usage from three angles: users, nodes and servers.
+
+![Traffic home screenshot](../../../assets/screenshots/dashboard.webp)
+
+Traffic home: four KPI cards (quota / used / remaining / live speed), the daily trend, node view, user view and server overview
+
+### User view
+
+Usage per user; click the expand icon for full screen and click a username to break it down by node.
+
+### Node view
+
+Usage per node; click a node name to break it down by user.
+
+### Server overview
+
+Live speed, used, total, remaining and utilization per server. "Today / This week / This month" at the top left switches the range. See [Traffic Accounting](/docs/en/traffic-accounting) for how the views differ.
 
 ## 12 Tools (TG Bot & MiniApp)
 
-Manage user-package bindings from within Telegram. The bot offers commands, daily notifications, and a login-free Mini App dashboard.
+Manage users and package bindings inside a Telegram bot with commands, daily notifications and a login-free Mini App.
 
-See System Settings → TG Bot for details.
+Configure it under "System Settings" → "TG Bot", see [Telegram Bot](/docs/en/tool-mmwx-tgbot).
+
+![System Settings TG Bot tab screenshot](../../../assets/screenshots/settings-tgbot.webp)
+
+System Settings → TG Bot: enter the Bot Token and admin Telegram IDs, enable and save
 
 ### Admin view (Mini App)
 
-![TG MiniApp admin view screenshot](/images/screenshots/tutorial-step12-miniapp-admin.webp)
+![TG MiniApp admin view screenshot](../../../assets/screenshots/tutorial-step12-miniapp-admin.webp)
 
-Admin view — account / traffic / subscription / redeem codes (phone resolution)
+Admin view: account / traffic / subscription / redeem codes (phone resolution)
 
 ### User view (Mini App)
 
-![TG MiniApp user view screenshot](/images/screenshots/tutorial-step12-miniapp-user.webp)
+![TG MiniApp user view screenshot](../../../assets/screenshots/tutorial-step12-miniapp-user.webp)
 
-Normal user view — own account / traffic / subscription only
+Regular user view: only the user's own account / traffic / subscription

@@ -8,59 +8,106 @@ tableOfContents:
 
 import { DocDemo } from "@/components/docs/islands/packages";
 
+![Packages page screenshot](../../../assets/screenshots/packages-list.webp)
+
+Packages — one card per template: quota, cycle, speed limit, node count, plus edit / delete / publish carpool
+
 ## Try it: package management
 
-4 mock packages — create, edit, delete; each picks bound nodes / quota / cycle / direction-based metering.
+4 mock packages; create, edit, delete; each package picks associated nodes / quota / cycle / one-way or two-way counting.
 
 <DocDemo lang="en" client:load />
 
 ## Overview
 
-Packages define a user's traffic quota, validity period, and accessible nodes. A user can hold multiple package instances; each instance has independent credentials, cycle baseline, quota, and expiry.
+A package defines the traffic quota, validity and node scope a user can use. One user can hold several package instances; each has independent credentials, cycle baseline, quota and expiry.
 
-## Package Attributes
+## Package attributes
 
-| Attribute       | Description                                   |
-| --------------- | --------------------------------------------- |
-| Name            | Package display name                          |
-| Traffic Quota   | Monthly available traffic (GB), 0 = unlimited |
-| Validity Period | Package validity in days                      |
-| Node Access     | Accessible nodes/node groups                  |
-| Rate Limit      | Bandwidth limit (optional)                    |
+| Attribute                    | Description                                                            |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| Name / description           | Display name and notes                                                 |
+| Traffic quota                | GB per cycle, 0 = unlimited                                            |
+| Counting mode                | One-way (×1, default) or two-way (×2)                                  |
+| Clash / Surge / Loon template | Templates used when generating subscriptions; empty = system default |
+| Billing cycle                | Days, default 30; optional monthly reset on a given day                |
+| Speed limit (Mbps)           | Max download per user, 0 = unlimited (PRO, embedded Xray)              |
+| Connection limit             | Max concurrent connections per user, 0 = unlimited (PRO)               |
+| Forwarding quota             | Lets package users create their own forwards on selected entry chains  |
+| Associated nodes             | Node scope; none = all nodes; optional per-package node names          |
 
-## Create Package
+## Create a package
 
-1\. Go to the "Package Management" page
+1. Open "Packages"
+2. Click "Create Package Template"
+3. Enter name, description, quota; choose counting mode and templates as needed
+4. Set the cycle / reset day, speed limit and connection limit
+5. Tick the nodes on the right (none = all nodes)
+6. Click "Save"
 
-2\. Click "Add Package"
+![Create package dialog (top) screenshot](../../../assets/screenshots/packages-create-dialog-top.webp)
 
-3\. Enter package name and quotas
+Create package template: basic parameters on the left, associated nodes on the right
 
-4\. Select accessible node scope
+![Create package dialog (bottom) screenshot](../../../assets/screenshots/packages-create-dialog.webp)
 
-5\. Save the package
+Scrolled down: billing cycle, monthly reset, speed limit and connection limit (PRO)
 
-## Rate Limit & Devices
+If no node is ticked, saving asks for confirmation: empty means "all nodes" and users bound to the package can use every node.
 
-Packages can set speed limits (Mbps) and device limits; individual user overrides can also be set in user management (user-level overrides package-level).
+![No nodes selected confirmation screenshot](../../../assets/screenshots/packages-create-confirm-no-nodes.webp)
 
-### Rate Limit
+Confirmation when no node is selected
 
-Set the limit in Mbps, 0 means unlimited. Once set, the Agent-side rate limiter enforces it on user connections; the UI provides unit conversion hints.
+### Example: three typical tiers
 
-### Auto Rate Limit / Release
+| Package  | Traffic | Cycle   | Speed     | Nodes                 | For               |
+| -------- | ------- | ------- | --------- | --------------------- | ----------------- |
+| Trial    | 20 GB   | 7 days  | 50 Mbps   | 1–2 nodes             | Trials            |
+| Basic    | 100 GB  | 30 days | 100 Mbps  | Regular nodes         | Light use         |
+| Advanced | 300 GB  | 30 days | Unlimited | All nodes (untick)    | Heavy / family    |
 
-You can enable auto rate limiting on quota exceed: when user traffic exceeds quota, speed is automatically reduced (instead of cutting subscription), and automatically released when traffic resets next month or quota is restored.
+Then bind them to users in [User Management → Bind and manage packages](/docs/en/users#bind-and-manage-packages).
 
-## Traffic Statistics & Billing Multiplier
+## Edit a package
 
-The system uses the Xray traffic collector to track each user's traffic in real-time. When a user's billed traffic exceeds the package quota, the subscription automatically stops returning nodes (or reduces speed via auto rate limiting).
+"Edit" on the card opens the same form; with many nodes, use "Select all" or the tag filters on the right:
 
-- \- Raw Xray user/email upload and download are stored first, with billing weights frozen at ingestion
-- \- Packages select one-way (`oneway`, `×1`) or two-way (`twoway`, `×2`) billing
-- \- Billed traffic = (raw upload + raw download) × package direction multiplier × per-package node multiplier
-- \- Multiplier changes affect future deltas only; every package instance advances its own cycle baseline and can be reset manually
+![Edit package dialog screenshot](../../../assets/screenshots/packages-edit-dialog.webp)
 
-The admin home uses server accounting, while the user home and User management use Xray user billing. With multiple packages, the User-management row aggregates usage across all credentials but keeps the primary-package limit; open Manage packages for authoritative per-instance values.
+Edit package template: filter nodes by "All / Manual / Remote:server" tags
 
-See [Traffic accounting](/docs/en/traffic-accounting) for each page's time range and reconciliation rules.
+Quota changes apply immediately; multiplier / counting mode changes only affect later increments.
+
+## Publish carpool
+
+"Publish carpool / Unpublish" lists the package on the carpool market so other users can join with an invite code, see [Carpool FAQ](/docs/en/faq-carpool).
+
+## Speed and device limits
+
+Packages can set a speed limit (Mbps) and a connection cap; users can also get individual overrides in User Management (user level overrides package level).
+
+### Speed limit
+
+Upper bound in Mbps, 0 = unlimited. Enforced by the Agent-side limiter on the user's connections; the UI shows the conversion (8 Mbps ≈ 1 MB/s, 100 Mbps ≈ 12.5 MB/s).
+
+### Connections
+
+Caps concurrent connections per user. This is "connections", not "devices" — one device easily opens dozens of connections; recommended values: [Rate Limiting](/docs/en/node-ratelimit).
+
+### Auto throttle / release
+
+Optional automatic throttling: when a user exceeds the quota they are slowed down instead of cut off, and released after the monthly reset or a quota top-up.
+
+## Traffic statistics and billing multipliers
+
+The Xray traffic collector counts every user's traffic in real time. When billable traffic exceeds the quota the subscription stops returning nodes (or throttles, per the setting above).
+
+- Raw up/down are stored per Xray user/email and weighted at collection time
+- Packages choose one-way (`oneway`, `×1`) or two-way (`twoway`, `×2`)
+- Billable = (raw up + raw down) × package direction multiplier × node multiplier
+- Multiplier changes only affect later increments; each instance advances its baseline per its reset settings, admins can reset manually
+
+The admin home shows server billing figures; the user home and the user list show user Xray billing traffic. With multiple packages the list aggregates all credentials while the limit comes from the primary package — check instances in "Manage Packages".
+
+Per-page scopes and reconciliation: [Traffic Accounting](/docs/en/traffic-accounting).

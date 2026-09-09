@@ -24,9 +24,9 @@ The current image does not require systemctl: the master can start, reload, and 
 
 Steps:
 
-1.  Start the container with host networking as shown in Quick Deployment.
-2.  Add a DNS provider in Certificate Management and request a certificate matching the master domain.
-3.  Deploy the certificate to the master; the system generates the reverse-proxy config and controls Nginx directly.
+1. Start the container with host networking as shown in Quick Deployment.
+2. Add a DNS provider in Certificate Management and request a certificate matching the master domain.
+3. Deploy the certificate to the master; the system generates the reverse-proxy config and controls Nginx directly.
 
 You may instead keep an existing host Nginx/Caddy proxy to container port 12889. Choose one approach to avoid competing for ports 80/443.
 

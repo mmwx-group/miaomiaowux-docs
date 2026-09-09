@@ -24,9 +24,9 @@ curl -sL https://raw.githubusercontent.com/iluobei/miaomiaowuX/main/install.sh |
 
 步骤:
 
-1.  按照快速部署示例使用 host 网络启动容器。
-2.  在证书管理添加 DNS 提供商并申请与主控域名匹配的证书。
-3.  部署证书到主控；系统会生成 Nginx 反代配置并直接管理进程。
+1. 按照快速部署示例使用 host 网络启动容器。
+2. 在证书管理添加 DNS 提供商并申请与主控域名匹配的证书。
+3. 部署证书到主控；系统会生成 Nginx 反代配置并直接管理进程。
 
 也可继续使用宿主机已有的 Nginx/Caddy 反代容器的 12889 端口；两种方式只选一种，避免争用 80/443。
 

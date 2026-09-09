@@ -1,115 +1,262 @@
 ---
 title: "Node Management"
-description: "Manage all proxy nodes — three sources (Xray inbounds auto-sync / remote servers / external subscriptions), enable/disable, rename, sort, group, plus tunnel forwarding and visual online-status indicators."
+description: "Manage all proxy nodes — three sources (Xray inbound auto-sync / remote server sync / external subscription import), enable/disable / rename / sort / group, tunnels and online status indicators."
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
 ---
 
-![Node Management page screenshot](/images/screenshots/doc-nodes-page.webp)
+![Nodes page screenshot](../../../assets/screenshots/nodes-list.webp)
 
-Node Management — inbound nodes grouped by server, supports batch edit / toggle / sync
+Nodes — the "Import external nodes" panel on top, the node list below: filter by protocol / tag, one node per row with inline actions
 
 ## Overview
 
-Nodes are the subscription system's representation of inbound configurations. After each inbound is created, the system automatically generates corresponding nodes for subscription distribution.
+A node is the subscription-side mapping of an inbound. Every inbound automatically creates a node used for subscription distribution. The page has two parts:
 
-## Node Sources
+- **Import external nodes**: import airport subscriptions or single URIs as "external nodes"
+- **Node list**: all nodes (self-hosted + external) with protocol / tag filters, inline actions (edit / landing / routing / copy URI …) and global tools at the top right
 
-| Source                       | Description                                      | Sync Method      |
-| ---------------------------- | ------------------------------------------------ | ---------------- |
-| Xray Inbound                 | Protocol inbounds created via the inbound wizard | Auto Sync        |
-| Remote Server Inbound        | Inbound configurations on remote servers         | Auto Sync        |
-| External Subscription Import | Nodes imported from external subscription links  | Manual/Scheduled |
+## Node sources
 
-## Auto Sync
+| Source                 | Description                              | Sync           |
+| ---------------------- | ---------------------------------------- | -------------- |
+| Xray inbound           | Inbounds created with the wizard         | Automatic      |
+| Remote server inbound  | Inbounds on remote servers               | Automatic      |
+| External subscription  | Nodes imported from subscription links   | Manual / timed |
 
-When inbound configurations change, the system automatically triggers node sync via the event bus. The sync process converts inbound configurations to mihomo/Clash compatible proxy node format.
+## Add a node (wizard)
 
-Sync trigger conditions:
+Click "Add Node" at the top right. The wizard has two steps.
 
-- \- Create new inbound
-- \- Modify inbound configuration
-- \- Delete inbound
-- \- Remote server inbound changes
+### Step 1: choose a server
 
-## Node Operations
+![Add node step 1 screenshot](../../../assets/screenshots/add-node-step1-selected.webp)
 
-| Operation         | Description                                                                                                                                                                                                                             |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rename            | Customize the node's display name in subscriptions                                                                                                                                                                                      |
-| Sort              | Adjust the node's order in subscriptions                                                                                                                                                                                                |
-| Group             | Assign nodes to different proxy groups                                                                                                                                                                                                  |
-| Multi-Tag v0.2.3+ | Since v0.2.3 nodes support multiple tags: the edit dialog lets you add / remove tags freely; frontend filters and package selected_tags match if any tag hits. Existing single-tag nodes are auto-backfilled to a single-element array. |
+Choose a server: pick IPv4 / IPv6 as the node address, "Xray ready" means nodes can be created immediately; the "Forward chain" tab creates nodes on a forward-chain entry
 
-## Port Forwarding
+If the server has a domain but port 443 has no certificate and Nginx yet, an "SSL configuration" prompt appears first. For TLS protocols (Trojan + TLS, Hysteria2, AnyTLS …) click "Configure" to set up the certificate first; for certificate-free protocols (REALITY / Shadowsocks / Snell …) simply close the prompt and continue:
 
-### Tunnel Configuration
+![SSL configuration prompt screenshot](../../../assets/screenshots/nodes-add-ssl-prompt.webp)
 
-#### Chained Tunnel
+SSL configuration prompt: lists servers whose port 443 is not ready, with one-click setup
 
-Use multiple Agent servers to forward traffic to a selected exit node, or enter the target address and port manually.
+### Step 2: configure the inbound
 
-#### Port Forwarding
+![Add node step 2 screenshot](../../../assets/screenshots/nodes-add-vless-reality.webp)
 
-Forward a port on one Agent to a selected exit node, or enter the target address and port manually.
+Inbound parameters: protocol → transport → security → mode → node name → protocol-specific settings → users; the JSON preview on the right updates live
 
-### Relay Configuration
+| Area              | Description                                                                                                       |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Protocol          | SHADOWSOCKS / SHADOWSOCKS2022 / SOCKS5 / TROJAN / VLESS / VMESS / HYSTERIA2 / ANYTLS / HTTP / SNELL / MIERU        |
+| Transport         | Depends on protocol, e.g. VLESS offers GRPC / TCP / WSS / XHTTP                                                   |
+| Security          | REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC …, see [Protocol Matrix](/docs/en/protocol-matrix)        |
+| Config mode       | Simple: port and UUID / password auto-generated; Expert: edit port, listen address, sniffing, relay address …     |
+| Node name         | Shown in the list and subscriptions; the flag is added from the server IP                                         |
+| REALITY domain    | The lowest-latency domain from the pool is probed automatically, or enter one and "Probe"; "Prevent REALITY theft" creates a dedicated tunnel that only allows serverNames |
+| Users             | Current admin by default, UUID / password / PSK auto-generated, more users can be added                           |
+| JSON preview      | The inbound config that will be submitted                                                                         |
 
-Relay configuration does not make MiaoMiaoWu X handle the forwarding. It is typically used after configuring forwarding externally, then adding that forwarding configuration to a node.
+Click "Submit" and the master creates the inbound, syncs the node and reports "Created". Screenshots and parameters for every protocol: the pages under [Protocol Reference](/docs/en/protocol-matrix).
 
-## URI Management
+## Import external nodes
 
-View the protocol:// URI configurations for every node belonging to every user.
+Expand "Import external nodes" at the top of the page. It has three tabs:
+
+![Import external nodes panel screenshot](../../../assets/screenshots/nodes-import-panel.webp)
+
+Import external nodes: Manual / Subscription / SOCKS5, plus node tag, skip certificate verification and enable relay
+
+### Manual
+
+Paste `vmess://`, `vless://`, `trojan://`, `ss://`, `anytls://`, `hysteria2://` … URIs one per line, click "Parse" to preview, then "Save nodes":
+
+![Manual URI input screenshot](../../../assets/screenshots/nodes-import-manual.webp)
+
+Manual input: one URI per line
+
+![Parse result screenshot](../../../assets/screenshots/nodes-import-manual-parsed.webp)
+
+Preview name / protocol / address before saving; saved nodes get the "Manual" tag and are marked external
+
+### Subscription
+
+Enter the airport's Clash subscription URL, pick a User-Agent (default clash.meta), optionally a tag, and click "Import"; every node in the subscription is fetched and parsed. Imported subscriptions appear under "Subscriptions → External subscriptions" and can be refreshed with "Sync external subscriptions".
+
+![Subscription import screenshot](../../../assets/screenshots/nodes-import-subscription.webp)
+
+Subscription import: URL + User-Agent + node tag
+
+### SOCKS5
+
+Enter address, port, username and password to import a SOCKS5 exit, commonly used as a landing.
+
+## Auto sync
+
+When an inbound changes, the event bus triggers node sync automatically, converting the inbound config into a mihomo/Clash compatible proxy.
+
+Triggers:
+
+- Creating an inbound
+- Editing an inbound
+- Deleting an inbound
+- Remote server inbound changes
+
+## Inline row actions
+
+The row of icon buttons next to the node name (the legend above the list lists them too), from left to right:
+
+| Icon          | Action                  | Description                                                                                          |
+| ------------- | ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| Pencil        | Edit node name          | Inline rename, the inbound is unchanged                                                              |
+| Double arrow  | Create chained outbound | Opens "Add landing node" to give the node a landing or create a routed child, see [Routed Outbound](/docs/en/routed-outbound) |
+| Edit          | View / edit config      | Opens the full inbound wizard (TAG and node ID stay; changing port / domain keeps user credentials)  |
+| Routing       | Node routing            | View / manage the inbound's dedicated and global routing rules, see [Xray Routing](/docs/en/xray-routing) |
+| Relay         | Create relay group      | Pick several relay nodes to form a url-test group; the landing's dialer-proxy points to it            |
+| Flag          | Add region emoji        | Auto-detect or choose a region                                                                       |
+| IP            | Resolve IP              | Write the resolved IP into the node address; "Restore original domain" reverts                       |
+| Waveform      | TCPing latency          | One TCPing from the master to the node address                                                       |
+| Eye           | View Clash config       | View and edit the node's Clash JSON                                                                  |
+| Copy          | Copy URI                | Copy the node's share link                                                                           |
+| Link          | Temporary subscription  | A one-node subscription link limited by visits and time                                              |
+| ×             | Delete                  | Delete the node; self-hosted nodes also delete their inbound                                          |
+
+![Edit config dialog screenshot](../../../assets/screenshots/nodes-row-edit.webp)
+
+View / edit config: the same form as the wizard; change protocol parameters, port, listen address, relay address, or enable "steal self" here
+
+![Clash config detail screenshot](../../../assets/screenshots/nodes-row-clash-config.webp)
+
+View Clash config: the fields written into subscriptions, editable
+
+![Temporary subscription dialog screenshot](../../../assets/screenshots/nodes-row-temp-sub.webp)
+
+Temporary subscription: set visit count and expiry seconds; the link expires automatically
+
+![Create relay group dialog screenshot](../../../assets/screenshots/nodes-row-relay-group.webp)
+
+Create relay group: choose relay nodes for a landing to form a url-test group
+
+## Node operations
+
+| Operation        | Description                                                                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rename           | Custom display name in subscriptions                                                                                                                 |
+| Sort             | Order of nodes in subscriptions                                                                                                                      |
+| Group            | Assign nodes to proxy groups                                                                                                                         |
+| Multi-tag v0.2.3+ | Since v0.2.3 nodes can carry several tags: the edit dialog adds / removes tags, filters match any tag, package selected_tags match any tag; old nodes are backfilled |
+
+## Toolbar
+
+The buttons at the top right of the list:
+
+| Button                 | Purpose                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| Sort mode              | Drag nodes or use the quick-move buttons; the order is saved when you turn it off                          |
+| Add node               | The wizard above                                                                                          |
+| Tunnel management      | Tunnel / relay / chain / port-forward configuration, see below                                             |
+| Routed outbound        | All routed child nodes, see [Routed Outbound](/docs/en/routed-outbound)                                   |
+| Speed test             | Speed test workbench (PRO), see [Node Speed Test](/docs/en/node-speedtest)                                |
+| External node probe    | Periodically connects to external nodes with mihomo to measure reachability and real latency; can re-sync subscriptions when nodes go down |
+| URI management         | Share URIs per user × node, filter by user / server, copy all                                              |
+| Sync external subs     | Re-fetch all external subscriptions now                                                                   |
+| Clear all              | Delete every node (dangerous)                                                                             |
+| Remove duplicates      | Delete nodes with the same address + port + protocol                                                       |
+| Helpers                | Bulk disable skip-cert-verify, Snell parameters, show per-node traffic in names …                           |
+
+![Speed test workbench screenshot](../../../assets/screenshots/nodes-toolbar-speedtest.webp)
+
+Speed test workbench: choose the source, threads and packet size, test speed or latency per node
+
+![URI management dialog screenshot](../../../assets/screenshots/nodes-toolbar-uri.webp)
+
+URI management: share URIs per user × node (generated with each user's sub-account credentials)
+
+![External node probe dialog screenshot](../../../assets/screenshots/nodes-toolbar-external-probe.webp)
+
+External node probe: external nodes only, every 5 minutes, probe from the master or a home speed-test endpoint
+
+## Port forwarding
+
+### Tunnel configuration
+
+#### Chained tunnel
+
+Forward a chosen landing node through several Agent servers, or enter a target address and port manually.
+
+#### Port forward
+
+Forward a port on one Agent to a chosen landing node or a manual target.
+
+### Relay configuration
+
+Relay configuration does not perform forwarding inside MiaoMiaoWu X. It is meant for scenarios where forwarding is already set up externally and you only want to attach that relay address to nodes.
+
+## URI management
+
+View the protocol:// URIs of every user on every node.
 
 ## Node traffic and multipliers
 
-For a regular user, `×N` is the primary package (`users.package_id`) weight for the node. It is not raw node usage and does not describe that user's other package instances. Raw directions are under Traffic · Nodes; user billing also includes the package direction multiplier. See [Traffic accounting](/docs/en/traffic-accounting).
+The `×N` in the node list is the billing multiplier the regular user's primary package (`users.package_id`) applies to that node, not the node's own traffic. Raw up/down per node lives in "Traffic · Nodes"; user billing traffic also applies the package direction multiplier. See [Traffic Accounting](/docs/en/traffic-accounting).
 
-## Sort Mode
+## Sort mode
 
-When enabled, drag nodes or use the quick-move buttons to reorder them. Disable sort mode afterward to save the new order.
+When on, drag nodes or use the quick-move buttons; the order is saved when you turn sort mode off.
 
-## Tunnel (Dokodemo-door) Management
+## Tunnel (dokodemo-door) management
 
-A Tunnel (dokodemo-door) inbound forwards traffic on a port of one server to another target (an existing node or a fixed address) — commonly used for entry→exit relay chains. Tunnel inbounds do not appear in the node list; manage them from the "Tunnel Management" entry at the top of Node Management (aggregated across all remote / shared servers).
+Tunnel (dokodemo-door) inbounds forward traffic arriving on one port of a server to another target (an existing node or a fixed address), typically for "entry → landing" chains. Tunnel inbounds are not listed as nodes; they are viewed, added and deleted in "Tunnel management" at the top of the Nodes page (aggregated across all remote / shared servers).
 
-### Adding a Tunnel (two modes)
+![Tunnel management dialog screenshot](../../../assets/screenshots/nodes-toolbar-tunnel.webp)
 
-Add from "Tunnel Management", or pick the Tunnel protocol when adding an inbound. The forward target can be given two ways:
+Tunnel management: Tunnel / Relay / Chain / Port forward tabs
 
-### ① Forward an Existing Node (Recommended)
+### Adding a tunnel (two modes)
 
-When adding an inbound, select Tunnel protocol, then choose "Forward Existing Node" - it automatically fills in the forwarding address/port/network type based on the selected node. After creation, a companion node is auto-generated: named "Original Node Name | Tunnel", with the inbound tag of the tunnel. The Clash config clones the original node but changes the server address and port to the tunnel server's IP and listen port - so clients connecting to the tunnel server use the forwarding chain.
+Add it in "Tunnel management" or choose the Tunnel protocol when adding an inbound. The target can be given two ways:
 
-### ② Port Forward (to a fixed target)
+### ① Forward an existing node (recommended)
 
-Enter the target address and port directly (no existing node needed); the tunnel server forwards traffic from a listen port straight to that target. Good for relaying arbitrary exits (non-panel nodes) or custom chains. You can also forward UDP — required for games / voice, otherwise UDP is dropped.
+Choose the Tunnel protocol and "Forward existing node"; address / port / network are filled from the chosen node. A companion node is created: name "original name | Tunnel", inbound tag = the tunnel tag, Clash config cloned from the original but with the tunnel server's IP and port — clients connecting to the tunnel server go through the chain.
 
-### Port-forward Reuse Mode (split by domain / IP)
+### ② Port forward (fixed target)
 
-Under "Tunnel Management → Port Forward", you can reuse an existing tunnel inbound and only divert specific domains / IPs through it — internally this adds a routing rule + a freedom outbound to that inbound, instead of opening a new listen port.
+Enter a target address and port directly and forward the tunnel server's listening port to it. Suited to arbitrary landings or self-built links. Tick "Also forward UDP" for games / voice, otherwise UDP is dropped.
 
-Such rules carry a yellow "Port Forward" badge in the Routing panel; delete them from the "Tunnel Management" list, not directly in Routing, to avoid orphaned outbounds.
+### Port-forward reuse mode (split by domain / IP)
 
-### Switching a Node's Server Address (Relay)
+In "Tunnel management → Port forward" you can reuse an existing tunnel inbound and only divert specified domains / IPs — implemented as a routing rule + a freedom outbound on that inbound, not a new listening port.
 
-In the node list, each node's server address can be switched to a relay entry: its clash server / port is changed to a tunnel server's entry address & port, so clients go through the relay chain, while the original exit address is kept as "original server".
+Such rules carry a yellow "Port forward" mark in the routing panel; delete them from the Tunnel management list, not from the routing panel, to avoid orphan outbounds.
 
-After setting up a port-forward to an exit node, MiaomiaowuX automatically switches that node’s address to the tunnel entry (entryHost:listenPort), saving a manual step; if auto-switch fails it does not affect the forward and you can switch manually.
+### Switching a node's server address (relay)
 
-A relayed node shows an extra "original server" line under its address — click to edit or revert to the original address.
+Every node's "server address" can be switched to a relay entry: the Clash server / port become the tunnel server's entry address and port, and the original landing address is kept as "original server".
 
-### "Forwarded by Tunnel" Indicator
+After configuring a port forward to a landing node, MiaoMiaoWu X automatically switches that landing node's address to the tunnel entry (entryHost:port); if the automatic switch fails the forward still works and you can switch manually.
 
-If a node is being forwarded by a tunnel, it shows a "Forwarded by Tunnel" tag in the node list. Hovering shows which server's tunnel is forwarding it.
+Relayed nodes show an extra "original server" line under the address; click it to edit or revert.
 
-Tunnel management is an admin feature; also works with received shared servers. Deleting a tunnel also cleans up its companion node.
+### "Forwarded by tunnel" marker
+
+A node currently forwarded by a tunnel shows a "Forwarded by tunnel" tag; hover to see which server and tunnel.
+
+Tunnel management is an admin feature and also works on received shared servers. Deleting a tunnel also removes its companion node.
+
+## Forward chains (Forward management)
+
+Besides Xray dokodemo-door tunnels, MiaoMiaoWu X provides native Agent forwarding: on the "Forwarding" page drag servers into an "entry → relay → exit" chain, optionally ending on a landing proxy node; the first step of the add-node wizard can also pick a "Forward chain" as the node entry.
+
+![Create forward chain dialog screenshot](../../../assets/screenshots/forward-create-dialog.webp)
+
+Create forward chain: drag servers into entry / relay / exit groups; the exit is either a server or a landing node
 
 ## Notes
 
-- \- Nodes auto-generated from inbounds are automatically updated when the inbound is modified
-- \- Manually renamed nodes will not be overwritten by auto sync
-- \- Disabled nodes will not appear in any subscription output
-- \- After a node resolves to IP, you can one-click "Restore Domain" to restore the original domain before resolution (does not affect the node's server)
-- \- New nodes default to their owning server's name as the tag, making it easy to filter by server. Legacy tags like "manual entry" are left untouched.
+- Nodes generated from inbounds update automatically when the inbound changes
+- Manually renamed nodes are not overwritten by sync
+- Disabled nodes never appear in subscription output
+- After resolving a node to an IP, "Restore domain" reverts to the original domain (the server is unchanged)
+- New nodes default to the server name as their tag; historical tags such as "Manual" are left alone

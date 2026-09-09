@@ -102,12 +102,24 @@ XTLS-RPRX-VISION 协议使用零拷贝（splice）优化，普通的流量拦截
 
 ### 方式一：主控切换
 
-在主控的服务器管理页面，可以直接切换服务器的 Xray 模式。切换后 Agent 会自动重启并以新模式运行。
+在主控的服务管理页面，可以直接切换服务器的 Xray 模式。切换后 Agent 会自动重启并以新模式运行。
 
-1. 进入「远程服务器」页面
-2. 点击目标服务器的设置
-3. 将 Xray 模式切换为「内嵌」
-4. Agent 自动重启，切换完成
+1. 进入「服务管理」页面
+2. 点击目标服务器卡片上的「编辑服务器」（铅笔图标）
+3. 在「Xray 模式」里选「内联 Xray」
+4. 保存后 Agent 自动重启，切换完成
+
+新建服务器时也可以直接在「添加服务器」对话框里选择：
+
+![添加服务器对话框中的 Xray 模式截图](../../assets/screenshots/add-server-dialog-filled.webp)
+
+添加 / 编辑服务器 → Xray 模式：外置 Xray 或内联 Xray（PRO），内联模式支持自动限速、设备数限制，可创建 Snell、AnyTLS 节点
+
+切换完成后服务器卡片会显示蓝色「内联 Xray」徽标：
+
+![内联 Xray 服务器卡片截图](../../assets/screenshots/servers-card-online.webp)
+
+内联 Xray 模式的服务器卡片
 
 ### 方式二：Agent 配置文件
 
@@ -123,13 +135,13 @@ xray_mode: "embedded"  # 可选值: "external"（默认）或 "embedded"
 
 Agent 以内嵌模式启动时，会执行以下步骤：
 
-1.  **1\. 停止外置 Xray — 自动执行 systemctl stop xray，避免端口冲突**
-2.  **2\. 配置迁移 — 如果存在外置 Xray 的 confdir 配置，自动合并到标准路径**
-3.  **3\. 确保 geodata — 检查 geoip.dat / geosite.dat 是否存在**
-4.  **4\. 注入运行时组件 — 向 Xray 配置注入自定义调度器、统计模块和策略配置**
-5.  **5\. 注册 Vision Hook — 注册 XTLS Vision 零拷贝连接的限速拦截器**
-6.  **6\. 启动内核 — 创建并启动内嵌 Xray 实例**
-7.  **7\. 连接主控 — 建立 WebSocket 连接，开始接收限速配置推送**
+1. **停止外置 Xray — 自动执行 systemctl stop xray，避免端口冲突**
+2. **配置迁移 — 如果存在外置 Xray 的 confdir 配置，自动合并到标准路径**
+3. **确保 geodata — 检查 geoip.dat / geosite.dat 是否存在**
+4. **注入运行时组件 — 向 Xray 配置注入自定义调度器、统计模块和策略配置**
+5. **注册 Vision Hook — 注册 XTLS Vision 零拷贝连接的限速拦截器**
+6. **启动内核 — 创建并启动内嵌 Xray 实例**
+7. **连接主控 — 建立 WebSocket 连接，开始接收限速配置推送**
 
 ## 流量统计
 

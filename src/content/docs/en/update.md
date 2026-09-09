@@ -6,9 +6,17 @@ tableOfContents:
   maxHeadingLevel: 3
 ---
 
-![Check Update dialog screenshot](/images/screenshots/doc-update-dialog.webp)
+![Check Update dialog screenshot](../../../assets/screenshots/about-dialog.webp)
 
-Check Update dialog — shows current version vs. latest GitHub Release, one-click upgrade
+Check Update dialog — shows the current version, lets you pick the stable / pre-release channel, upgrades in one click when a new version exists, and can "Force reinstall"
+
+## In-panel update (recommended)
+
+Masters installed with the one-click script or the binary can upgrade from the panel: avatar menu at the top right → "Check for updates", pick a channel and click upgrade; the master downloads the release, verifies the signature and restarts. Docker deployments use the image methods below.
+
+![User menu screenshot](../../../assets/screenshots/user-menu.webp)
+
+"Check for updates" and the current version in the avatar menu
 
 ## Docker Update
 
@@ -64,4 +72,12 @@ systemctl start miaomiaowux
 
 ## Agent Update
 
-Agent update follows the same process as master. Download the new version, replace, and restart. It's recommended to keep Agent and master versions consistent.
+No SSH needed: in "Servers", cards with a newer Agent show a red dot on the version badge — click it to upgrade that server, or use "Upgrade Agents" at the top to upgrade every upgradable server at once. The Agent restarts briefly. Keep Agent and master versions consistent.
+
+![Upgrade single Agent confirmation screenshot](../../../assets/screenshots/servers-version-menu.webp)
+
+Upgrade one Agent
+
+![Upgrade all Agents confirmation screenshot](../../../assets/screenshots/servers-upgrade-agents-dialog.webp)
+
+Upgrade all Agents

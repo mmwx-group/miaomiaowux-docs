@@ -8,7 +8,11 @@ tableOfContents:
 
 MiaoMiaoWu X is an enhanced version of MiaoMiaoWu, supporting remote server management, Xray inbound/outbound configuration, certificate management, and other advanced features, using Master-Agent architecture for unified multi-server management.
 
-[**Quick Start**](/docs/en/quick-start) · [**GitHub**](https://github.com/iluobei/miaomiaowuX)
+[**Quick Start**](/docs/en/quick-start) · [**Beginner Tutorial**](/docs/en/tutorial) · [**GitHub**](https://github.com/iluobei/miaomiaowuX)
+
+![Servers page screenshot](../../../assets/screenshots/servers-list.webp)
+
+The "Servers" page of the MiaoMiaoWu X master: one card per connected server, managing Xray / Nginx / Agent directly
 
 ## Core features
 

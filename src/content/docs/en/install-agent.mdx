@@ -10,13 +10,17 @@ import { DocDemo } from "@/components/docs/islands/add-server";
 
 ## Overview
 
-Agent deployment on remote servers requires no manual download or configuration. After adding a server on the master, the system automatically generates a one-click install command that can be run on the remote server to complete the entire deployment.
+Agent deployment on remote servers requires no manual download or configuration. After adding a server on the master, the system automatically generates a one-click install command that can be run on the remote server to complete the entire deployment. Once installed, the server card on the Servers page turns online:
 
-Important: each server must use a unique agent_token
+![Online server card screenshot](../../../assets/screenshots/servers-card-online.webp)
 
+After the Agent connects: online, lock icon (encrypted channel), WS connection, Xray running, Agent version
+
+:::caution[Important: each server must use a unique agent_token]
 Do NOT copy one agent config (same token) to multiple servers and run them in parallel. Each token maps to a single server record on the master; reusing it across machines triggers a reconnect storm — the two agents keep evicting each other and the master is forced to handle several database writes per second.
 
 The damage is not contained to the conflicting server: the write storm saturates the master's SQLite write queue, causing heartbeat updates from unrelated servers to time out. Those servers get incorrectly marked offline and degraded to HTTP/Pull mode. The master now auto-locks the token to the first-connecting IP for 60s and rejects same-token auth from other IPs — see "agent_token reuse detected" warnings in the logs. Fix: add and use a unique token per server.
+:::
 
 ## Xray mode
 
@@ -33,13 +37,18 @@ Note: Hysteria2 / AnyTLS and other newer protocols are supported in both modes. 
 
 ### Step 1: Add Server on Master
 
-1\. Log in to the master management panel
+![Add remote server dialog screenshot](../../../assets/screenshots/add-server-dialog-filled.webp)
 
-2\. Go to the "Xray Servers" page
+Add remote server: name, address, external / embedded Xray
 
-3\. Click "Add Server" and enter server name and IP
+![Install command after token generation screenshot](../../../assets/screenshots/add-server-result.webp)
 
-4\. After saving, the system automatically generates the install command for that server
+After "Generate Token": the one-click install command and the Docker environment variables (including MMWX_MASTER_PUBLIC_KEY)
+
+1. Log in to the master management panel
+2. Go to the "Xray Servers" page
+3. Click "Add Server" and enter server name and IP
+4. After saving, the system automatically generates the install command for that server
 
 ### Try it: add a server
 
@@ -87,11 +96,13 @@ SSH into the remote server and run the copied command with root privileges. The 
 
 Besides the one-click bare-metal + systemd script, you can also pull the Docker image directly. The image ships with embedded xray-core + nginx + all dependencies — pull and run, no in-container installation needed.
 
-Must run with host network mode
+The lower half of the "Generate Token" dialog lists the Docker environment variables; copy them into the compose `environment` block.
 
+:::caution[Must run with host network mode]
 Xray inbound ports are added dynamically by the master UI — bridge mode would force you to update -p mappings every time a new port appears; the agent's own listening port for the master's reverse connection also needs the host network stack.
 
 The container entrypoint checks the default gateway IP on startup — if it matches the Docker bridge default range (172.17.x.x / 172.18.x.x) the container exits with an error. Always use --network host or network_mode: host.
+:::
 
 ### docker run
 
@@ -156,10 +167,10 @@ Start with: `docker compose up -d`
 
 ### Hard constraints / FAQ
 
-- \- **Host network:** Required. Bridge mode is rejected by the entrypoint — bypassing is not recommended.
-- \- **Xray mode:** The image has no external xray binary, only embedded mode is supported. Select "embedded" when adding the server in the master UI (requires PRO license; the agent itself does not verify signatures).
-- \- **Nginx:** Pre-installed via apt + symlinks compatible with hardcoded paths. The master's "install nginx" request returns "already installed" immediately, no install action triggered.
-- \- **Bypass host check (debug):** Not recommended. May hit port conflicts. Debug only: `-e MMWX_REQUIRE_HOST_NETWORK=0`
+- **Host network:** Required. Bridge mode is rejected by the entrypoint — bypassing is not recommended.
+- **Xray mode:** The image has no external xray binary, only embedded mode is supported. Select "embedded" when adding the server in the master UI (requires PRO license; the agent itself does not verify signatures).
+- **Nginx:** Pre-installed via apt + symlinks compatible with hardcoded paths. The master's "install nginx" request returns "already installed" immediately, no install action triggered.
+- **Bypass host check (debug):** Not recommended. May hit port conflicts. Debug only: `-e MMWX_REQUIRE_HOST_NETWORK=0`
 
 ## Automatic Xray Installation
 
@@ -247,9 +258,15 @@ systemctl stop mmw-agent
 #   tail -f /var/log/mmw-agent.log
 ```
 
-## Reinstallation
+## Upgrade and reinstall
 
-If the Agent has issues, find the "Reinstall Command" in the server details and run it again. The script automatically stops the old service, reinstalls, and restarts.
+When a new release is out, the version badge on the server card shows a red dot; click it or "Upgrade Agents" at the top to upgrade remotely without SSH. The card's "Agent" menu also offers "Uninstall Agent".
+
+![Agent menu screenshot](../../../assets/screenshots/servers-agent-menu.webp)
+
+Agent menu: sync nodes / sync node addresses / config history / push default config / websites / upgrade Agent / uninstall Agent
+
+If the Agent has issues, open "Edit server" to get the install command again and re-run it. The script automatically stops the old service, reinstalls, and restarts.
 
 ## Supported Architectures
 

@@ -22,6 +22,18 @@ Shadowsocks is a classic proxy protocol supporting both AEAD and SS2022 encrypti
 
 SS2022 uses a combined format of server password + client password. In mihomo/Clash, the password format is serverPassword:clientPassword.
 
+## Creating it in the wizard
+
+The wizard offers two Shadowsocks buttons: "SHADOWSOCKS" (AEAD such as aes-256-gcm) and "SHADOWSOCKS2022" (2022-blake3-aes-128-gcm, server password + per-user PSK). Neither needs a certificate; simple mode generates port and passwords:
+
+![Shadowsocks 2022 add node wizard screenshot](../../../assets/screenshots/nodes-add-ss2022.webp)
+
+Shadowsocks 2022: the user password (PSK) is Base64-encoded automatically; the JSON preview shows method 2022-blake3-aes-128-gcm and network tcp,udp
+
+![Shadowsocks add node wizard screenshot](../../../assets/screenshots/nodes-add-shadowsocks.webp)
+
+Classic Shadowsocks (AEAD)
+
 ## Configuration Example
 
 ### SS2022

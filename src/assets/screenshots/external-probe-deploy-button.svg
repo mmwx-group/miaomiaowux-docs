@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="579" height="325" viewBox="0 0 579 325" role="img" aria-labelledby="title desc">
+  <title id="title">MMWX Probe 的 Deploy to Cloudflare 按钮</title>
+  <desc id="desc">项目说明顶部的一键部署按钮，红框标出了点击位置。</desc>
+  <rect width="579" height="325" fill="#fff"/>
+  <text x="24" y="67" fill="#24292f" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="52" font-weight="600">MMWX Probe</text>
+  <line x1="24" y1="94" x2="579" y2="94" stroke="#d8dee4"/>
+  <text x="23" y="151" fill="#24292f" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="27">妙妙屋 X（MiaoMiaoWuX）的独立服务器探针前端</text>
+  <text x="23" y="192" fill="#24292f" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="27">同一个 Cloudflare Worker，访客只接触探针域名</text>
+  <rect x="9" y="213" width="334" height="91" rx="2" fill="none" stroke="#ff565b" stroke-width="6"/>
+  <rect x="24" y="228" width="303" height="62" rx="6" fill="#080808" stroke="#f48120" stroke-width="4"/>
+  <path d="M45 270c0-7 5-12 12-12 2-8 8-12 16-12 9 0 16 7 16 16h2c7 0 12 4 12 10H45v-2Z" fill="#f48120"/>
+  <text x="110" y="268" fill="#f48120" font-family="Arial, sans-serif" font-size="22" font-weight="700">Deploy to Cloudflare</text>
+</svg>

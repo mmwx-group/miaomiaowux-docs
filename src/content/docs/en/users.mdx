@@ -1,6 +1,6 @@
 ---
 title: "User Management"
-description: "User account and permission management"
+description: "User accounts and permissions"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -8,49 +8,111 @@ tableOfContents:
 
 import { DocDemo } from "@/components/docs/islands/users";
 
+![Users page screenshot](../../../assets/screenshots/users-list.webp)
+
+Users — account list: username / nickname / Telegram binding / remark / user short code / subscription / package and traffic bar / role / status / actions
+
 ## Try it: user management
 
-6 mock users — create, bind a package, toggle on/off, copy subscription, delete. Usage bar shifts color with consumption.
+6 mock users; create, bind packages, toggle, copy subscription, delete. The traffic bar changes color with usage.
 
 <DocDemo lang="en" client:load />
 
 ## Overview
 
-The user management module handles subscription user accounts, permissions, and subscription tokens. Supports admin and regular user roles.
+The user module manages subscriber accounts, permissions and subscription tokens. Two roles exist: administrator and regular user. Search by username / nickname / package above the list or filter by package; "Full view / Renewal view" at the top right switches the list layout.
 
-## User Roles
+## Roles
 
-| Role         | Permissions  | Description                                           |
-| ------------ | ------------ | ----------------------------------------------------- |
-| Admin        | All          | System management, server management, user management |
-| Regular User | Subscription | View subscription links, personal info                |
+| Role          | Permissions | Description                                          |
+| ------------- | ----------- | ---------------------------------------------------- |
+| Administrator | All         | System, server and user management                   |
+| Regular user  | Subscribe   | View own subscription link and profile               |
 
-## Create User
+## Create a user
 
-1\. Go to User Management page
+1. Open "Users"
+2. Click "Add User"
+3. Enter the username; email / nickname / remark are optional
+4. The initial password is random by default and can be changed before creating
+5. Click "Create"; the initial password is copied to the clipboard
+6. The user short code and subscription token are generated; use "Copy subscription" in the list
 
-2\. Click Add User
+![Add user dialog screenshot](../../../assets/screenshots/users-create-dialog.webp)
 
-3\. Enter username and password
+Add user: username, email, nickname, initial password, remark
 
-4\. Select role (Admin/Regular User)
+## Bind and manage packages
 
-5\. Bind package (optional)
+Rows without a package show a "Bind Package" button; for bound users open the "…" menu and click the package name to reach "Manage Packages":
 
-6\. System automatically generates subscription token after saving
+![Manage packages dialog screenshot](../../../assets/screenshots/users-manage-packages-dialog.webp)
 
-## Subscription Token
+Manage packages: bound package cards (usage / expiry / unbind), package picker, expiry (+30 / +60 / +90 days), monthly reset, traffic override
 
-Each user has a unique subscription Token for subscription link authentication. Tokens can be regenerated; old tokens are immediately invalidated.
+| Item                     | Description                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Bound packages           | One card per package instance with used / limit and expiry; unbind individually                              |
+| Choose package           | Pick from the created package templates                                                                      |
+| Expiry                   | +30 / +60 / +90 days or a date; on expiry all inbound configs are removed and the package unbound            |
+| Monthly traffic reset    | Reset on the given day (1–31)                                                                                |
+| Traffic override (GB)    | User override > package quota; 0 = explicitly unlimited, empty = package default; cleared on package change  |
+| Add as separate package  | One user can hold several packages; the same node gets independent sub-accounts with separate traffic, connections and expiry |
+
+### Example: a 30-day Advanced package for a friend
+
+1. "Add User" → username `alice`, remark "friend", create (the initial password is copied, send it over)
+2. On alice's row click "Bind Package" → choose "Advanced" → "+30 days" → "Save package"
+3. The "Package/Traffic" column shows a bar; click "Copy subscription" and send the link
+4. Before expiry click +30 days again in "Renewal view" or the "Renew" menu item
+
+## Action menu
+
+The "…" at the far right of each row:
+
+![User action menu screenshot](../../../assets/screenshots/users-row-menu.webp)
+
+Action menu: reset password, reset traffic, manage packages (shows the current package name), renew, rate limit, sub-accounts, nodes, delete
+
+| Item            | Description                                                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Reset password  | Generates a new random password (editable) and applies it on confirm                                              |
+| Reset traffic   | Zero the user's usage for the current period                                                                      |
+| Package name    | Opens "Manage Packages"                                                                                           |
+| Renew           | +30 / +60 / +90 days                                                                                              |
+| Rate limit      | Per-user speed / connection overrides with priority over the package, plus per-node overrides, see [Rate Limiting](/docs/en/node-ratelimit) |
+| Sub-accounts    | The user's sub-accounts on each node (multi-package / routed outbounds create separate credentials)               |
+| Nodes           | Nodes the user imported themselves (excluding the package pool), can be cleared                                    |
+| Delete          | Delete the user and all credentials                                                                               |
+
+![Edit rate limit override dialog screenshot](../../../assets/screenshots/users-menu-ratelimit.webp)
+
+Rate limit override: global override (Mbps + connections) and per-node overrides
+
+## Renewal view
+
+"Renewal view" reorganizes the list around expiry dates; each row offers +30 / +60 / +90 / custom renewal and reset traffic, handy for bulk renewals at the start of the month:
+
+![Renewal view screenshot](../../../assets/screenshots/users-renewal-view.webp)
+
+Renewal view
+
+## Subscription token
+
+Each user has a unique subscription token used to authenticate subscription links. It can be regenerated; the old one is invalidated immediately. The "user short code" in the list identifies the user in short links and can be customized with the pencil icon.
+
+## Telegram binding
+
+"Bind" in the Telegram column generates a `/start` command the user sends to the bot to link their Telegram; afterwards the Mini App shows their package and subscription without a login, see [Telegram Bot](/docs/en/tool-mmwx-tgbot).
 
 ## Traffic and multiple packages
 
-The user row aggregates billable usage across all of the user's credentials while its limit still comes from the primary package. Open Manage packages for authoritative per-instance usage and limits; shared nodes still use separate credentials, baselines, and expiry dates. See [Traffic accounting](/docs/en/traffic-accounting) for formulas and detail semantics.
+List usage aggregates all of the user's billable credentials while the list limit still comes from the primary package. Open "Manage Packages" to see each instance's own usage and limit; the same node uses independent credentials, reset baselines and expiry per instance. Billing formulas and the "Traffic" page details: [Traffic Accounting](/docs/en/traffic-accounting).
 
 ## Authentication
 
-System uses JWT for API authentication:
+The API uses JWT:
 
-- \- Obtain JWT Token after login
-- \- Send Token in MM-Authorization header
-- \- Re-login required when Token expires
+- Obtain a JWT token after login
+- Send it in the MM-Authorization header
+- Log in again after expiry

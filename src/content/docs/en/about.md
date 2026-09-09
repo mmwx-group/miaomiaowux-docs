@@ -12,6 +12,10 @@ MiaoMiaoWu X (MMWX) is an enhanced version based on MiaoMiaoWu. It retains all e
 
 It uses a Master-Agent architecture where the master node communicates with Agents on remote servers via WebSocket/HTTP, enabling unified management of multiple servers.
 
+![Traffic home screenshot](../../../assets/screenshots/dashboard.webp)
+
+The "Traffic" home page after login
+
 ## Architecture Overview
 
 ```

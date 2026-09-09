@@ -51,25 +51,29 @@ Cloudflare Turnstile 是 CF 推出的人机验证服务,免费、不需要点图
 
 用管理员账号登录妙妙屋X 主控,左侧菜单进「系统设置」。
 
-### 2\. 找到 Cloudflare 人机验证区
+### 2. 找到 Cloudflare 人机验证区
 
-滚到「Cloudflare 人机验证」区块(在「自定义安全阈值」下方)。
+切到「验证」选项卡,只有「Cloudflare 人机验证」一个区块。
 
-![Turnstile 卡片未填 Key 截图](/images/screenshots/system-settings-turnstile-empty.webp)
+![验证选项卡截图](../../assets/screenshots/settings-captcha.webp)
 
-系统设置「Cloudflare 人机验证」区域,两个 key 未填的初始状态
+系统设置 → 验证:Cloudflare 人机验证,两个 key 未填的初始状态
 
-### 3\. 粘贴 Key + 保存
+### 3. 粘贴 Key + 保存
 
 把 Site Key 贴到 Site Key 输入框,把 Secret Key 贴到 Secret Key 输入框,焦点离开输入框自动保存(无须点按钮),即时生效不需要重启主控。
 
-![Turnstile 卡片已配置截图](/images/screenshots/system-settings-turnstile-filled.webp)
+![Turnstile 卡片已配置截图](../../assets/screenshots/system-settings-turnstile-filled.webp)
 
 填入 Site Key 后明文显示;Secret Key 保存后回显屏蔽 mask
 
+:::caution[配错了进不去怎么办]
+Turnstile 只看两个 key 是否非空。一旦填了 key,Secret 填错或服务器连不上 Cloudflare 就再也登不进面板,而改设置又要先登录。此时给主控加环境变量 `MMWX_DISABLE_CAPTCHA=1` 重启,即可临时跳过验证进去修正。
+:::
+
 ## 第三步:验证生效
 
-![登录页 Turnstile widget 截图](/images/screenshots/login-page-with-widget.webp)
+![登录页 Turnstile widget 截图](../../assets/screenshots/login-page-with-widget.webp)
 
 妙妙屋X 登录页,表单底部出现 Cloudflare Turnstile widget(此处用 CF 测试 key 演示,自动判定通过显示「成功」)
 

@@ -8,7 +8,11 @@ tableOfContents:
 
 妙妙屋X 是妙妙屋的增强版，支持远程服务器管理、Xray 入站/出站配置、证书管理等高级功能，采用 Master-Agent 架构实现多服务器统一管理。
 
-[**快速开始**](/docs/quick-start) · [**GitHub**](https://github.com/iluobei/miaomiaowuX)
+[**快速开始**](/docs/quick-start) · [**新手教程**](/docs/tutorial) · [**GitHub**](https://github.com/iluobei/miaomiaowuX)
+
+![服务管理页面截图](../../assets/screenshots/servers-list.webp)
+
+妙妙屋X 主控的「服务管理」页面：每台接入的服务器一张卡片，直接管理 Xray / Nginx / Agent
 
 ## 核心功能
 
