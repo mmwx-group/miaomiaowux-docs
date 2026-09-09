@@ -35,6 +35,13 @@ export default defineConfig({
         },
       ],
       pagefind: true,
+      expressiveCode: {
+        styleOverrides: {
+          borderRadius: "0.75rem",
+          borderWidth: "2px",
+          codeFontFamily: "var(--sl-font-mono)",
+        },
+      },
       lastUpdated: true,
       pagination: true,
       customCss: [
@@ -128,7 +135,12 @@ export default defineConfig({
         {
           label: "系统配置",
           translations: { en: "System configuration" },
-          items: ["custom-rules", "backup-restore", "backup-auto-sync", "probe-api"],
+          items: [
+            "custom-rules",
+            "backup-restore",
+            "backup-auto-sync",
+            "probe-api",
+          ],
         },
         {
           label: "AI 与工具",
@@ -154,7 +166,12 @@ export default defineConfig({
       head: [
         {
           tag: "meta",
-          attrs: { name: "theme-color", content: "#ffffff" },
+          attrs: { name: "theme-color", content: "#d97757" },
+        },
+        {
+          // 配图点击放大;放在 public/ 下随 base 一起提供
+          tag: "script",
+          attrs: { src: "/docs/scripts/docs-lightbox.js", defer: true },
         },
       ],
     }),

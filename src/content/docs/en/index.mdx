@@ -1,0 +1,142 @@
+---
+title: MiaoMiaoWu X Docs
+description: "MiaoMiaoWu X is the enhanced MiaoMiaoWu: a Master-Agent architecture that manages multiple servers from one panel, visual Xray inbound / outbound / routing configuration, automatic certificates, packages and users, and one-click subscriptions for 12+ clients."
+template: splash
+hero:
+  title: MiaoMiaoWu X Docs
+  tagline: One master for every node server. Install, connect Agents, create nodes, then packages, users and subscription delivery — every step with screenshots and examples.
+  image:
+    file: ../../../assets/screenshots/servers-card-online.webp
+    alt: An online server card on the MiaoMiaoWu X Servers page
+  actions:
+    - text: Beginner Tutorial
+      link: /docs/en/tutorial
+      icon: rocket
+      variant: primary
+    - text: Quick Start
+      link: /docs/en/quick-start
+      icon: right-arrow
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/iluobei/miaomiaowuX
+      icon: github
+      variant: minimal
+      attrs:
+        target: _blank
+---
+
+import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+<div class="mmwx-home">
+
+## Core features
+
+<CardGrid stagger>
+  <Card title="Remote servers" icon="laptop">
+    Master-Agent architecture, one-click Agent install, WebSocket / HTTP / Pull
+    connections, start / stop Xray and Nginx from the card, upgrade Agents
+    remotely. [Remote Servers →](/docs/en/remote-servers)
+  </Card>
+  <Card title="Nodes & inbound wizard" icon="setting">
+    VLESS / VMess / Trojan / Shadowsocks / Hysteria2 / AnyTLS / Snell / Mieru —
+    pick protocol, transport and security to generate an inbound that syncs to a
+    node automatically. [Node Management →](/docs/en/nodes)
+  </Card>
+  <Card title="Protocol reference" icon="open-book">
+    The full protocol × transport × security matrix, each protocol with wizard
+    screenshots and Xray config examples. [Protocol Matrix
+    →](/docs/en/protocol-matrix)
+  </Card>
+  <Card title="Certificates" icon="approve-check">
+    ACME issuance and renewal with Cloudflare / Alibaba / Tencent / Namesilo,
+    auto-deployed to every server that uses the certificate; upload or webhook
+    also supported. [Certificates →](/docs/en/certificates)
+  </Card>
+  <Card title="Users & packages" icon="star">
+    Packages define traffic, cycle, speed limits and node scope; users can hold
+    several packages, copy subscriptions in one click, bind Telegram and use the
+    Mini App. [User Management →](/docs/en/users)
+  </Card>
+  <Card title="Subscriptions & templates" icon="document">
+    12+ client formats, V3 templates with include-all / filter so new nodes join
+    subscriptions automatically, override rules for fine-grained splitting.
+    [Subscription Generator →](/docs/en/generator)
+  </Card>
+</CardGrid>
+
+## Start here
+
+<CardGrid>
+  <LinkCard
+    title="Beginner Tutorial"
+    description="12 steps from zero: install the master → HTTPS → add a server → nodes → packages → users, with screenshots."
+    href="/docs/en/tutorial"
+  />
+  <LinkCard
+    title="Docker Install"
+    description="Deploy the master with Compose; the three hard constraints explained."
+    href="/docs/en/install-docker"
+  />
+  <LinkCard
+    title="Agent Deployment"
+    description="One-click script or Docker image; choosing embedded vs external Xray."
+    href="/docs/en/install-agent"
+  />
+  <LinkCard
+    title="Migrate from MiaoMiaoWu"
+    description="Keep subscription links, certificates and Nginx; only the master changes."
+    href="/docs/en/upgrade-from-mmw"
+  />
+</CardGrid>
+
+## PRO features
+
+<CardGrid>
+  <LinkCard
+    title="Node Speed Test"
+    description="Measure download and real latency with the mihomo core, optionally from a home endpoint."
+    href="/docs/en/node-speedtest"
+  />
+  <LinkCard
+    title="Rate Limiting"
+    description="Cap download speed and concurrent connections per package and per user."
+    href="/docs/en/node-ratelimit"
+  />
+  <LinkCard
+    title="Server Sharing"
+    description="Share a server with another master without handing over the Agent token."
+    href="/docs/en/share-server"
+  />
+  <LinkCard
+    title="Embedded Xray"
+    description="xray-core inside the Agent process, unlocking rate-limit push and device limits."
+    href="/docs/en/embedded-xray"
+  />
+</CardGrid>
+
+## Need help
+
+<CardGrid>
+  <LinkCard
+    title="FAQ"
+    description="Installation, nodes, servers, protocols and subscription clients."
+    href="/docs/en/faq"
+  />
+  <LinkCard
+    title="Traffic Accounting"
+    description="Data sources and formulas behind every traffic figure in the UI."
+    href="/docs/en/traffic-accounting"
+  />
+  <LinkCard
+    title="AI Agents (MCP)"
+    description="Operate the master in natural language with OpenClaw / Hermes and friends."
+    href="/docs/en/mcp"
+  />
+  <LinkCard
+    title="Changelog"
+    description="What changed in each release."
+    href="/docs/en/changelog"
+  />
+</CardGrid>
+
+</div>

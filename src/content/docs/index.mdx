@@ -1,0 +1,139 @@
+---
+title: 妙妙屋X 文档
+description: "妙妙屋X 是妙妙屋的增强版：Master-Agent 架构统一管理多台服务器，可视化配置 Xray 入站 / 出站 / 路由，自动申请证书，套餐与用户管理，一键生成 12+ 种客户端订阅。"
+template: splash
+hero:
+  title: 妙妙屋X 文档
+  tagline: 一台主控，管好所有节点服务器。从安装、接入 Agent、创建节点，到套餐、用户与订阅分发，每一步都有截图和示例。
+  image:
+    file: ../../assets/screenshots/servers-card-online.webp
+    alt: 妙妙屋X 服务管理页面中的一张在线服务器卡片
+  actions:
+    - text: 新手教程
+      link: /docs/tutorial
+      icon: rocket
+      variant: primary
+    - text: 快速开始
+      link: /docs/quick-start
+      icon: right-arrow
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/iluobei/miaomiaowuX
+      icon: github
+      variant: minimal
+      attrs:
+        target: _blank
+---
+
+import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+<div class="mmwx-home">
+
+## 核心功能
+
+<CardGrid stagger>
+  <Card title="远程服务器" icon="laptop">
+    Master-Agent 架构，一键安装 Agent 接入，WebSocket / HTTP /
+    轮询三种连接方式，卡片上直接启停 Xray、Nginx，远程升级 Agent。
+    [了解远程服务器 →](/docs/remote-servers)
+  </Card>
+  <Card title="节点与入站向导" icon="setting">
+    VLESS / VMess / Trojan / Shadowsocks / Hysteria2 / AnyTLS / Snell /
+    Mieru，选协议、传输、安全层即可生成入站，自动同步为节点。 [了解节点管理
+    →](/docs/nodes)
+  </Card>
+  <Card title="协议参考" icon="open-book">
+    协议 × 传输 × 安全层完整矩阵，每种协议附向导截图与 Xray 配置示例。
+    [查看协议矩阵 →](/docs/protocol-matrix)
+  </Card>
+  <Card title="证书管理" icon="approve-check">
+    ACME 自动申请与续期，支持 Cloudflare / 阿里云 / 腾讯云 /
+    Namesilo，自动部署到所有引用证书的服务器，也可上传或 Webhook 推送。
+    [了解证书管理 →](/docs/certificates)
+  </Card>
+  <Card title="用户与套餐" icon="star">
+    套餐定义流量、周期、限速与节点范围；用户可绑定多个套餐，一键复制订阅，支持
+    Telegram 绑定与 Mini App。 [了解用户管理 →](/docs/users)
+  </Card>
+  <Card title="订阅与模板" icon="document">
+    12+ 种客户端格式，V3 模板 include-all / filter
+    语法让新节点自动进订阅，覆写规则精细分流。 [了解生成订阅 →](/docs/generator)
+  </Card>
+</CardGrid>
+
+## 从这里开始
+
+<CardGrid>
+  <LinkCard
+    title="新手教程"
+    description="12 步从零部署：安装主控 → HTTPS → 添加服务器 → 建节点 → 套餐 → 用户，每步配截图。"
+    href="/docs/tutorial"
+  />
+  <LinkCard
+    title="Docker 安装"
+    description="用 Compose 部署主控，三条硬约束一次说清。"
+    href="/docs/install-docker"
+  />
+  <LinkCard
+    title="Agent 部署"
+    description="一键脚本或 Docker 镜像接入服务器，内联 / 外置 Xray 模式怎么选。"
+    href="/docs/install-agent"
+  />
+  <LinkCard
+    title="从妙妙屋迁移"
+    description="订阅链接、证书、Nginx 全部保留，只换主控。"
+    href="/docs/upgrade-from-mmw"
+  />
+</CardGrid>
+
+## PRO 功能
+
+<CardGrid>
+  <LinkCard
+    title="节点测速"
+    description="mihomo 内核实测下行与真连接延迟，支持家用测速端。"
+    href="/docs/node-speedtest"
+  />
+  <LinkCard
+    title="节点限速"
+    description="按套餐与用户两层限制下载速度与并发连接数。"
+    href="/docs/node-ratelimit"
+  />
+  <LinkCard
+    title="分享服务器"
+    description="把服务器分享给另一个妙妙屋X 主控，无需交出 Agent 令牌。"
+    href="/docs/share-server"
+  />
+  <LinkCard
+    title="内嵌 Xray"
+    description="xray-core 内嵌在 Agent 进程内，解锁限速推送与设备数限制。"
+    href="/docs/embedded-xray"
+  />
+</CardGrid>
+
+## 遇到问题
+
+<CardGrid>
+  <LinkCard
+    title="常见问题"
+    description="安装部署、节点管理、服务器管理、协议入站、订阅客户端。"
+    href="/docs/faq"
+  />
+  <LinkCard
+    title="流量统计口径"
+    description="服务器、节点、用户、套餐、订阅与探针各页面的数据来源与公式。"
+    href="/docs/traffic-accounting"
+  />
+  <LinkCard
+    title="接入 AI Agent（MCP）"
+    description="用 OpenClaw / Hermes 等 AI Agent 以自然语言运维主控。"
+    href="/docs/mcp"
+  />
+  <LinkCard
+    title="更新日志"
+    description="每个版本的变化。"
+    href="/docs/changelog"
+  />
+</CardGrid>
+
+</div>

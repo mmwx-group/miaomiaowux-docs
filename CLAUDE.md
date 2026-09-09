@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev:landing` — 落地页 Vite 开发服务器。开发模式下所有文档链接经 `src/lib/docs-url.ts` 指向 astro dev(默认 `http://localhost:4321`,可用 `VITE_DOCS_DEV_ORIGIN` 覆盖),所以想在落地页点「文档」看到页面,要**同时**跑 `npm run dev`;生产构建里链接是相对路径 `/docs/...`
 - `npm run build` — `build:landing`(搜索索引 → tsc → vite build → 注入 site.json)+ `build:docs`(astro build → 校验站内链接)
 - `npm run check:docs` — 只跑站内链接校验(需先 build:docs)
+- `npm run preview:docs` — 构建文档并用 astro preview 起本地预览。**文档站的 Pagefind 搜索只在构建产物里可用**,`npm run dev` 下搜索框会提示「搜索仅适用于生产版本」,要试搜索请用这个命令
 - `npm run lint` / `npm run format` / `npm run knip`
 
 ## Architecture
