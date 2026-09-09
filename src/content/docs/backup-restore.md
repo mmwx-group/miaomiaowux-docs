@@ -72,4 +72,4 @@ tar czf mmwx-files.tar.gz data subscribes rule_templates
 
 ## 自动上传到远端
 
-手工下载的备份和主控在同一台机器上——机器整机挂掉时两份一起没。配置[定时同步备份](/backup-auto-sync/)可以把完整备份按间隔自动传到 WebDAV、S3 兼容存储或 Google Drive，并自动清理旧的。
+手工下载的备份和主控在同一台机器上——机器整机挂掉时两份一起没。配置[定时同步备份](/docs/backup-auto-sync)可以把完整备份按间隔自动传到 WebDAV、S3 兼容存储或 Google Drive，并自动清理旧的。
