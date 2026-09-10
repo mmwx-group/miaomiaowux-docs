@@ -1,5 +1,5 @@
-// 网格波纹背景(Canvas 版):网格顶点随同心波位移,波从中心不断向外扩散并衰减,
-// 波峰经过处的网格线以品牌色点亮。文档首页与落地页共用同一份实现。
+// 网格水波纹背景(Canvas 版):以中心为波源的连续同心水波,一圈圈快速向四周推进,
+// 网格顶点随波面起伏、波峰经过处的网格线以品牌色点亮。文档首页与落地页共用同一份实现。
 //
 // 挂载方式:
 //   1. 元素加 data-grid-wave 属性(可选 data-origin-x / data-origin-y / data-spacing / data-height)
@@ -12,12 +12,10 @@
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  var SPEED = 0.17; // px / ms,波前扩散速度
-  var WAVE_WIDTH = 80; // 单个波包的半宽(px)
-  var AMPLITUDE = 13; // 顶点最大位移(px)
-  var DECAY = 5200; // 波幅衰减时间常数(ms)
-  var INTERVAL = 2400; // 新波产生间隔(ms)
-  var AMBIENT = 2.2; // 无波时的轻微呼吸位移(px)
+  var WAVELENGTH = 120; // 相邻两圈波峰的间距(px)
+  var PERIOD = 900; // 一圈波峰走完一个波长所需时间(ms),越小越快
+  var AMPLITUDE = 14; // 波源附近顶点的最大位移(px)
+  var FALLOFF = 420; // 振幅随距离衰减的尺度(px):amp / (1 + r / FALLOFF)
 
   function readColors(host) {
     var cs = getComputedStyle(host);
@@ -36,7 +34,7 @@
     opts = opts || {};
     var spacing = Number(opts.spacing) || 42;
     var originX = opts.originX != null ? Number(opts.originX) : 0.5;
-    var originY = opts.originY != null ? Number(opts.originY) : 0.4;
+    var originY = opts.originY != null ? Number(opts.originY) : 0.5;
     var maxHeight = Number(opts.height) || 0;
 
     var canvas = document.createElement("canvas");
@@ -52,8 +50,6 @@
       cols = 0,
       rows = 0;
     var colors = readColors(host);
-    var ripples = [];
-    var lastSpawn = 0;
     var raf = 0;
     var visible = true;
     var started = 0;
@@ -76,37 +72,23 @@
       if (reduceMotion) draw(0);
     }
 
-    // 计算某个顶点在 now 时刻的位移与发光强度
+    // 计算某个顶点在 now 时刻的位移与发光强度:
+    // 径向行波 sin(2π(r/λ - t/T)),振幅随距离衰减,位移沿径向(像水面被推开)
     function displace(x, y, now, out) {
       var ox = originX * w;
       var oy = originY * h;
       var rx = x - ox;
       var ry = y - oy;
       var r = Math.sqrt(rx * rx + ry * ry) || 1;
-      var dx = 0;
-      var dy = 0;
-      var glow = 0;
-      for (var i = 0; i < ripples.length; i++) {
-        var age = now - ripples[i];
-        var front = age * SPEED;
-        var d = r - front; // 顶点到波前的距离,波前之内为负
-        if (d > WAVE_WIDTH * 2 || d < -WAVE_WIDTH * 2) continue;
-        var env =
-          Math.exp(-(d * d) / (2 * WAVE_WIDTH * WAVE_WIDTH)) *
-          Math.exp(-age / DECAY);
-        var s = Math.sin((d / WAVE_WIDTH) * Math.PI) * env * AMPLITUDE;
-        dx += (rx / r) * s;
-        dy += (ry / r) * s;
-        glow += env;
-      }
-      // 轻微呼吸,让网格在两道波之间也不是完全静止
-      dy +=
-        Math.sin(x * 0.018 + now * 0.0011) *
-        Math.cos(y * 0.02 - now * 0.0008) *
-        AMBIENT;
-      out[0] = x + dx;
-      out[1] = y + dy;
-      out[2] = glow > 1 ? 1 : glow;
+      var phase = (r / WAVELENGTH - now / PERIOD) * Math.PI * 2;
+      var env = 1 / (1 + r / FALLOFF);
+      var wave = Math.sin(phase);
+      var s = wave * env * AMPLITUDE;
+      out[0] = x + (rx / r) * s;
+      out[1] = y + (ry / r) * s * 0.75; // 竖向略压扁,更像俯视水面
+      // 只有波峰发光,并随距离减弱
+      var crest = wave > 0 ? wave * wave : 0;
+      out[2] = crest * Math.min(1, env * 1.6);
     }
 
     var px = [],
@@ -193,16 +175,7 @@
       raf = 0;
       if (!visible) return;
       if (!started) started = ts;
-      var now = ts - started;
-      if (now - lastSpawn > INTERVAL) {
-        ripples.push(now);
-        lastSpawn = now;
-      }
-      var maxR = Math.sqrt(w * w + h * h) + WAVE_WIDTH * 2;
-      ripples = ripples.filter(function (t0) {
-        return (now - t0) * SPEED < maxR;
-      });
-      draw(now);
+      draw(ts - started);
       raf = requestAnimationFrame(frame);
     }
 
@@ -216,10 +189,7 @@
     }
 
     resize();
-    if (!reduceMotion) {
-      ripples.push(0);
-      start();
-    }
+    start();
 
     var ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
     if (ro) ro.observe(host);
@@ -279,11 +249,7 @@
       var hv = parseFloat(cs.getPropertyValue("--mmwx-hero-bg-height")) || 0;
       var remPx =
         parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      mount(panel, {
-        originX: 0.74,
-        originY: 0.36,
-        height: hv ? hv * remPx : 0,
-      });
+      mount(panel, { height: hv ? hv * remPx : 0 });
     }
   }
 
