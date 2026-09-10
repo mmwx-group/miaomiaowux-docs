@@ -174,9 +174,9 @@ export default defineConfig({
           attrs: { src: "/docs/scripts/docs-lightbox.js", defer: true },
         },
         {
-          // 首页 hero 的网格波纹动画(Canvas)
+          // 首页 hero 的移动方格网格背景(Canvas,移植自 ReactBits ShapeGrid)
           tag: "script",
-          attrs: { src: "/docs/scripts/grid-wave.js", defer: true },
+          attrs: { src: "/docs/scripts/shape-grid.js", defer: true },
         },
       ],
     }),
