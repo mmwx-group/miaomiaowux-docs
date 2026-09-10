@@ -422,3 +422,153 @@ img.emoji {
   vertical-align: -0.1em;
   display: inline-block;
 }
+
+/* ------------------------------------------------------------
+   首页 hero:网格 + 向外扩散的品牌色波纹(纯 CSS)
+   用法:hero <section> 加 relative overflow-hidden,内部放
+   <div class="mmwx-grid-ripple" aria-hidden="true" />
+   ------------------------------------------------------------ */
+@property --mmwx-ripple-r {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+.mmwx-grid-ripple {
+  --grid-line: rgba(217, 119, 87, 0.14);
+  --grid-glow: rgba(217, 119, 87, 0.7);
+  --grid-size: 44px;
+  --ripple-x: 50%;
+  --ripple-y: 38%;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: radial-gradient(
+    55% 45% at var(--ripple-x) var(--ripple-y),
+    color-mix(in srgb, var(--primary) 12%, transparent),
+    transparent 70%
+  );
+}
+
+.dark .mmwx-grid-ripple {
+  --grid-line: rgba(255, 255, 255, 0.07);
+  --grid-glow: rgba(241, 140, 110, 0.65);
+}
+
+/* 静态网格:缓慢漂移,四周渐隐 */
+.mmwx-grid-ripple::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  -webkit-mask-image: radial-gradient(85% 90% at 50% 45%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(85% 90% at 50% 45%, #000 30%, transparent 100%);
+  animation: mmwx-grid-drift 28s linear infinite;
+}
+
+/* 波纹:品牌色网格只露出一圈正在扩散的环 */
+.mmwx-grid-ripple::after,
+.mmwx-grid-ripple > i {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  display: block;
+  background-image:
+    linear-gradient(var(--grid-glow) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, var(--grid-glow) 1.5px, transparent 1.5px);
+  background-size: var(--grid-size) var(--grid-size);
+  -webkit-mask-image: radial-gradient(
+    circle at var(--ripple-x) var(--ripple-y),
+    transparent calc(var(--mmwx-ripple-r) - 120px),
+    #000 calc(var(--mmwx-ripple-r) - 34px),
+    #000 var(--mmwx-ripple-r),
+    transparent calc(var(--mmwx-ripple-r) + 28px)
+  );
+  mask-image: radial-gradient(
+    circle at var(--ripple-x) var(--ripple-y),
+    transparent calc(var(--mmwx-ripple-r) - 120px),
+    #000 calc(var(--mmwx-ripple-r) - 34px),
+    #000 var(--mmwx-ripple-r),
+    transparent calc(var(--mmwx-ripple-r) + 28px)
+  );
+  animation: mmwx-grid-ripple 8s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+.mmwx-grid-ripple > i {
+  animation-delay: -4s;
+}
+
+/* 细描边圆环,和波纹一起扩散 */
+.mmwx-grid-ripple > b {
+  position: absolute;
+  left: var(--ripple-x);
+  top: var(--ripple-y);
+  width: 14rem;
+  height: 14rem;
+  margin: -7rem 0 0 -7rem;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  opacity: 0;
+  animation: mmwx-ring 8s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+.mmwx-grid-ripple > b + b {
+  animation-delay: -4s;
+}
+
+@keyframes mmwx-grid-drift {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      var(--grid-size) var(--grid-size),
+      var(--grid-size) var(--grid-size);
+  }
+}
+
+@keyframes mmwx-grid-ripple {
+  0% {
+    --mmwx-ripple-r: 0px;
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    --mmwx-ripple-r: 1300px;
+    opacity: 0;
+  }
+}
+
+@keyframes mmwx-ring {
+  0% {
+    transform: scale(0.15);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(7);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mmwx-grid-ripple::before,
+  .mmwx-grid-ripple::after,
+  .mmwx-grid-ripple > i,
+  .mmwx-grid-ripple > b {
+    animation: none;
+  }
+  .mmwx-grid-ripple::after,
+  .mmwx-grid-ripple > i,
+  .mmwx-grid-ripple > b {
+    display: none;
+  }
+}
