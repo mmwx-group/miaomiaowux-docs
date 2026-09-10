@@ -175,8 +175,14 @@ function XHomePage() {
         </div>
       </header>
 
-      <section className="relative min-h-[80vh] flex items-center justify-center px-4 sm:px-6 py-12 sm:py-20">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative overflow-hidden min-h-[80vh] flex items-center justify-center px-4 sm:px-6 py-12 sm:py-20">
+        {/* 网格 + 波纹动画背景,样式见 styles/index.css 的 .mmwx-grid-ripple */}
+        <div className="mmwx-grid-ripple" aria-hidden="true">
+          <i />
+          <b />
+          <b />
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <Sparkles className="size-4" />
             {t('xHome.advancedBadge')}
@@ -230,7 +236,7 @@ function XHomePage() {
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+        <div className="absolute z-10 bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
           <ChevronDown className="size-6 text-primary" />
           <ChevronDown className="size-6 text-primary/60 -mt-4" />
         </div>
