@@ -24,7 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - mdx 页里的「在线演示」是 React island:`src/components/docs/islands/*.tsx` → `src/components/docs/*-demo.tsx`,用 `demo-shell.tsx` 挂 i18n(`xdocs` 命名空间)。
   - **配图必须放 `src/assets/screenshots/` 并用相对路径引用**(中文页 `../../assets/...`,英文页 `../../../assets/...`)。不要写 `/images/...`:astro dev 只在 `/docs/` 前缀下提供 `public/`,绝对路径会 404;线上能显示只是因为 vite 也把 `public/` 复制到了 dist 根。图片段落后面紧跟的普通段落即图注(`src/styles/starlight.css` 有对应样式)。
   - `public/images/screenshots/` 里的老截图只剩落地页在用。
-  - 落地页 hero 与文档首页 hero 的「网格波纹」动画共用 `public/scripts/grid-wave.js`(Canvas 绘制,网格顶点随同心波位移;文档站经 astro 配置 `head` 注入,落地页由 `src/components/landing/grid-wave.tsx` 动态加载)。CSS 里的静态网格只是无 JS / 减少动效时的回退。
+  - 落地页 hero 与文档首页 hero 的移动方格网格背景共用 `public/scripts/shape-grid.js`(移植自 ReactBits ShapeGrid 的 Canvas 实现:网格斜向平移 + 鼠标悬停格子点亮带尾迹;文档站经 astro 配置 `head` 注入,落地页由 `src/components/landing/shape-grid.tsx` 动态加载)。CSS 里的静态网格只是无 JS / 减少动效时的回退。
 
 **i18n**: `src/i18n/`,命名空间 `common/layout/sidebar/landing/search/xdocs`,locales 在 `src/i18n/locales/{zh,en}`。`xdocs` 给 mdx 里的 React 演示用。
 

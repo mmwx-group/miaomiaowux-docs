@@ -734,22 +734,22 @@ starlight-toc a[aria-current="true"] {
 }
 
 /* ------------------------------------------------------------
-   首页 hero 背景:网格 + 向外扩散的品牌色波纹
+   首页 hero 背景:斜向平移的方格网格,悬停格子点亮(ReactBits ShapeGrid)
    结构:.content-panel > .sl-container > .hero(splash 模板)
-   动画由 public/scripts/grid-wave.js 在 Canvas 上绘制(网格顶点随波位移);
+   动画由 public/scripts/shape-grid.js 在 Canvas 上绘制;
    这里的 ::before 静态网格只是无 JS / 减少动效时的回退。
    ------------------------------------------------------------ */
 :root {
   --mmwx-grid-line: rgba(217, 119, 87, 0.14);
-  --mmwx-grid-glow: rgba(217, 119, 87, 0.8);
+  --mmwx-grid-glow: rgba(217, 119, 87, 0.45);
   --mmwx-grid-size: 42px;
   /* 背景只铺在页面顶部的 hero 区域,向下淡出 */
   --mmwx-hero-bg-height: 46rem;
 }
 
 :root[data-theme="dark"] {
-  --mmwx-grid-line: rgba(255, 255, 255, 0.08);
-  --mmwx-grid-glow: rgba(241, 140, 110, 0.8);
+  --mmwx-grid-line: rgba(255, 255, 255, 0.13);
+  --mmwx-grid-glow: rgba(241, 140, 110, 0.45);
 }
 
 .content-panel:has(> .sl-container > .hero) {
@@ -784,12 +784,12 @@ starlight-toc a[aria-current="true"] {
   mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
 }
 
-.content-panel.mmwx-grid-wave-host::before {
+.content-panel.mmwx-shape-grid-host::before {
   display: none;
 }
 
-/* Canvas 波纹层 */
-.content-panel:has(> .sl-container > .hero) > canvas.mmwx-grid-wave {
+/* Canvas 网格层 */
+.content-panel:has(> .sl-container > .hero) > canvas.mmwx-shape-grid {
   position: absolute;
   top: 0;
   left: 0;

@@ -424,15 +424,15 @@ img.emoji {
 }
 
 /* ------------------------------------------------------------
-   首页 hero:网格 + 向外扩散的品牌色波纹
-   动画由 public/scripts/grid-wave.js 在 Canvas 上绘制(网格顶点随波位移);
+   首页 hero:斜向平移的方格网格,悬停格子点亮(ReactBits ShapeGrid)
+   动画由 public/scripts/shape-grid.js 在 Canvas 上绘制;
    用法:hero <section> 加 relative overflow-hidden,内部放
-   <div class="mmwx-grid-ripple" data-grid-wave aria-hidden="true" />
+   <div class="mmwx-grid-ripple" data-shape-grid aria-hidden="true" />
    ::before 的静态网格只是无 JS / 减少动效时的回退。
    ------------------------------------------------------------ */
 .mmwx-grid-ripple {
   --mmwx-grid-line: rgba(217, 119, 87, 0.14);
-  --mmwx-grid-glow: rgba(217, 119, 87, 0.8);
+  --mmwx-grid-glow: rgba(217, 119, 87, 0.45);
   --grid-size: 44px;
   position: absolute;
   inset: 0;
@@ -447,8 +447,8 @@ img.emoji {
 }
 
 .dark .mmwx-grid-ripple {
-  --mmwx-grid-line: rgba(255, 255, 255, 0.08);
-  --mmwx-grid-glow: rgba(241, 140, 110, 0.8);
+  --mmwx-grid-line: rgba(255, 255, 255, 0.13);
+  --mmwx-grid-glow: rgba(241, 140, 110, 0.45);
 }
 
 .mmwx-grid-ripple::before {
@@ -463,11 +463,11 @@ img.emoji {
   mask-image: radial-gradient(70% 75% at 50% 50%, #000 25%, transparent 100%);
 }
 
-.mmwx-grid-ripple.mmwx-grid-wave-host::before {
+.mmwx-grid-ripple.mmwx-shape-grid-host::before {
   display: none;
 }
 
-.mmwx-grid-ripple > canvas.mmwx-grid-wave {
+.mmwx-grid-ripple > canvas.mmwx-shape-grid {
   position: absolute;
   top: 0;
   left: 0;
