@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { docsUrl } from '@/lib/docs-url'
+import { GridWave } from '@/components/landing/grid-wave'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -177,11 +178,8 @@ function XHomePage() {
 
       <section className="relative overflow-hidden min-h-[80vh] flex items-center justify-center px-4 sm:px-6 py-12 sm:py-20">
         {/* 网格 + 波纹动画背景,样式见 styles/index.css 的 .mmwx-grid-ripple */}
-        <div className="mmwx-grid-ripple" aria-hidden="true">
-          <i />
-          <b />
-          <b />
-        </div>
+        <div className="mmwx-grid-ripple" data-grid-wave data-origin-y="0.42" aria-hidden="true" />
+        <GridWave />
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <Sparkles className="size-4" />

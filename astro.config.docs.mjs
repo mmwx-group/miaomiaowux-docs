@@ -173,6 +173,11 @@ export default defineConfig({
           tag: "script",
           attrs: { src: "/docs/scripts/docs-lightbox.js", defer: true },
         },
+        {
+          // 首页 hero 的网格波纹动画(Canvas)
+          tag: "script",
+          attrs: { src: "/docs/scripts/grid-wave.js", defer: true },
+        },
       ],
     }),
   ],
