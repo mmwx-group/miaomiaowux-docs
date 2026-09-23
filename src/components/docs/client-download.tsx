@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  Apple,
   Download,
+  ExternalLink,
   Laptop,
   Monitor,
   Smartphone,
@@ -59,6 +61,12 @@ const STRINGS = {
       setup: "安装包",
       portable: "便携版",
     },
+    ios: {
+      badge: "TestFlight 内测",
+      requirement: "iOS 17 及以上 · iPhone / iPad",
+      text: "iOS 版通过 TestFlight 内测分发：登录许可证服务器，在「内测报名」登记 Apple ID 邮箱，收到邀请后在 TestFlight 里安装。",
+      button: "去内测报名",
+    },
   },
   en: {
     loading: "Fetching the latest release…",
@@ -81,8 +89,16 @@ const STRINGS = {
       setup: "Installer",
       portable: "Portable",
     },
+    ios: {
+      badge: "TestFlight beta",
+      requirement: "iOS 17 or later · iPhone / iPad",
+      text: "The iOS build is distributed through TestFlight. Sign in to the license server, register your Apple ID email under “Beta signup”, then install from TestFlight once the invitation arrives.",
+      button: "Beta signup",
+    },
   },
 } as const;
+
+const BETA_SIGNUP_URL = "https://license.miaomiaowux.com/beta";
 
 const PLATFORMS: { id: Platform; Icon: typeof Laptop }[] = [
   { id: "macos", Icon: Laptop },
@@ -143,7 +159,7 @@ export function ClientDownload({ lang = "zh" }: { lang?: "zh" | "en" }) {
           <span>{t.loading}</span>
         </div>
       )}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         {PLATFORMS.map(({ id, Icon }) => {
           const p = manifest?.platforms?.[id];
           return (
@@ -216,6 +232,26 @@ export function ClientDownload({ lang = "zh" }: { lang?: "zh" | "en" }) {
             </Card>
           );
         })}
+        {/* iOS：TestFlight 内测，不走 latest.json；报名入口在许可证服务器 */}
+        <Card className="gap-3 py-4">
+          <CardContent className="flex flex-col gap-3 px-4">
+            <div className="flex items-center gap-2">
+              <Apple className="size-5" />
+              <span className="text-base font-semibold">iOS</span>
+              <Badge variant="outline" className="ml-auto">
+                {t.ios.badge}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">{t.ios.requirement}</p>
+            <p className="text-sm">{t.ios.text}</p>
+            <Button asChild variant="outline">
+              <a href={BETA_SIGNUP_URL} target="_blank" rel="noreferrer">
+                <ExternalLink className="size-4" />
+                <span>{t.ios.button}</span>
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
