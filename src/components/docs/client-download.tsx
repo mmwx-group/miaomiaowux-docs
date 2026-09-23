@@ -14,7 +14,7 @@ import {
 // ClientDownload — 「客户端下载」页的下载卡片。版本与链接不写死在文档里，而是读 R2 桶根目录的
 // latest.json（由 MeowX 仓库 scripts/publish-r2.sh 在发版时上传），发版不用改文档、不用重新部署。
 
-const MANIFEST_URL = "https://dl.miaomiaowux.com/latest.json";
+const MANIFEST_URL = "https://dl.miaomiaowux.com/meowx/latest.json";
 
 type Platform = "macos" | "android" | "windows";
 type FileKind = "dmg" | "zip" | "apk" | "setup" | "portable";
