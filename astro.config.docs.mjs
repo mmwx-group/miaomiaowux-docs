@@ -60,6 +60,11 @@ export default defineConfig({
           items: ["about", "comparison", "features", "quick-start"],
         },
         {
+          label: "客户端",
+          translations: { en: "Clients" },
+          items: ["client-download"],
+        },
+        {
           label: "安装部署",
           translations: { en: "Installation" },
           items: [

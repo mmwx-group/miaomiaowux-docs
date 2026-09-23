@@ -1,0 +1,50 @@
+---
+title: "Client Downloads"
+description: "Download and install the official MeowX client for macOS, Android and Windows"
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 3
+---
+
+import { ClientDownload } from "@/components/docs/islands/client-download";
+
+MeowX is the official client for MiaoMiaoWu X. Sign in with your panel account or paste a subscription link to get started; it supports real-time subscription sync, return-route medals and streaming unlock badges from the panel. The version information below is fetched from the latest release, and all downloads are served from `dl.miaomiaowux.com`.
+
+<ClientDownload lang="en" client:load />
+
+## Installation
+
+### macOS
+
+1. Open the DMG and drag MeowX into Applications. The app is signed with a Developer ID and notarized, so it opens without extra steps.
+2. MeowX lives in the menu bar and has no main window: everything is in the drop-down panel behind the menu bar icon.
+3. The first connection in System Proxy mode asks for an administrator password to install the helper that changes the system proxy. TUN mode requires allowing the MeowX system extension under System Settings → General → Login Items & Extensions.
+4. Apple Silicon (M-series) only.
+
+### Android
+
+1. Download and install the APK (Android may ask you to allow installs from unknown sources).
+2. The first connection shows a VPN permission prompt; confirm it.
+3. The `mips` network stack is used by default; it can be changed under Settings → Advanced.
+
+### Windows
+
+1. The installer is not code-signed, so SmartScreen may show "Windows protected your PC": click "More info → Run anyway".
+2. The portable build runs from any folder and keeps its data next to the executable.
+3. System Proxy mode works out of the box; TUN mode needs administrator rights and triggers a UAC prompt when the core starts.
+
+## Sign in and import subscriptions
+
+- **Sign in from the web panel** (macOS / Windows): open "Account menu → QR login" in the panel and click "Sign in to client"; MeowX opens and signs in automatically.
+- **Scan with your phone** (Android): show the QR code under "Account menu → QR login" on a desktop browser and scan it with MeowX.
+- **Subscription link**: paste a subscription URL or a MiaoMiaoWu X short link on the Profiles page; `clash://install-config` deep links are supported too.
+
+After signing in, "My subscriptions" lists every subscription on the account; tap one to download it and make it active. Changes made in the panel are synced to the client automatically. Signing out removes the subscriptions imported from that panel.
+
+## iOS
+
+The iOS build is currently distributed through TestFlight for internal testing and is not available for public download yet.
+
+## FAQ
+
+See [Subscriptions & Clients](/docs/en/faq-sub-client).
