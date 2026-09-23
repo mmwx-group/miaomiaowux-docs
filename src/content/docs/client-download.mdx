@@ -1,0 +1,50 @@
+---
+title: "客户端下载"
+description: "MeowX 官方客户端（macOS / Android / Windows）下载与安装说明"
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 3
+---
+
+import { ClientDownload } from "@/components/docs/islands/client-download";
+
+MeowX 是妙妙屋X 的官方客户端，登录面板账号或粘贴订阅链接即可使用，支持面板的实时同步、回程线路奖牌与流媒体解锁标记。下方版本信息自动读取最新发布，下载地址均为 `dl.miaomiaowux.com`。
+
+<ClientDownload lang="zh" client:load />
+
+## 安装说明
+
+### macOS
+
+1. 打开 DMG，把 MeowX 拖到「应用程序」。App 已做 Developer ID 签名与公证，可直接打开。
+2. MeowX 是菜单栏应用，没有主窗口：所有功能都在菜单栏图标的下拉面板里。
+3. 「系统代理」模式首次连接会请求管理员授权，用于安装修改系统代理的辅助工具；「TUN 模式」需要在「系统设置 → 通用 → 登录项与扩展」里允许 MeowX 的系统扩展。
+4. 仅提供 Apple Silicon（M 系列）版本。
+
+### Android
+
+1. 下载 APK 直接安装（系统可能提示允许安装未知来源应用）。
+2. 首次连接会弹出 VPN 授权，确认即可。
+3. 默认使用 `mips` 网络栈；在「设置 → 高级」里可以切换。
+
+### Windows
+
+1. 安装包未做代码签名，SmartScreen 可能提示「Windows 已保护你的电脑」：点「更多信息 → 仍要运行」。
+2. 便携版解压即用，数据保存在程序目录。
+3. 系统代理模式开箱即用；TUN 模式需要管理员权限，首次启动核心会弹出 UAC 提示。
+
+## 登录与导入订阅
+
+- **网页端登录客户端**（macOS / Windows）：在面板网页「个人菜单 → 扫码登录」里点「登录客户端」，MeowX 会自动打开并完成登录。
+- **手机扫码**（Android）：在桌面端「个人菜单 → 扫码登录」出示二维码，用 MeowX 扫一扫即可。
+- **订阅链接**：在「配置」页粘贴订阅 URL 或妙妙屋X 短链导入；也支持 `clash://install-config` 深链。
+
+登录后「我的订阅」会列出账号下的全部订阅，点一下即下载并切换为当前配置；面板更新订阅后客户端会自动同步。退出登录时，从该面板导入的订阅会一并删除。
+
+## iOS
+
+iOS 版目前通过 TestFlight 内测，暂不提供公开下载。
+
+## 常见问题
+
+见 [订阅与客户端](/docs/faq-sub-client)。
