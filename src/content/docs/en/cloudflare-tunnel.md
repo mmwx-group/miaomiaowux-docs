@@ -68,12 +68,13 @@ Open the Tunnel's **Routes** section and add two **Published application** route
 Path for the subscription hostname:
 
 ```regex
-^/(x/.*|api/(clash/subscribe|user/package-subscribe|subscribe))$
+^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe))$
 ```
 
 This permits only:
 
 - `/x/*`: short links and package subscriptions.
+- `/api/fw/*`: client IP allowlist reports (the official client reports automatically).
 - `/api/clash/subscribe`: Clash/Mihomo subscriptions.
 - `/api/user/package-subscribe`: package subscriptions.
 - `/api/subscribe`: compatibility endpoint.
@@ -92,7 +93,7 @@ ingress:
   - hostname: panel.example.com
     service: http://127.0.0.1:12889
   - hostname: sub.example.com
-    path: ^/(x/.*|api/(clash/subscribe|user/package-subscribe|subscribe))$
+    path: ^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe))$
     service: http://127.0.0.1:12889
   - service: http_status:404
 ```

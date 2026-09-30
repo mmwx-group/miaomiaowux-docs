@@ -121,6 +121,10 @@ Deployment installs Nginx, which may take a while depending on server performanc
 
 Configure HTTPS separately for the master domain and the subscription domain: the master domain proxies the whole panel, the subscription domain only allows subscription paths and returns 404 for everything else. Make sure both domains resolve to the master server and certificates are ready.
 
+:::tip[The panel can configure the subscription domain for you]
+If the master's HTTPS was enabled with "Deploy certificate to master" in Certificates (Nginx managed by the master), enter the subscription domain in [System Settings](/docs/en/system-settings) → "System" tab: the panel checks that DNS points to this server and a certificate is available, then configures it in one click. For your own Nginx or Caddy, the same place shows a ready-to-copy config.
+:::
+
 #### Install Nginx
 
 ```
@@ -156,9 +160,9 @@ Replace {domain} with the master domain and confirm fullchain.pem and privkey.pe
 
 ```
 server {
-    listen 443;
+    listen 443 ssl;
     #listen 443 quic;
-    listen [::]:443;
+    listen [::]:443 ssl;
     #listen [::]:443 quic;
     http2 on;
     server_name {domain};
@@ -169,7 +173,7 @@ server {
     ssl_prefer_server_ciphers on;
     error_page 497 https://$host:443$1;
     #add_header Alt-Svc 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000';
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_protocols TLSv1.2 TLSv1.3;
 
     location / {
         proxy_ssl_server_name on;
@@ -206,10 +210,11 @@ server {
 
     # Allowed endpoints:
     #   /x/{code}                    short links and package subscription links
+    #   /api/fw/{token}/...          client IP allowlist reports
     #   /api/clash/subscribe         direct Clash/Mihomo subscriptions
     #   /api/user/package-subscribe  direct package subscriptions
     #   /api/subscribe               compatibility endpoint
-    location ~ ^(?:/x/|/api/(?:clash/subscribe|user/package-subscribe|subscribe)$) {
+    location ~ ^(?:/x/|/api/fw/|/api/(?:clash/subscribe|user/package-subscribe|subscribe)$) {
         proxy_pass http://127.0.0.1:12889;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -227,6 +232,20 @@ server {
     location / {
         return 404;
     }
+}
+```
+
+#### Reject unknown domains (required)
+
+Both sites above only list their own `server_name`. When the requested domain matches no `server_name`, Nginx hands it to the first site on port 443 — with a wildcard certificate and wildcard DNS, any subdomain (e.g. `abc.example.com`) opens the panel or the subscription site.
+
+Add this catch-all site so unknown domains are rejected during the TLS handshake. Save it as /usr/local/nginx/servers/00-default.conf; port 443 can only have one `default_server`, so skip it if you already have one.
+
+```
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    ssl_reject_handshake on;
 }
 ```
 
@@ -267,7 +286,7 @@ Replace {master_domain} and {subscription_domain}. The master domain exposes the
 
 {subscription_domain} {
     @subscriptions {
-        path /x/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+        path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
     }
 
     handle @subscriptions {
