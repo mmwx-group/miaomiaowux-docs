@@ -121,6 +121,10 @@ http://mmwx.example.com:12889
 
 为主控域名和订阅域名分别配置 HTTPS：主控域名反代完整面板，订阅域名只允许订阅相关路径，其余请求统一返回 404。请先确保两个域名均已解析到主控服务器，并准备对应证书。
 
+:::tip[面板可自动配置订阅域名]
+如果主控是在「证书管理」里点「部署证书到主控」启用的 HTTPS（Nginx 由主控管理），在 [系统设置](/docs/system-settings)「系统」选项卡填写订阅域名后，下方会检查 DNS 解析是否指向本机、证书是否可用，检查通过即可一键配置。自行安装的 Nginx 或 Caddy，同一位置也会给出对应配置，复制即可使用。
+:::
+
 #### 安装 Nginx
 
 ```
@@ -156,9 +160,9 @@ sudo chmod 600 /usr/local/nginx/cert/{domain}/privkey.pem
 
 ```
 server {
-    listen 443;
+    listen 443 ssl;
     #listen 443 quic;
-    listen [::]:443;
+    listen [::]:443 ssl;
     #listen [::]:443 quic;
     http2 on;
     server_name {domain};
@@ -169,7 +173,7 @@ server {
     ssl_prefer_server_ciphers on;
     error_page 497 https://$host:443$1;
     #add_header Alt-Svc 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000';
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_protocols TLSv1.2 TLSv1.3;
 
     location / {
         proxy_ssl_server_name on;
@@ -206,10 +210,11 @@ server {
 
     # Allowed endpoints:
     #   /x/{code}                    short links and package subscription links
+    #   /api/fw/{token}/...          client IP allowlist reports
     #   /api/clash/subscribe         direct Clash/Mihomo subscriptions
     #   /api/user/package-subscribe  direct package subscriptions
     #   /api/subscribe               compatibility endpoint
-    location ~ ^(?:/x/|/api/(?:clash/subscribe|user/package-subscribe|subscribe)$) {
+    location ~ ^(?:/x/|/api/fw/|/api/(?:clash/subscribe|user/package-subscribe|subscribe)$) {
         proxy_pass http://127.0.0.1:12889;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -227,6 +232,20 @@ server {
     location / {
         return 404;
     }
+}
+```
+
+#### 拒绝未知域名（必须）
+
+上面两个站点都只写了自己的 `server_name`。请求的域名不在任何 `server_name` 里时，Nginx 会交给 443 上第一个站点处理 —— 使用泛域名证书并做了泛解析时，随便一个二级域名（如 `abc.example.com`）都能打开面板或订阅。
+
+再添加下面这个兜底站点，未知域名直接拒绝 TLS 握手。保存为 /usr/local/nginx/servers/00-default.conf；443 上只能有一个 `default_server`，已经有了就不要重复添加。
+
+```
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    ssl_reject_handshake on;
 }
 ```
 
@@ -267,7 +286,7 @@ sudo apt install caddy
 
 {subscription_domain} {
     @subscriptions {
-        path /x/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+        path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
     }
 
     handle @subscriptions {
