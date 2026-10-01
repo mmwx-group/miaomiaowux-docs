@@ -49,6 +49,114 @@ The setting is saved only after all of them are processed.
 
 Click **Revert to the master address** and the Agents go back to using the master address. The master address is already in use, so no DNS check is needed.
 
+## Configuration examples
+
+At the "Check" step the panel shows the config with your domain and port filled in, ready to copy; or write it from the examples below. They assume the report domain is `agent.example.com`, the master listens on the default port `12889`, and the reverse proxy runs on the same host.
+
+### Nginx
+
+Put the certificate under `/usr/local/nginx/cert/agent.example.com/` (or use your own path) and save as, for example, `/usr/local/nginx/servers/agent.conf`:
+
+```nginx
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name agent.example.com;
+
+    ssl_certificate     /usr/local/nginx/cert/agent.example.com/fullchain.pem;
+    ssl_certificate_key /usr/local/nginx/cert/agent.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    # Agent long-lived connection (WebSocket): forward Upgrade and use long timeouts so idle periods are not cut
+    location = /api/remote/ws {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade            $http_upgrade;
+        proxy_set_header Connection         "upgrade";
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    1h;
+        proxy_read_timeout    1h;
+    }
+
+    # Agent HTTP reports / heartbeats / install script
+    location ^~ /api/remote/ {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    120s;
+        proxy_read_timeout    120s;
+    }
+
+    location / {
+        return 404;
+    }
+}
+
+# Reject unknown domains: only one default_server on 443; skip it if you already have one
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    ssl_reject_handshake on;
+}
+```
+
+Run `/usr/local/nginx/sbin/nginx -t` to check, then `systemctl reload nginx`.
+
+### Caddy
+
+Caddy's `reverse_proxy` supports WebSocket out of the box and does not cut long-lived connections:
+
+```caddy
+agent.example.com {
+    # Agent communication (WebSocket + HTTP reports)
+    @agent path /api/remote/*
+    handle @agent {
+        reverse_proxy 127.0.0.1:12889
+    }
+    # Everything else returns 404
+    handle {
+        respond 404
+    }
+}
+```
+
+Run `caddy validate --config /etc/caddy/Caddyfile`, then `systemctl reload caddy`.
+
+### Sharing a domain with subscriptions
+
+One `server_name` can only have one server block, so both sets of paths go into the same site.
+
+Nginx: put the subscription `location ~ ...` block from the [subscription domain example](/docs/en/domain-subscription#nginx) and the two `/api/remote/` locations above into one server block, keeping `location / { return 404; }` last.
+
+Caddy:
+
+```caddy
+edge.example.com {
+    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+    handle @subscriptions {
+        reverse_proxy 127.0.0.1:12889
+    }
+    @agent path /api/remote/*
+    handle @agent {
+        reverse_proxy 127.0.0.1:12889
+    }
+    handle {
+        respond 404
+    }
+}
+```
+
 ## Notes
 
 - The report domain can be the same domain as the subscription domain: both sets of paths are allowed and the panel still returns 404.

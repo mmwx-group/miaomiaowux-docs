@@ -37,6 +37,8 @@ tableOfContents:
 | 19  | AnyTLS      | TCP   | REALITY               | 后端支持但 Clash/Mihomo/sing-box 客户端均无支持   |
 | 20  | Snell       | TCP   | None                  | Snell v4 / v5:每用户独立 PSK,支持 obfs 混淆       |
 | 21  | Snell       | TCP   | None                  | Snell v6:共享 PSK + clientID,隐藏 salt + 流量整形 |
+| 22  | Mieru       | TCP   | None                  | 用户名 + 密码,协议自身加密;仅嵌入式 xray          |
+| 23  | Mieru       | UDP   | None                  | 同一端口同时监听 TCP/UDP;MeowX Mac/iOS 仅支持 TCP |
 
 ## 已废弃的组合
 

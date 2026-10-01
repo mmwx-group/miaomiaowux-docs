@@ -38,13 +38,81 @@ tableOfContents:
 
 ## 手动配置
 
-自己维护 Nginx 或 Caddy 时，可以直接复制面板给出的配置，也可以参考：
+自己维护 Nginx 或 Caddy 时，可以直接复制面板给出的配置（域名、端口已经替换好），也可以照下面的示例写。示例假设订阅域名为 `sub.example.com`、主控监听默认端口 `12889`，反代与主控在同一台机器上。
 
-- [部署教程 · 独立订阅域名配置](/docs/tutorial#独立订阅域名配置)（Nginx）
-- [部署教程 · Caddy](/docs/tutorial#55-可选使用-caddy-反向代理主控)
-- [Cloudflare Tunnel](/docs/cloudflare-tunnel)：订阅域名的 Path 规则
+### Nginx
 
-面板生成的 Nginx 配置包含 [拒绝未知域名](/docs/tutorial#拒绝未知域名必须) 的兜底站点，避免泛域名证书下任意子域名都能访问。
+证书放在 `/usr/local/nginx/cert/sub.example.com/` 下（或改成你自己的路径），保存为例如 `/usr/local/nginx/servers/sub.conf`：
+
+```nginx
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name sub.example.com;
+
+    ssl_certificate     /usr/local/nginx/cert/sub.example.com/fullchain.pem;
+    ssl_certificate_key /usr/local/nginx/cert/sub.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    # 只放行订阅相关路径（短链接、订阅接口、客户端 IP 白名单上报），不开放登录页与管理接口
+    location ~ ^(?:/x/|/api/fw/|/api/(?:clash/subscribe|user/package-subscribe|subscribe)$) {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_set_header X-Forwarded-Host   $host;
+        proxy_set_header X-Forwarded-Port   $server_port;
+        proxy_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    60s;
+        proxy_read_timeout    60s;
+    }
+
+    location / {
+        return 404;
+    }
+}
+
+# 拒绝未知域名：443 上只需要一个 default_server，已经有了就不要重复添加
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    ssl_reject_handshake on;
+}
+```
+
+`X-Real-IP` 不能省：客户端 IP 白名单上报靠它拿到客户端的真实出口 IP，缺了会报「主控看到的是反代/内网地址」。
+
+保存后执行 `/usr/local/nginx/sbin/nginx -t` 检查，再执行 `systemctl reload nginx`。
+
+### Caddy
+
+```caddy
+sub.example.com {
+    # 只放行订阅相关路径（短链接、订阅接口、客户端 IP 白名单上报）
+    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+    handle @subscriptions {
+        reverse_proxy 127.0.0.1:12889
+    }
+    # 其余一律 404
+    handle {
+        respond 404
+    }
+}
+```
+
+保存后执行 `caddy validate --config /etc/caddy/Caddyfile`，再执行 `systemctl reload caddy`。
+
+### Cloudflare Tunnel
+
+用 Tunnel 发布订阅域名时，在 Cloudflare 侧按路径限制，见 [Cloudflare Tunnel](/docs/cloudflare-tunnel)。
+
+:::note
+订阅域名与 [上报域名](/docs/domain-agent) 用同一个域名时，同一个站点里要同时放行两组路径，见 [上报域名 · 与订阅域名共用](/docs/domain-agent#与订阅域名共用一个域名)。
+:::
 
 ## 和「关闭公网访问」一起用
 
