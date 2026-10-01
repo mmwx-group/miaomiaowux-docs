@@ -33,13 +33,13 @@ This overview follows the current /system-settings implementation in the MiaoMia
 | Subscriptions | External traffic sync, node-name regex filtering, forced refresh, matching rules, sync scope, name preservation, and cache lifetime.                                 | Effective after saving        |
 | Features      | Short links, override scripts, update CDN, Clash output, legacy compatibility, silent mode, mandatory Agent encryption, default templates, and multiplier prefixes.  | Effective after saving        |
 | Notifications | Telegram notifications, test messages, and independent events for login, subscription fetches, server status, daily traffic, and threshold alerts.                   | Effective after saving        |
-| Security      | Login rate limiting, brute-force protection, and subscription request limits. Fields auto-save on blur and hot-update the limiters.                                  | Effective after saving        |
+| Security      | Login rate limiting, brute-force protection, and subscription request limits. Fields auto-save on blur and hot-update the limiters. The [client IP allowlist](#client-ip-allowlist) lives here too. | Effective after saving        |
 | Probe         | Disguise the site as a public monitor; configure title, logo, hidden login, visible servers, and Agent CPU, memory, disk, and Ping collection.                       | Effective after saving        |
 | Appearance    | Set the default theme, login wallpaper, custom branding, and [custom CSS](/docs/en/custom-css). A user's theme takes priority; custom branding and custom CSS require the matching PRO feature. | Effective after saving        |
 | Announcements | Configure blocked/recovered node, maintenance, subscription update, and general templates; select Bot/Mini App channels and probes, or publish immediately.          | Effective after saving        |
 | TGBot         | Enable the built-in Bot and Mini App, configure the Bot Token and administrator Telegram IDs, and control the development-only preview. Saving hot-restarts the Bot. | Effective after saving        |
 | Verification  | Configure and test Cloudflare Turnstile Site Key and Secret Key. Login verification is enabled only when both keys are configured.                                   | Effective after saving        |
-| System        | Sync custom proxy groups, tune scheduled tasks, set the public master URL and listener scope, configure TG redemption copy, and view or regenerate the API Token.    | Some settings require restart |
+| System        | Sync custom proxy groups, tune scheduled tasks, set the master URL / subscription URL / Agent connection address (see [Domains](/docs/en/domains)) and listener scope, configure TG redemption copy, and view or regenerate the API Token. | Some settings require restart |
 | License       | Review license status, plan, expiry, and server/node/user quotas; update the key and verify PRO feature availability.                                                | Effective after saving        |
 
 Block Public Access makes the master listen only on 127.0.0.1 and requires a restart. It only suits a reverse proxy on the same host; Docker port mapping, cross-server proxying, and direct IP:port access will stop working. Regenerating the API Token invalidates the old token immediately.
@@ -62,7 +62,7 @@ Notifications: enable push, Telegram Bot Token / Chat ID, per-event switches, da
 
 ![Security tab screenshot](../../../assets/screenshots/settings-security.webp)
 
-Security: login rate limit, brute-force protection, subscription request frequency and other thresholds, auto-saved on blur
+Security: login rate limit, brute-force protection, subscription request frequency and other thresholds, auto-saved on blur; client IP allowlist and po0 server config
 
 ![Probe tab screenshot](../../../assets/screenshots/settings-probe.webp)
 
@@ -86,7 +86,7 @@ Captcha: Cloudflare Turnstile Site Key / Secret Key, see [Cloudflare Turnstile](
 
 ![System tab screenshot](../../../assets/screenshots/settings-system.webp)
 
-System: auto backup, custom proxy-group source, scheduler intervals, master address / subscription domain, disable public access, HTTPS self-healing, API Token
+System: auto backup, custom proxy-group source, scheduler intervals, master address / subscription domain / Agent connection address (see [Domains](/docs/en/domains)), disable public access, HTTPS self-healing, API Token
 
 ![Database tab screenshot](../../../assets/screenshots/settings-database.webp)
 
@@ -259,6 +259,18 @@ Controls which nodes are updated during sync.
     </tr>
   </tbody>
 </table>
+
+## Client IP allowlist
+
+In the "Security" tab. On servers with the allowlist enabled, proxy ports only accept connections from listed source IPs; the list is filled by users' clients reporting directly, so admins do not maintain it by hand.
+
+- **Enabled servers**: tick the servers to protect. Protected ports **follow the server's current inbounds automatically**; inter-server inbounds (forward exits `fwd-exit-*`, `wg-transit-*`), loopback-only inbounds and the master's and Agent's own ports are excluded. An empty list leaves the allowlist inactive instead of closing the ports.
+- **IPs per user**: 10 by default (one device usually takes two, v4 and v6). When exceeded, the **earliest added** one is pushed out.
+- **IP expiry (days)**: 7 by default; IPs not reported for that many days are removed. 0 means never expire.
+- **List**: shows each IP's **region and carrier** (requires the IP region database) and lets you remove entries one by one.
+- **po0 server config**: some servers sit behind the po0 firewall. Click "po0 服务器配置" (po0 server config; this card is not translated yet), choose which servers are po0 servers and enter the po0 token. A po0 server has only 5 allowlist slots in total, shared by all users. See [Client settings · po0 allowlisting](/docs/en/client-settings#po0-allowlisting).
+
+Users get their report link in "Personal settings → Client IP allowlist" and also see the region of their own IPs there; the official client reports automatically. The report link uses the master address; with a [subscription domain](/docs/en/domain-subscription) it can go through that domain as well.
 
 ## Feature Toggles
 
