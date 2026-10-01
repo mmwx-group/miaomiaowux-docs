@@ -227,6 +227,16 @@ Therefore, even if a user has multiple sub-accounts (subscribed to multiple rout
 | Triggers Xray restart           | Yes                         | Yes (on first creation and each new user addition) |
 | Traffic Statistics Granularity  | Inbound as a whole          | Independent per user email                         |
 
+## Unlock detection
+
+The unlock results of a routed node (the lock icon in node management and the unlock marks in clients) come from its **real exit**:
+
+- The landing is a server managed by this panel: that server's results are used directly.
+- The landing is an **external line** (someone else's residential line, a node from an external subscription) or **WARP**: the host server's Agent tests **through this routed outbound** and the results are stored per node. Requires Agent v0.9.1 or later; a newly created node of this kind is tested within 10 minutes, then refreshed with the daily 04:40 run.
+- The landing is blocked (blackhole) or the outbound config does not match: nothing is shown, rather than borrowing the host server's results.
+
+Results tested through the outbound may differ from the host server's own results. That is expected: they reflect the path traffic actually takes through this outbound — for example, when the landing's Xray prefers IPv6, some services judge the region by the IPv6 address.
+
 ## FAQ
 
 ### Can routed outbound child nodes be deleted?

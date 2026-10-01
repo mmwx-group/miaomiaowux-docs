@@ -80,6 +80,16 @@ export default defineConfig({
           ],
         },
         {
+          label: "域名配置",
+          translations: { en: "Domains" },
+          items: [
+            "domains",
+            "domain-master",
+            "domain-subscription",
+            "domain-agent",
+          ],
+        },
+        {
           label: "服务管理",
           translations: { en: "Server management" },
           items: [

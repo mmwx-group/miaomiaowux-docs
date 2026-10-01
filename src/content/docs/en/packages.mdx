@@ -103,6 +103,10 @@ Optional automatic throttling: when a user exceeds the quota they are slowed dow
 
 The Xray traffic collector counts every user's traffic in real time. When billable traffic exceeds the quota the subscription stops returning nodes (or throttles, per the setting above).
 
+:::note[Admins are exempt from traffic limits]
+An admin account is never marked over quota or cut off, even with a package bound to itself; an admin previously marked over quota is restored automatically. Package expiry still applies as usual.
+:::
+
 - Raw up/down are stored per Xray user/email and weighted at collection time
 - Packages choose one-way (`oneway`, `×1`) or two-way (`twoway`, `×2`)
 - Billable = (raw up + raw down) × package direction multiplier × node multiplier

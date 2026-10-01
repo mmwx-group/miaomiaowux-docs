@@ -15,7 +15,7 @@ Nodes — the "Import external nodes" panel on top, the node list below: filter 
 A node is the subscription-side mapping of an inbound. Every inbound automatically creates a node used for subscription distribution. The page has two parts:
 
 - **Import external nodes**: import airport subscriptions or single URIs as "external nodes"
-- **Node list**: all nodes (self-hosted + external) with protocol / tag filters, inline actions (edit / landing / routing / copy URI …) and global tools at the top right
+- **Node list**: all nodes (self-hosted + external) with protocol / tag filters and a keyword search over servers / nodes (matches node name, tags, server and address), inline actions (edit / landing / routing / copy URI …) and global tools at the top right
 
 ## Node sources
 
@@ -252,6 +252,8 @@ Besides Xray dokodemo-door tunnels, MiaoMiaoWu X provides native Agent forwardin
 ![Create forward chain dialog screenshot](../../../assets/screenshots/forward-create-dialog.webp)
 
 Create forward chain: drag servers into entry / relay / exit groups; the exit is either a server or a landing node
+
+When creating a chain you can pick the "forwarding engine": relay by default (user-space forwarding in the Agent), or iptables / nftables, which DNAT in the kernel without user space and with low CPU usage. Rules that do not fit — rate limits, IPv6, ports with the client IP allowlist — fall back to relay automatically; the engine each server actually uses is shown under "Forward status". If the Agent lacks the iptables / nftables command it installs it with the system package manager (Agent v0.9.1 or later), using relay until the install finishes.
 
 ## Notes
 
