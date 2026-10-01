@@ -38,6 +38,47 @@ tableOfContents:
 2. 需要时再配**订阅域名**：保存后，面板、TG Bot 和 Mini App 里复制或推送的订阅地址都会换成它。
 3. 最后配**上报域名**：它会把新地址下发给所有 Agent，按「检查 → 单台测试 → 全部切换」三步走，详见 [上报域名](/docs/domain-agent)。
 
+## 完整示例（三个域名同一台主控）
+
+假设面板 `panel.example.com`、订阅 `sub.example.com`、上报 `agent.example.com` 都解析到主控，主控监听默认端口 `12889`。用 Caddy 时整个 `/etc/caddy/Caddyfile` 如下（Caddy 自动申请证书）：
+
+```caddy
+# 主控域名：全部放行
+panel.example.com {
+    reverse_proxy 127.0.0.1:12889
+}
+
+# 订阅域名：只放行订阅相关路径
+sub.example.com {
+    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+    handle @subscriptions {
+        reverse_proxy 127.0.0.1:12889
+    }
+    handle {
+        respond 404
+    }
+}
+
+# 上报域名：只放行 Agent 通信
+agent.example.com {
+    @agent path /api/remote/*
+    handle @agent {
+        reverse_proxy 127.0.0.1:12889
+    }
+    handle {
+        respond 404
+    }
+}
+```
+
+用 Nginx 时，每个域名一个 server 块，外加一个拒绝未知域名的兜底站点，分别见：
+
+- [主控域名 · Nginx](/docs/domain-master#nginx)
+- [订阅域名 · Nginx](/docs/domain-subscription#nginx)
+- [上报域名 · Nginx](/docs/domain-agent#nginx)
+
+配好反代后，别忘了在「系统设置」→「系统」里填写对应的地址，否则面板生成的链接仍然使用主控域名。
+
 :::caution[泛域名证书要加兜底站点]
 使用泛域名证书并做了泛解析时，任何没有配置过的子域名都可能被 Nginx 交给第一个站点（往往就是面板）。自己配置 Nginx 时务必加上 [拒绝未知域名](/docs/tutorial#拒绝未知域名必须) 的兜底站点；面板一键配置生成的 Nginx 配置已经包含它。
 :::

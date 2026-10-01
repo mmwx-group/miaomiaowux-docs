@@ -49,6 +49,114 @@ tableOfContents:
 
 点 **改回与主控地址相同**，Agent 会改回使用主控地址。主控地址本来就在用，不需要再检查 DNS。
 
+## 配置示例
+
+在「检查」那一步面板会给出替换好域名和端口的配置，复制即可；也可以照下面的示例写。示例假设上报域名为 `agent.example.com`、主控监听默认端口 `12889`，反代与主控在同一台机器上。
+
+### Nginx
+
+证书放在 `/usr/local/nginx/cert/agent.example.com/` 下（或改成你自己的路径），保存为例如 `/usr/local/nginx/servers/agent.conf`：
+
+```nginx
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name agent.example.com;
+
+    ssl_certificate     /usr/local/nginx/cert/agent.example.com/fullchain.pem;
+    ssl_certificate_key /usr/local/nginx/cert/agent.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    # Agent 长连接（WebSocket）：要转发 Upgrade，读写超时放长，避免空闲时段被砍断
+    location = /api/remote/ws {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade            $http_upgrade;
+        proxy_set_header Connection         "upgrade";
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    1h;
+        proxy_read_timeout    1h;
+    }
+
+    # Agent 的 HTTP 上报 / 心跳 / 安装脚本
+    location ^~ /api/remote/ {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    120s;
+        proxy_read_timeout    120s;
+    }
+
+    location / {
+        return 404;
+    }
+}
+
+# 拒绝未知域名：443 上只需要一个 default_server，已经有了就不要重复添加
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    ssl_reject_handshake on;
+}
+```
+
+保存后执行 `/usr/local/nginx/sbin/nginx -t` 检查，再执行 `systemctl reload nginx`。
+
+### Caddy
+
+Caddy 的 `reverse_proxy` 自带 WebSocket 支持，长连接不会被超时砍断：
+
+```caddy
+agent.example.com {
+    # Agent 通信（WebSocket 长连接 + HTTP 上报）
+    @agent path /api/remote/*
+    handle @agent {
+        reverse_proxy 127.0.0.1:12889
+    }
+    # 其余一律 404
+    handle {
+        respond 404
+    }
+}
+```
+
+保存后执行 `caddy validate --config /etc/caddy/Caddyfile`，再执行 `systemctl reload caddy`。
+
+### 与订阅域名共用一个域名
+
+同一个 `server_name` 只能有一个 server 块，所以两组路径要写在同一个站点里。
+
+Nginx：把 [订阅域名示例](/docs/domain-subscription#nginx) 中订阅路径的 `location ~ ...` 段，和上面两段 `/api/remote/` 的 location 放进同一个 server 块，最后保留 `location / { return 404; }`。
+
+Caddy：
+
+```caddy
+edge.example.com {
+    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+    handle @subscriptions {
+        reverse_proxy 127.0.0.1:12889
+    }
+    @agent path /api/remote/*
+    handle @agent {
+        reverse_proxy 127.0.0.1:12889
+    }
+    handle {
+        respond 404
+    }
+}
+```
+
 ## 注意事项
 
 - 上报域名可以和订阅域名用同一个域名：两类路径都会放行，面板仍然 404。

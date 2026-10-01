@@ -37,6 +37,8 @@ The three button rows at the top of the wizard: protocol → transport → secur
 | 19  | AnyTLS      | TCP       | REALITY               | Backend supported, but no Clash/Mihomo/sing-box client supports it |
 | 20  | Snell       | TCP       | None                  | Snell v4 / v5: per-user PSK, supports obfs                         |
 | 21  | Snell       | TCP       | None                  | Snell v6: shared PSK + clientID, hidden salt + shaping             |
+| 22  | Mieru       | TCP       | None                  | Username + password, self-encrypted; embedded xray only            |
+| 23  | Mieru       | UDP       | None                  | Listens on TCP and UDP on one port; MeowX Mac/iOS supports TCP only |
 
 ## Deprecated Combinations
 

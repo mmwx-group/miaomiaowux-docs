@@ -33,6 +33,68 @@ Pick one:
 
 See [Certificates](/docs/en/certificates) for issuing and deploying certificates.
 
+## Configuration examples
+
+The examples assume the master domain is `panel.example.com`, the master listens on the default port `12889` (replace it if you changed `PORT`), and the reverse proxy runs on the same host. The master domain must allow every path and support WebSocket (live panel refresh relies on it, and so do Agent connections when no report domain is set).
+
+### Nginx
+
+Put the certificate under `/usr/local/nginx/cert/panel.example.com/` (or use your own path) and save as, for example, `/usr/local/nginx/servers/panel.conf`:
+
+```nginx
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name panel.example.com;
+
+    ssl_certificate     /usr/local/nginx/cert/panel.example.com/fullchain.pem;
+    ssl_certificate_key /usr/local/nginx/cert/panel.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    # Restoring backups, uploading a logo, etc. need a larger request body
+    client_max_body_size 512m;
+
+    location / {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Host               $host;
+        proxy_set_header Upgrade            $http_upgrade;
+        proxy_set_header Connection         $http_connection;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    600s;
+        proxy_read_timeout    600s;
+    }
+}
+
+# Reject unknown domains: only one default_server on 443; skip it if you already have one
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    ssl_reject_handshake on;
+}
+```
+
+- `proxy_http_version 1.1` and the `Upgrade` / `Connection` headers are all required, otherwise the WebSocket handshake fails.
+- `X-Real-IP` / `X-Forwarded-For` let the master see the real client IP for login rate limiting, the client IP allowlist and so on. The master trusts these headers automatically when the proxy is on the same host (or a private network); when the proxy is on another public server, add its IP to the `MMWX_TRUSTED_PROXIES` environment variable or the "Trusted proxies" setting.
+
+Run `/usr/local/nginx/sbin/nginx -t` to check, then `systemctl reload nginx`.
+
+### Caddy
+
+Caddy issues and renews certificates and handles WebSocket and the `X-Forwarded-*` headers automatically. Add to `/etc/caddy/Caddyfile`:
+
+```caddy
+panel.example.com {
+    reverse_proxy 127.0.0.1:12889
+}
+```
+
+To use an existing certificate, add `tls /path/to/fullchain.pem /path/to/privkey.pem` inside the site block. Run `caddy validate --config /etc/caddy/Caddyfile`, then `systemctl reload caddy`. Caddy only answers the domains written in the Caddyfile, so no extra "reject unknown domains" site is needed.
+
 ## Disabling public access
 
 After enabling **Disable public access** in the "System" tab and restarting the master, it only accepts requests coming through a reverse proxy:

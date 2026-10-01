@@ -114,6 +114,7 @@ export default defineConfig({
             "protocol-hysteria2",
             "protocol-anytls",
             "protocol-snell",
+            "protocol-mieru",
           ],
         },
         {

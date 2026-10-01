@@ -177,6 +177,7 @@ server {
 
     location / {
         proxy_ssl_server_name on;
+        proxy_http_version 1.1;
         proxy_set_header Host $host;
         client_max_body_size 512M;
         proxy_set_header Connection $http_connection;
