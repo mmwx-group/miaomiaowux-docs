@@ -14,74 +14,26 @@ In short: MiaoMiaoWu is a subscription management platform, while MiaoMiaoWu X i
 
 | Feature | MiaoMiaoWu | MiaoMiaoWu X |
 | ------- | ---------- | ------------ |
-
-|
-Traffic Management
-
-| Probe-based, imprecise stats | Agent-based, precise + auto-expiry |
-|
-
-Node Management
-
-| Manual import / external sub sync | UI creation + steal-self / routed outbound / tunnel |
-|
-
-User Management
-
-| Basic, local config still works after expiry | Package-bound, auto-revoke on expiry |
-|
-
-Server Management
-
-| Not supported | Master-Agent remote management |
-|
-
-Certificate Management
-
-| Not supported | ACME auto-apply / renew / deploy |
-|
-
-Package Management
-
-| Not supported | Traffic quota / validity / rate limit |
-|
-
-Monitoring
-
-| Probe traffic collection, node-level | Precise stats + real-time online tracking |
-|
-
-Subscription Generation
-
-| 12+ client formats | 12+ client formats (inherited) |
-|
-
-Template System
-
-| V3 template engine | V3 template engine (inherited) |
-|
-
-Custom Rules
-
-| DNS / routing / rule sets | DNS / routing / rule sets (inherited) |
-|
-
-Security
-
-| Silent mode / TOTP 2FA | Silent mode / TOTP 2FA (inherited) |
-|
-
-Deployment
-
-| Docker / binary | Docker / binary (Master + Agent) |
+| Traffic Management | Probe-based, imprecise stats | Agent-based, precise + auto-expiry |
+| Node Management | Manual import / external sub sync | UI creation + steal-self / routed outbound / tunnel |
+| User Management | Basic, local config still works after expiry | Package-bound, auto-revoke on expiry |
+| Server Management | Not supported | Master-Agent remote management |
+| Certificate Management | Not supported | ACME auto-apply / renew / deploy |
+| Package Management | Not supported | Traffic quota / validity / rate limit |
+| Monitoring | Probe traffic collection, node-level | Precise stats + real-time online tracking |
+| Subscription Generation | 12+ client formats | 12+ client formats (inherited) |
+| Template System | V3 template engine | V3 template engine (inherited) |
+| Custom Rules | DNS / routing / rule sets | DNS / routing / rule sets (inherited) |
+| Security | Silent mode / TOTP 2FA | Silent mode / TOTP 2FA (inherited) |
+| Deployment | Docker / binary | Docker / binary (Master + Agent) |
 
 ## Traffic Management
 
 ### MiaoMiaoWu
 
-- •Reads node traffic data through the probe system
-- •Can only track node-level traffic, not per-user
-- ✗After user expiry, local subscription configs still work since node info hasn't changed
+- Reads node traffic data through the probe system
+- Can only track node-level traffic, not per-user
+- ✗ After user expiry, local subscription configs still work since node info hasn't changed
 
 ### MiaoMiaoWu X
 
@@ -94,10 +46,10 @@ Deployment
 
 ### MiaoMiaoWu
 
-- •Manual node addition (fill in node info)
-- •Sync nodes via external subscription links
-- •Chain proxy, node grouping, sorting and basic management
-- ✗To add nodes on a server, you must manually log in to configure, then import to MiaoMiaoWu
+- Manual node addition (fill in node info)
+- Sync nodes via external subscription links
+- Chain proxy, node grouping, sorting and basic management
+- ✗ To add nodes on a server, you must manually log in to configure, then import to MiaoMiaoWu
 
 ### MiaoMiaoWu X
 
@@ -111,9 +63,9 @@ Deployment
 
 ### MiaoMiaoWu
 
-- •Create users, assign subscription files, manage user status
-- •Supports setting user expiry, but requires manual handling after expiry
-- ✗Local configs still work after user expiry (node info unchanged)
+- Create users, assign subscription files, manage user status
+- Supports setting user expiry, but requires manual handling after expiry
+- ✗ Local configs still work after user expiry (node info unchanged)
 
 ### MiaoMiaoWu X
 
@@ -166,25 +118,16 @@ Remote install/uninstall Nginx, manage config files, deploy SSL certificates, an
 
 MiaoMiaoWu X inherits all core features from MiaoMiaoWu. The following features are identical in both versions:
 
-Subscription generation for 12+ client formats (Clash/Surge/Shadowrocket/Loon/QX, etc.)
-
-V3 template engine with flexible subscription config templates
-
-Custom DNS, routing rules, and rule set management
-
-External subscription sync (scheduled auto-updates)
-
-Chain proxy (multi-layer transit acceleration)
-
-Silent mode and TOTP two-factor authentication
-
-Telegram push notifications and daily reports
-
-Backup and restore functionality
-
-Override scripts (JavaScript Hooks)
-
-Docker and binary deployment options
+- Subscription generation for 12+ client formats (Clash/Surge/Shadowrocket/Loon/QX, etc.)
+- V3 template engine with flexible subscription config templates
+- Custom DNS, routing rules, and rule set management
+- External subscription sync (scheduled auto-updates)
+- Chain proxy (multi-layer transit acceleration)
+- Silent mode and TOTP two-factor authentication
+- Telegram push notifications and daily reports
+- Backup and restore functionality
+- Override scripts (JavaScript Hooks)
+- Docker and binary deployment options
 
 ## Summary
 
