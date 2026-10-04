@@ -255,6 +255,8 @@ Create forward chain: drag servers into entry / relay / exit groups; the exit is
 
 When creating a chain you can pick the "forwarding engine": relay by default (user-space forwarding in the Agent), or iptables / nftables, which DNAT in the kernel without user space and with low CPU usage. Rules that do not fit — rate limits, IPv6, ports with the client IP allowlist — fall back to relay automatically; the engine each server actually uses is shown under "Forward status". If the Agent lacks the iptables / nftables command it installs it with the system package manager (Agent v0.9.1 or later), using relay until the install finishes.
 
+For the canvas editor, branches, path sets with lowest-latency selection, real client IP passthrough, latency probes and more, see [Forwarding](/en/forward/).
+
 ## Notes
 
 - Nodes generated from inbounds update automatically when the inbound changes
