@@ -50,6 +50,8 @@ Manage package dialog — pick package + expiration + reset cycle
 
 Tip: each user's credentials (uuid, password, etc.) are unique and are injected into the node config by MiaomiaowuX when the user fetches their subscription. So sharing a single node with multiple users requires zero manual work — finish the 4 steps above, and every user's subscription gets their own credential automatically; traffic is metered per username.
 
+For giving different people different package combinations, and what happens on over-quota, reset, renewal and leaving, see [Carpool walkthrough: several packages, several users](/docs/en/carpool-multi-package).
+
 ### Tools
 
 #### TG Bot & Mini App

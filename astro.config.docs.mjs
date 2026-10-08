@@ -152,7 +152,7 @@ export default defineConfig({
         {
           label: "用户与套餐",
           translations: { en: "Users & packages" },
-          items: ["users", "packages"],
+          items: ["users", "packages", "carpool-multi-package"],
         },
         {
           label: "系统配置",
