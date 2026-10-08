@@ -97,11 +97,11 @@ Caps concurrent connections per user. This is "connections", not "devices" — o
 
 ### Auto throttle / release
 
-Optional automatic throttling: when a user exceeds the quota they are slowed down instead of cut off, and released after the monthly reset or a quota top-up.
+Auto-throttle rules are triggered by **speed**, not by the traffic quota: when a user stays above a speed threshold (sustained), or crosses it several times within a window (burst), they are slowed down for a while and then returned to their normal limit. A package without rules uses the global default rules from system settings; rules set on the package replace the global defaults as a whole. Requires servers running [embedded Xray](/docs/en/embedded-xray).
 
 ## Traffic statistics and billing multipliers
 
-The Xray traffic collector counts every user's traffic in real time. When billable traffic exceeds the quota the subscription stops returning nodes (or throttles, per the setting above).
+The Xray traffic collector counts every user's traffic in real time. When a package instance's billable traffic reaches its quota, the panel removes that instance's credentials from the nodes, so the user can no longer connect through that package's nodes (usually within 1–2 minutes; the subscription link itself does not change and the user's other packages are unaffected). Access returns automatically on the reset day, after a quota increase or a manual traffic reset, without re-importing the subscription. The whole process is shown in the [carpool walkthrough](/docs/en/carpool-multi-package#what-happens-over-quota).
 
 :::note[Admins are exempt from traffic limits]
 An admin account is never marked over quota or cut off, even with a package bound to itself; an admin previously marked over quota is restored automatically. Package expiry still applies as usual.
