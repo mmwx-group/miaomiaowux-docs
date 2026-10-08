@@ -21,7 +21,7 @@ Two steps:
 1. Create a package: In "Package Management", create a new package - set traffic quota, reset cycle (monthly/custom), speed limit (optional), device limit (optional), and select which nodes the package includes.
 2. Create a user and bind: In "User Management", create a new user and bind the package. The system automatically generates a subscription link for the user - they can use any client to pull this link and see the nodes in the package.
 
-When quota is exceeded, nodes are automatically removed from subscription or speed is limited based on your package configuration.
+When a package runs over its quota, the panel removes its credentials from the nodes and that package's nodes stop working; access returns on the reset day, after a quota increase or a traffic reset. See the [carpool walkthrough](/docs/en/carpool-multi-package#what-happens-over-quota).
 
 ### I migrated from MiaoMiaoWu (mmw), why can't I see the original features?
 

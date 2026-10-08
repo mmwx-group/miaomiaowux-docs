@@ -8,7 +8,7 @@ tableOfContents:
 
 ## Overview
 
-The backup in [Backup & Restore](/en/backup-restore/) requires an admin to click Download. Scheduled sync makes the master **package and upload automatically on an interval**, then prune old copies — if the machine itself dies, the local backup dies with it. An off-site copy is the one that actually saves you.
+The backup in [Backup & Restore](/docs/en/backup-restore) requires an admin to click Download. Scheduled sync makes the master **package and upload automatically on an interval**, then prune old copies — if the machine itself dies, the local backup dies with it. An off-site copy is the one that actually saves you.
 
 The artifact is **identical** to the manual download: both use the same packaging code, so an automatic backup can never restore into something different from what you'd get by hand.
 
@@ -95,7 +95,7 @@ The probe filename deliberately lacks the `miaomiaowux-backup-` prefix, so it is
 
 ## Restoring
 
-A remote backup is the same ZIP as the manual download. Fetch it and follow the steps in [Backup & Restore](/en/backup-restore/).
+A remote backup is the same ZIP as the manual download. Fetch it and follow the steps in [Backup & Restore](/docs/en/backup-restore).
 
 > **Actually restore one periodically** into a test environment. An unverified backup is not a backup — the classic discovery is a PostgreSQL deployment that never ticked "Include database", leaving backups with files but no data.
 

@@ -205,7 +205,7 @@ Which address the previous hop uses to reach each member can be chosen per membe
 
 ## Shared servers
 
-[Shared servers](/en/share-server/) you have received can be used in chains too. The owner master merges the forwarding rules and pushes them to the Agent, and remains the Agent's sole controller.
+[Shared servers](/docs/en/share-server) you have received can be used in chains too. The owner master merges the forwarding rules and pushes them to the Agent, and remains the Agent's sole controller.
 
 ## Opening forwarding to users
 
