@@ -7,10 +7,32 @@ tableOfContents:
 ---
 
 import { ClientDownload } from "@/components/docs/islands/client-download";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 MeowX 是妙妙屋X 的官方客户端，登录面板账号或粘贴订阅链接即可使用，支持面板的实时同步、回程线路奖牌与流媒体解锁标记。下方版本信息自动读取最新发布，下载地址均为 `dl.miaomiaowux.com`。
 
 <ClientDownload lang="zh" client:load />
+
+## 界面预览
+
+各端是同一套界面：首页连接与用量、节点（代理组与延迟、回程线路奖牌、流媒体解锁标记）、动态（连接与日志）、我的（账户、订阅与设置）。截图里是示例订阅。
+
+<Tabs>
+  <TabItem label="iOS / iPadOS">
+    ![MeowX 在 iPhone 与 iPad 上的节点页截图](../../assets/screenshots/client-ios.webp)
+  </TabItem>
+  <TabItem label="macOS">
+    ![MeowX macOS 菜单栏下拉面板截图（浅色与深色）](../../assets/screenshots/client-macos.webp)
+  </TabItem>
+  <TabItem label="Android">
+    ![MeowX Android 首页与节点页截图](../../assets/screenshots/client-android.webp)
+  </TabItem>
+  <TabItem label="Windows">
+    ![MeowX Windows 首页截图](../../assets/screenshots/client-windows-home.webp)
+
+    ![MeowX Windows 节点页截图](../../assets/screenshots/client-windows-nodes.webp)
+  </TabItem>
+</Tabs>
 
 ## 安装说明
 
@@ -25,7 +47,7 @@ MeowX 是妙妙屋X 的官方客户端，登录面板账号或粘贴订阅链接
 
 1. 下载 APK 直接安装（系统可能提示允许安装未知来源应用）。
 2. 首次连接会弹出 VPN 授权，确认即可。
-3. 默认使用 `mips` 网络栈；在「设置 → 高级」里可以切换。
+3. 默认使用 `mips` 网络栈；在「我的 → 高级」里可以切换。
 
 ### Windows
 
@@ -37,7 +59,7 @@ MeowX 是妙妙屋X 的官方客户端，登录面板账号或粘贴订阅链接
 
 - **网页端登录客户端**（macOS / Windows）：在面板网页「个人菜单 → 扫码登录」里点「登录客户端」，MeowX 会自动打开并完成登录。
 - **手机扫码**（Android）：在桌面端「个人菜单 → 扫码登录」出示二维码，用 MeowX 扫一扫即可。
-- **订阅链接**：在「配置」页粘贴订阅 URL 或妙妙屋X 短链导入；也支持 `clash://install-config` 深链。
+- **订阅链接**：在「我的」页点「导入订阅」，粘贴订阅 URL 或妙妙屋X 短链；也支持 `clash://install-config` 深链。
 
 登录后「我的订阅」会列出账号下的全部订阅，点一下即下载并切换为当前配置；面板更新订阅后客户端会自动同步。退出登录时，从该面板导入的订阅会一并删除。
 
