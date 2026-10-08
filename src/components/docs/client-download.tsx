@@ -61,6 +61,7 @@ const STRINGS = {
       setup: "安装包",
       portable: "便携版",
     },
+    arch: { "arm64-v8a": "arm64", universal: "通用" } as Record<string, string>,
     ios: {
       badge: "TestFlight 内测",
       requirement: "iOS 17 及以上 · iPhone / iPad",
@@ -89,6 +90,10 @@ const STRINGS = {
       setup: "Installer",
       portable: "Portable",
     },
+    arch: { "arm64-v8a": "arm64", universal: "universal" } as Record<
+      string,
+      string
+    >,
     ios: {
       badge: "TestFlight beta",
       requirement: "iOS 17 or later · iPhone / iPad",
@@ -195,7 +200,9 @@ export function ClientDownload({ lang = "zh" }: { lang?: "zh" | "en" }) {
                           key={f.name}
                           asChild
                           variant={
-                            f.kind === "zip" || f.kind === "portable"
+                            f.kind === "zip" ||
+                            f.kind === "portable" ||
+                            f.arch === "universal"
                               ? "outline"
                               : "default"
                           }
@@ -204,6 +211,9 @@ export function ClientDownload({ lang = "zh" }: { lang?: "zh" | "en" }) {
                             <Download className="size-4" />
                             <span className="truncate">
                               {t.kind[f.kind] ?? f.kind}
+                              {/* 同一平台有多个同类包（Android 的 arm64 / 通用）时标出架构，否则几个按钮一模一样 */}
+                              {p.files.filter((o) => o.kind === f.kind).length >
+                                1 && ` · ${t.arch[f.arch] ?? f.arch}`}
                             </span>
                             <span className="ml-auto text-xs opacity-75">
                               {formatSize(f.size)}
