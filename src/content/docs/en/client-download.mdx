@@ -7,10 +7,32 @@ tableOfContents:
 ---
 
 import { ClientDownload } from "@/components/docs/islands/client-download";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 MeowX is the official client for MiaoMiaoWu X. Sign in with your panel account or paste a subscription link to get started; it supports real-time subscription sync, return-route medals and streaming unlock badges from the panel. The version information below is fetched from the latest release, and all downloads are served from `dl.miaomiaowux.com`.
 
 <ClientDownload lang="en" client:load />
+
+## Screenshots
+
+All platforms share the same design: Home (connection and usage), Nodes (proxy groups and latency, return-route medals, streaming unlock badges), Activity (connections and logs) and Me (account, subscriptions and settings). The screenshots use a sample subscription.
+
+<Tabs>
+  <TabItem label="iOS / iPadOS">
+    ![MeowX Nodes page on iPhone and iPad](../../../assets/screenshots/client-ios.webp)
+  </TabItem>
+  <TabItem label="macOS">
+    ![MeowX menu bar panel on macOS, light and dark](../../../assets/screenshots/client-macos.webp)
+  </TabItem>
+  <TabItem label="Android">
+    ![MeowX Home and Nodes pages on Android](../../../assets/screenshots/client-android.webp)
+  </TabItem>
+  <TabItem label="Windows">
+    ![MeowX Home page on Windows](../../../assets/screenshots/client-windows-home.webp)
+
+    ![MeowX Nodes page on Windows](../../../assets/screenshots/client-windows-nodes.webp)
+  </TabItem>
+</Tabs>
 
 ## Installation
 
@@ -25,7 +47,7 @@ MeowX is the official client for MiaoMiaoWu X. Sign in with your panel account o
 
 1. Download and install the APK (Android may ask you to allow installs from unknown sources).
 2. The first connection shows a VPN permission prompt; confirm it.
-3. The `mips` network stack is used by default; it can be changed under Settings → Advanced.
+3. The `mips` network stack is used by default; it can be changed under Me → Advanced.
 
 ### Windows
 
@@ -37,7 +59,7 @@ MeowX is the official client for MiaoMiaoWu X. Sign in with your panel account o
 
 - **Sign in from the web panel** (macOS / Windows): open "Account menu → QR login" in the panel and click "Sign in to client"; MeowX opens and signs in automatically.
 - **Scan with your phone** (Android): show the QR code under "Account menu → QR login" on a desktop browser and scan it with MeowX.
-- **Subscription link**: paste a subscription URL or a MiaoMiaoWu X short link on the Profiles page; `clash://install-config` deep links are supported too.
+- **Subscription link**: tap “Import subscription” on the Me page and paste a subscription URL or a MiaoMiaoWu X short link; `clash://install-config` deep links are supported too.
 
 After signing in, "My subscriptions" lists every subscription on the account; tap one to download it and make it active. Changes made in the panel are synced to the client automatically. Signing out removes the subscriptions imported from that panel.
 
