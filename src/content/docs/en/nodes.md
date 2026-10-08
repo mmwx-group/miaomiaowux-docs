@@ -243,7 +243,11 @@ Relayed nodes show an extra "original server" line under the address; click it t
 
 A node currently forwarded by a tunnel shows a "Forwarded by tunnel" tag; hover to see which server and tunnel.
 
-Tunnel management is an admin feature and also works on received shared servers. Deleting a tunnel also removes its companion node.
+### Reverse tunnel (target behind NAT)
+
+A port forward needs the entry server to reach the target directly. When the target sits behind home broadband / NAT, use "Reverse tunnel" (反向隧道) in Tunnel management: the target server dials a WireGuard tunnel to the entry, and the port forward goes to a private address inside the tunnel. Choosing "Reverse tunnel" mode in the port forward form creates the tunnel, the forward and the node in one step. See [Reverse tunnel](/docs/en/reverse-tunnel) for the full guide.
+
+Tunnel management is an admin feature and also works on received shared servers (except reverse tunnels). Deleting a tunnel also removes its companion node.
 
 ## Forward chains (Forward management)
 
@@ -255,7 +259,7 @@ Create forward chain: drag servers into entry / relay / exit groups; the exit is
 
 When creating a chain you can pick the "forwarding engine": relay by default (user-space forwarding in the Agent), or iptables / nftables, which DNAT in the kernel without user space and with low CPU usage. Rules that do not fit — rate limits, IPv6, ports with the client IP allowlist — fall back to relay automatically; the engine each server actually uses is shown under "Forward status". If the Agent lacks the iptables / nftables command it installs it with the system package manager (Agent v0.9.1 or later), using relay until the install finishes.
 
-For the canvas editor, branches, path sets with lowest-latency selection, real client IP passthrough, latency probes and more, see [Forwarding](/en/forward/).
+For the canvas editor, branches, path sets with lowest-latency selection, real client IP passthrough, latency probes and more, see [Forwarding](/docs/en/forward).
 
 ## Notes
 
