@@ -125,7 +125,13 @@ export default defineConfig({
         {
           label: "功能说明",
           translations: { en: "Feature guides" },
-          items: ["traffic-accounting", "routed-outbound", "forward", "system-settings"],
+          items: [
+            "traffic-accounting",
+            "routed-outbound",
+            "forward",
+            "reverse-tunnel",
+            "system-settings",
+          ],
         },
         {
           label: "PRO 功能",
