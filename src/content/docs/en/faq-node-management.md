@@ -1,73 +1,79 @@
 ---
-title: "Node creation & usage (inbound + outbound)"
-description: "Five key buttons on the Node Management page, with an interactive mock that reveals each sub-UI on hover."
+title: "Creating and Using Nodes (Inbounds and Outbounds)"
+description: "How to create a node in MiaomiaowuX, how to send its traffic out through another machine (landing node / routed outbound / relay group), and what the key buttons on the node page do."
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
 ---
 
-### Quick orientation
+This page answers the two most common questions: **how to create a node**, and **how to change where a node's traffic exits**. For the full reference of buttons and parameters see [Node Management](/docs/en/nodes).
 
-Node Management groups five capabilities on one page: «add inbound», «chained / routed outbound», «tunnel forwarding» and the global «routed outbound manager». The mock below recreates the top button strip — hover any color-ringed button to preview the sub-UI that opens.
+## Inbound vs. outbound
 
-Mock demoEach button's color ring matches the legend below; hover to see the sub-UI bubble.
+| Term | What it is | Where |
+| --- | --- | --- |
+| Inbound | A protocol port a server listens on; clients connect to it. **Creating a node = creating an inbound** | Nodes → "Add node" |
+| Outbound | Where traffic leaves after entering the server. By default it leaves from the server itself | "Create chained outbound" on a node row, or Servers → Xray config → Outbounds |
+| Node | The inbound as it appears in subscriptions. It shows up in the node list automatically once the inbound exists | Nodes |
 
-Node list3
+So the usual order is: create the node (inbound) first, then configure an outbound when you need a different exit.
 
-Heads up: edits & deletions on nodes propagate to all subscriptions
+## Create a node
 
-**Add node\*\***Tunnel mgr\***\*Routed outbound\*\***Speed test\*\*
+1. Open "Nodes" and click "**Add node**" at the top right
+2. **Pick a server**: choose one marked "Xray ready" and whether the node address uses IPv4 or IPv6. With many servers, use the search box and group filter above the list. The "Forward chain" tab creates a node on the entry of a [forward chain](/docs/en/forward)
+3. **Configure the inbound**: choose protocol, transport and security. In "Simple mode" the port and UUID / password are generated for you; switch to "Expert mode" to change the port, listen address and so on
+4. Click "Submit". The master creates the inbound on the server and the node appears in the list
 
-ProtoNameActionsTagConfigOps
+Protocols that need a certificate (Trojan + TLS, Hysteria2, AnyTLS…) require a domain and certificate on the server first — the wizard prompts for this in step one. REALITY, Shadowsocks and Snell need none. See the [protocol matrix](/docs/en/protocol-matrix) for valid combinations.
 
-VLESS
+Then add the node to a package so it appears in users' subscriptions, see [Packages](/docs/en/packages).
 
-🇭🇰香港 GoMami - KAZE
+## Send a node's traffic out through another machine
 
-HK GoMami Pro N
+Click "**Create chained outbound**" (two-way arrow icon) on the node row to open "Add landing node". Three options:
 
-🇭🇰
+| Tab | What it does | Use when |
+| --- | --- | --- |
+| Pick a landing node | Use an existing node (your own or an imported external one) as the exit. The master adds the outbound and routing on this server | You already have a landing node |
+| Pick a server | Choose another server; the master creates an inbound there as the landing and configures outbound and routing. You can also reuse an outbound that already exists on this server | The landing machine is also your server |
+| Pick a load balancer | Hand this inbound's traffic to a load balancer already configured on the server; no outbound or node is created | You built a balancer in Xray routing |
 
-manual
+This adds a "routed outbound" child node. It **shares the same port and address** as the original node; only the exit differs. The original node is unaffected, and the two can go into different packages. See [Routed outbound](/docs/en/routed-outbound).
 
-TROJAN
+:::tip[One line node, several landings]
+You can use "Create chained outbound" on the same node repeatedly; each landing adds one child node. A single entry port can then offer "via Hong Kong", "via Japan" and so on — handy on NAT machines with few ports.
+:::
 
-🇭🇰香港 GoMami - Trojan
+### Relay groups
 
-HK GoMami Pro N
+For the opposite case — a fixed landing node that clients should reach through **the fastest of several relays** — click "**Create relay group**" on the landing node's row: pick relay nodes and name the group. In subscriptions the landing node's `dialer-proxy` then points at this auto-selecting group.
 
-🇭🇰
+- Relay groups already created on other nodes are listed at the top of the dialog; click one to reuse it
+- Changing the members on one node updates every other node using the same group name
+- This is chaining on the **client side** (done by Clash-type clients). Nothing is forwarded on your servers, so that leg is not counted against package users
 
-manual
+## Other entry points
 
-SHADOWSOCKS
+| Button | Where | What it does |
+| --- | --- | --- |
+| Node routing | Node row (route icon) | Shows the routing rules in effect for this inbound: its own rules and the global ones. See [Xray routing](/docs/en/xray-routing) |
+| Tunnel management | Top right | Manages port forwards on servers: forward a server port to another node or a fixed address, and point a node at an external relay address. Tunnels are not in the node list; add and remove them here |
+| Routed outbounds | Top right | Lists and removes all routed-outbound child nodes |
+| View / edit config | Node row (edit icon) | Reopens the inbound wizard; node ID and user credentials stay the same |
 
-🇭🇰香港 GoMami - SS2022
+To arrange several servers as "entry → relay → exit" with monitoring, use [Forwarding](/docs/en/forward) rather than individual tunnels.
 
-HK GoMami Pro N
+## FAQ
 
-🇭🇰
+**I created a node but it is not in the subscription.**
+A node must be in a package and the package bound to a user. The administrator's own subscription is generated on the "Subscription" page.
 
-manual
+**Does deleting a node remove the inbound?**
+Deleting a self-built node also removes its inbound on the server; an imported external node is only removed from the list. Edits and deletions are synced to all subscriptions.
 
-Red = Add node (create inbound)Black = Tunnel manager (port forwarding)Yellow = All routed outbounds (global)Blue = Add routed child on a rowGreen = View routing of a nodeHover a ringed button to preview the sub-UI it opens
+**How is traffic counted for landing / routed-outbound child nodes?**
+The traffic passes through your server and is counted against the user's package as usual. Only client-side chains (relay groups, chained proxy) have a relay leg that never touches your server and cannot be measured.
 
-#### Red — Add node (inbound)
-
-Opens the inbound wizard. Pick a protocol (VLESS / Trojan / SS / VMess / Hysteria2 / AnyTLS / Tunnel / Socks), then transport + security. Simple mode jumps straight to the must-fill fields (REALITY domain / cert path…); expert mode shows the generated Xray JSON live.
-
-#### Blue — Add routed child (inline)
-
-Inline button on a node row. Opens «Add routed node» with three add modes: pick another node as the egress / pick a server (its default outbound) / pick a load balancer (bundles multiple egresses). Scope can be «whole-node share» or «per-user isolation».
-
-#### Green — View node routing (inline)
-
-Shows the effective routing for this inbound: «exclusive rules» plus the global rules (read-only here; edit them in Custom Rules).
-
-#### Black — Tunnel manager
-
-Central manager for every tunnel inbound (xray «dokodemo-door»). Tunnel-type inbounds never appear in the Node list — this is the only place to delete them. Common use: transparently forward a port on box A to a port on box B.
-
-#### Yellow — Routed outbound manager (global)
-
-Global view of every routed child node — review / delete / add. Each routed child shares its parent inbound credential but routes traffic through its own outbound. Add it to a package → bound users auto-provision a sub-account + rule.user, achieving «per-user routed egress» at scale.
+**What is the difference between "Create outbound from node" in Outbounds and "Create chained outbound" here?**
+The former only adds an outbound on the server; you still have to write routing rules to use it. The latter does everything: outbound, routing and the child node. Prefer the latter.
