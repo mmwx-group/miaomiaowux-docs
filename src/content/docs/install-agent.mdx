@@ -111,6 +111,7 @@ xray 入站端口是主控前端动态加的,bridge 模式得跟着改 -p 映射
 docker run -d \
   --name mmw-agent \
   --network host \
+  --cap-add NET_ADMIN \
   --restart unless-stopped \
   -e MMWX_LISTEN_PORT=12888 \
   -e MMWX_MASTER_URL=https://master.example.com \
@@ -135,6 +136,16 @@ config / xray-config / nginx-cert / nginx-servers 4 个 volume 都是可选(容�
 
 token 的环境变量名是 `MMWX_TOKEN`。早期文档写成 `MMWX_MASTER_TOKEN`,agent 不认那个名字,照抄的话容器起来只会一直刷 `authentication failed: Token required`。新版 agent 已同时兼容旧名,但新部署请用 `MMWX_TOKEN`。
 
+:::note[需要 NET_ADMIN,不需要特权模式]
+`--cap-add NET_ADMIN`(compose 里是 `cap_add: [NET_ADMIN]`)让容器能管理宿主的网络规则。下面这些功能要靠它,没给时会各自提示或回落:
+
+- 转发链的**内核转发引擎**(iptables / nftables)—— 没给时提示「nft 不可用 … Operation not permitted (you must be root)」,转发自动回落到用户态 relay,仍然能用,只是 CPU 占用高一些
+- 反向隧道(要创建 WireGuard 网卡)
+- 客户端 IP 白名单(要写 iptables 规则)
+
+容器里已经是 root、工具也已装好,**不要**为此开 `--privileged`。已经在跑的容器要删掉重建才能加上这个权限(`docker compose up -d` 会自动重建)。内核转发还要求宿主的 `net.ipv4.ip_forward=1`(装了 Docker 的宿主一般已经是 1;不是的话在宿主上 `sysctl -w net.ipv4.ip_forward=1`)。
+:::
+
 ### Docker Compose
 
 推荐生产环境用 compose,后续 docker compose pull / up -d 升级更顺。
@@ -147,6 +158,8 @@ services:
     container_name: mmw-agent
     restart: unless-stopped
     network_mode: host                  # 必须 host,bridge 模式 entrypoint 会拒启
+    cap_add:
+      - NET_ADMIN
     environment:
       - MMWX_LISTEN_PORT=12888
       - MMWX_MASTER_URL=https://master.example.com
