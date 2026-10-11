@@ -1,6 +1,6 @@
 ---
 title: "Forwarding"
-description: "Chain servers into entry → relay → exit forward chains with Agent-native forwarding: canvas editor, branches, path sets with lowest-latency selection, kernel forwarding engines, real client IP passthrough, latency probes and iperf3"
+description: "Chain servers into entry → relay → exit forward chains with Agent-native forwarding: canvas editor, load strategies, sticky connections, branches, path sets with lowest-latency selection, kernel forwarding engines, real client IP passthrough, latency probes and full-chain speed tests"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -21,7 +21,7 @@ Forwarding is an admin feature. Regular users get "My forwards", see [Opening fo
 | Concept | Meaning |
 | --- | --- |
 | Forward chain | A complete path from entry to exit, made of groups in order |
-| Group | The servers of one hop. The previous hop distributes connections among them by the group's load strategy |
+| Group | The servers of one hop. How connections are spread across its members is decided by **this group's own** load strategy and carried out by the previous hop |
 | Entry / exit group | The first and last hop. Clients connect to the entry; the exit is either the server hosting a self-built node, or a landing node |
 | Relay group | Hops between entry and exit, zero or more |
 | Branch | One server of a group detours through its own relay group, then rejoins the next hop |
@@ -36,9 +36,17 @@ Open "Forwarding" from the sidebar to see all chains. Two buttons at the top rig
 
 ![Forward chain list screenshot](../../../assets/screenshots/forward-chains-list.webp)
 
-Chain list: each card shows group members and latency, with "Edit on canvas / Edit chain / Bind nodes / Delete" at the bottom
+Chain overview (the screenshot shows the previous layout; the description below is current)
 
-The latency next to each server is coloured: green <50ms, orange 50–200ms, red >200ms; "不通" means unreachable, and `*` means only an ICMP result is available. When a chain has a problem (empty group, offline server, branch not rejoined…), an amber strip appears at the bottom of the card; open the canvas to see exactly where.
+The page has three parts: a summary of all chains (average end-to-end latency, port usage) with a topology map, a "To do" list (pending push, unreachable, offline… the same source as Telegram alerts), and a card per chain. Each card shows online members per group, end-to-end latency, loss, 24-hour availability and today's traffic; latency is coloured green <50ms, orange 50–200ms, red >200ms.
+
+Click a chain name to open its **detail page**:
+
+- Route and members: latency and loss from each member to the next group, and the route each entry server is actually using
+- Latency history, per-hop latency, availability (15-minute cells) and traffic
+- "Full-chain speed test", "Bind nodes" and other actions at the top
+
+A chain with no node bound has no forwarding rules and therefore no regular probe data. When you open the overview or the detail page the master measures each hop once on demand, so unbound chains still show latency instead of "unreachable".
 
 ## Canvas editor
 
@@ -72,11 +80,59 @@ Saving validates the chain: the main line must be straight, a server may appear 
 Select a group to edit:
 
 - **Name**
-- **Load strategy**: how the previous hop distributes connections among this group — round robin / weighted / least connections / most remaining traffic / by period / sticky / lowest latency (needs a recent Agent). With "weighted", set a weight per member
+- **Load strategy**: how connections are spread across **this group's** members (see [Load strategies](#load-strategies))
 - **Forwarding engine**: overrides the chain default (see [Forwarding engines](#forwarding-engines))
 - **Failover**: temporarily removes a member that is unreachable or slower than a threshold (ms), and adds it back once it recovers
 
-Load strategy and failover describe how the previous hop feeds this group. Which entry server a client reaches is decided by the DNS of the entry domain.
+### Load strategies
+
+:::note[A strategy is set on the group that receives the traffic]
+A group's load strategy decides **how traffic is spread across that group's members**; the previous hop carries it out. Take "entry group → relay group → exit group":
+
+- To have the 3 relay servers share load by weight, choose "weighted" on the **relay group** and set the weights — every entry server then distributes connections to the relay group by those weights
+- To prefer the exit server with the fewest connections, choose "least connections" on the **exit group** — the relay group carries it out
+
+So to change how one hop distributes traffic, edit the **next-hop group**, not the group that sends the traffic.
+:::
+
+| Strategy | What it does | Good for |
+| --- | --- | --- |
+| Round robin | Takes members in turn | Similar machines |
+| Weighted | By member weight; weight 2 gets about twice the connections of weight 1 | Mixed bandwidth / specs |
+| Least connections | Prefers the member with the fewest active connections | Long-lived connections, large files |
+| Most remaining traffic | More remaining traffic means a higher weight; recalculated every 5 minutes | Members with traffic quotas |
+| By period | The closer to the traffic reset day, the higher the weight | Different reset days |
+| Lowest latency | The previous hop uses only the member with the lowest total latency to the exit; the rest are standby and take over within seconds (needs a recent Agent) | Latency first |
+
+**The entry group is special**: it has no previous hop. Which entry server a client reaches is decided by the DNS records of the [entry domain](#chain-settings), so entry-group strategies are implemented through DNS:
+
+| Entry-group strategy | Actual effect |
+| --- | --- |
+| Round robin | Every healthy entry is published in the entry domain and DNS rotates between them; unreachable ones are withdrawn |
+| Lowest latency | Only the entry with the lowest total latency to the exit is published, the rest are standby; it is replaced when unreachable, or when another entry is more than 15% faster |
+| Most remaining traffic / By period | Entries that lag far behind (less than a quarter of the best one's remaining traffic, or quota used up) are withdrawn for now |
+| Weighted / Least connections | Not possible with DNS (plain records have no weight and cannot follow connection counts); greyed out and treated as round robin |
+
+Entry-group strategies need an entry domain on the chain and take effect with a delay because of DNS caching. Withdrawn entries are marked "standby entry · not published" on the detail page.
+
+### Sticky connections
+
+"Sticky connections" is a **chain-wide switch** (in the chain settings), not a group strategy: when on, the same client IP lands on the same server at **every hop**.
+
+- **Works together with load strategies**: weights and failover still apply — clients are spread across members by weight and each client then stays on its member; when a member fails, only its clients are reassigned. "Lowest latency" groups use a single member anyway and are unaffected
+- **Turns on client IP passthrough automatically**: for later hops to recognise the client, the entry writes a PROXY header carrying the client IP, so enabling sticky connections also enables [Real client IP passthrough](#real-client-ip-passthrough), and hops that carry the header use the relay engine
+- UDP cannot carry a PROXY header; each hop sticks by the connection's source IP
+- **Every** Agent on the chain must be recent; otherwise the UI shows "not in effect" and the chain follows each group's own strategy
+
+Use it when:
+
+- Sites, games or streaming services tie risk control or login state to the exit IP, and the exit group has several servers
+- One application opens many connections (downloaders, video segments) that should share one exit
+- You limit concurrent online IPs or keep per-IP statistics and want a client to stay on one exit server
+
+You do not need it when the exit group has a single server, or when you only want traffic spread as evenly as possible.
+
+Chains that used the old "sticky" group strategy are migrated to the chain switch on upgrade, and the group goes back to round robin.
 
 ### Chain settings
 
@@ -85,8 +141,9 @@ Click an empty spot on the canvas to see the chain settings:
 - **Name**
 - **Port range**: ports this chain uses on every server, default 50520–51314; temporary ports for latency probes and iperf3 come from here too
 - **Default forwarding engine**: used by groups without their own setting
+- **Sticky connections**: the same client lands on the same server at every hop, see [Sticky connections](#sticky-connections)
 - **Pass through real client IP**: see [Real client IP passthrough](#real-client-ip-passthrough)
-- **Entry domain**: a domain (wildcard certificate required) whose A / AAAA records the master maintains every 17 seconds from entry server health — a failed entry server drops out of DNS automatically
+- **Entry domain**: a domain (wildcard certificate required) whose A / AAAA records the master maintains every 17 seconds from entry server health and the entry group's load strategy — a failed entry server drops out of DNS automatically
 
 ## Branches
 
@@ -162,6 +219,7 @@ The last hop is attached in one of two ways:
 
 - Drag the landing node from the node pool into the exit group on the canvas, or use "Bind existing node" on the card
 - Forwarded protocols: TCP / UDP / TCP+UDP
+- If the node has **related nodes** (its parent node and routed-outbound children of the same parent — they share one IP and port), a dialog lists them when you bind; the ones you tick are pointed at this chain's entry address too and show the entry address in node management. Deleting the entry node later puts them back on their original address
 
 Exit-group servers and landing nodes are mutually exclusive; WireGuard nodes can't go through a forward chain.
 
@@ -177,9 +235,16 @@ Latency probe: per-hop latency / loss / jitter, an end-to-end ranking of every e
 - The end-to-end ranking lists the total latency of every possible entry-to-exit path, best first
 - **Through-chain handshake**: for TLS / Reality nodes, performs a real handshake across the whole chain to confirm the node works through it, not just that ports are open
 
-## iperf3 bandwidth tests
+## Speed tests
 
-Also in the canvas toolbar:
+**Full-chain speed test** (button at the top of the chain detail page): tests every entry server against every exit server over the real forwarding path.
+
+- The master picks a free port from the chain's port range, pushes temporary test-only forwarding rules, starts iperf3 on the exit and runs the test from the entry, then removes everything; the temporary rules are excluded from traffic, billing and alerts
+- Choose upload / download / both, TCP / UDP, duration per pair and a rate limit
+- Results are shown as a heat matrix, grouped bars and per-second curves (all entry × exit pairs in one chart); the last 20 runs are kept for comparison
+- Closing the dialog does not stop the test; shared servers are skipped; when the exit is a landing node the test stops at the last group of forwarding servers
+
+**iperf3 in the canvas toolbar**:
 
 - **Between servers**: bandwidth between any two servers
 - **Through landing node**: real bandwidth across the whole chain to the landing node
@@ -197,7 +262,7 @@ Mobile canvas: with the entry group selected, the bottom bar shows "Group settin
 ## Alerts and monitoring
 
 - **Forward chain node down alert**: under "System settings → Notifications", on by default. Sends a Telegram notification when a node on a chain has been unreachable for 2 minutes
-- Latency and active routes on chain cards and the canvas refresh continuously
+- Latency and active routes on the overview, detail pages and the canvas refresh continuously; the overview's "To do" list shows every current problem
 
 ## Member forwarding address
 
