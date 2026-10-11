@@ -319,6 +319,45 @@ proxy-groups:
     filter: hkFilter          # 同一段正则复用,改一处即可
 ```
 
+## sing-box 模板(.json)
+
+除了 Clash / Surge / Loon / Quantumult X,模板管理也支持 sing-box 模板。它是**一份完整的 sing-box 配置**(JSON,扩展名 `.json`),节点由主控在生成订阅时填进去。
+
+#### 分组里怎么写「把节点放进来」
+
+在分组(`selector` / `urltest`)的 `outbounds` 里写占位符 `{all}`,生成时会展开成这份订阅的全部节点;同一个分组里可以再用 `filter` 按节点名筛选:
+
+```json
+{
+  "type": "urltest",
+  "tag": "🇭🇰 香港",
+  "outbounds": ["{all}"],
+  "filter": [
+    { "action": "include", "keywords": ["🇭🇰|HK|香港"] },
+    { "action": "exclude", "keywords": ["高倍|到期"] }
+  ]
+}
+```
+
+`keywords` 是正则,多个关键字用 `|` 隔开;`include` 只保留匹配的,`exclude` 去掉匹配的。可视化编辑里对应「只保留名字匹配的节点」「去掉名字匹配的节点」两个输入框,也可以切到「配置代码」直接改 JSON。
+
+#### 怎么让订阅用上它
+
+- **订阅文件绑定**:在 [订阅管理](/docs/subscribe-files) 里给订阅文件选一个 `.json` 模板,和绑定其它模板一样按标签 / 节点筛选取节点。
+- **设为系统默认**:在模板列表里点 sing-box 模板的星标。之后客户端用 sing-box 格式拉取**没有绑定模板**的订阅时,会套上这份模板,节点就是那份订阅本来的节点。
+
+不设默认、也不绑定时,sing-box 订阅与以前一样只输出节点,行为不变。
+
+#### 生成时会自动处理的情况
+
+- 筛选后一个节点都不剩的分组,会改成只含直连,不会让客户端因为空分组拒绝加载
+- 规则、`final`、DNS 的 `detour` 指向不存在的出站时,去掉这个引用
+- Snell 节点不会放进套了模板的 sing-box 订阅(sing-box 客户端目前不支持);REALITY 公钥不合法的节点也会跳过
+
+:::note[sing-box 版本]
+内置的起步模板和社区预置按 **sing-box 1.14** 的写法(显式的 `http_clients` 下载规则集),1.13 及更早的内核不认识这些字段。自己上传的模板写成什么版本的格式,就需要对应版本的客户端。
+:::
+
 ## 支持的节点类型
 
 include-type 和 exclude-type 支持以下节点类型（不区分大小写）：

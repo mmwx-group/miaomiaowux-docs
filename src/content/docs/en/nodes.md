@@ -205,6 +205,8 @@ The `×N` in the node list is the billing multiplier the regular user's primary 
 
 When on, drag nodes or use the quick-move buttons; the order is saved when you turn sort mode off.
 
+After selecting one or more nodes, top / up / down / bottom buttons appear at the bottom, and you can also press ↑ ↓ on the keyboard. Up / down move one step in the order currently visible in the list: with a protocol / tag filter on or nodes hidden, the filtered-out nodes keep their positions.
+
 ## Tunnel (dokodemo-door) management
 
 Tunnel (dokodemo-door) inbounds forward traffic arriving on one port of a server to another target (an existing node or a fixed address), typically for "entry → landing" chains. Tunnel inbounds are not listed as nodes; they are viewed, added and deleted in "Tunnel management" at the top of the Nodes page (aggregated across all remote / shared servers).
