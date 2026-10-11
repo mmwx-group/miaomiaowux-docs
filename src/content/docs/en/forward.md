@@ -145,6 +145,20 @@ Click an empty spot on the canvas to see the chain settings:
 - **Pass through real client IP**: see [Real client IP passthrough](#real-client-ip-passthrough)
 - **Entry domain**: a domain (wildcard certificate required) whose A / AAAA records the master maintains every 17 seconds from entry server health and the entry group's load strategy — a failed entry server drops out of DNS automatically
 
+### Ports per server
+
+A binding has a single **entry port** — the one clients connect to; every server in the entry group listens on it. Later hops (relays, exits) each use their own port:
+
+- If the entry port falls inside the range a server allows, the server reuses it (a chain with no port-restricted servers still uses one port end to end)
+- Otherwise the server picks a free port from its own range; the previous hop forwards to that port, and a self-built exit inbound is created on it
+
+The range a server allows defaults to the server's own port range (set in Servers — fill it in for NAT machines that only map a block of ports); unset means unrestricted. On the canvas, click "Port" on a member row to set a range for **this chain** only (use the same number twice for a single port).
+
+- A range on an **entry server** limits which entry ports can be chosen: the entry port comes from the intersection of the entry servers' ranges, or from the entry range itself when it does not overlap the chain's port range
+- Entry servers whose ranges do not intersect cannot share one entry port — adjust the ranges or enable "separate entries"
+- When binding or adding a node, the port field lists the servers that will use a different port; "Random" always returns a port the entry servers allow
+- Temporary ports for latency probes and the full-chain speed test follow each server's own range as well
+
 ## Branches
 
 Each hop on the main line is a group, and by default every server in it takes the same route to the next hop. If one server needs its own detour (say its direct route to the exit is poor but it is fast through a particular relay), give it a branch:
