@@ -68,6 +68,15 @@ Fields revealed by "Steal self": front end, deploy mode, port 443, domain, site 
 
 **Two deployment options:** one-click script (bare metal + systemd) or the Docker image (embedded xray + nginx, host network required). Commands and caveats: [Install Agent](/docs/en/install-agent).
 
+## Monitor-only servers
+
+Turn on "Monitor only (do not install Xray)" when adding a server and only the Agent is installed, for monitoring: online status, NIC traffic, speed and — once added to the probe page — CPU / memory / disk and latency. Xray is neither installed nor managed.
+
+- **Counts toward the quota**: a monitor-only server uses one server slot like any other. When the total exceeds the license quota, servers later in the list lose Xray authorization; drag to reorder the list.
+- **What it cannot do**: create nodes or be shared with another master.
+- **Forward groups are allowed**: no restriction as an entry or relay; as the last hop of a chain it can only forward to a specified landing node (it has no Xray, so no landing inbound can be created on it). See [Forwarding](/docs/en/forward).
+- **Installing Xray later**: choose "Convert to full server" in the card's Agent menu; the Agent switches mode and restarts.
+
 ## Edit a server
 
 The pencil icon on the card opens the edit dialog. Besides the fields from creation it adds:

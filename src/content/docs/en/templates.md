@@ -319,6 +319,45 @@ proxy-groups:
     filter: hkFilter          # reuse; edit once
 ```
 
+## sing-box templates (.json)
+
+Besides Clash / Surge / Loon / Quantumult X, template management also supports sing-box templates. A sing-box template is **a complete sing-box configuration** (JSON, `.json` extension); the master fills in the nodes when it generates the subscription.
+
+#### Pulling nodes into a group
+
+Put the placeholder `{all}` in the `outbounds` of a group (`selector` / `urltest`). It expands to every node of the subscription; add a `filter` in the same group to select by node name:
+
+```json
+{
+  "type": "urltest",
+  "tag": "🇭🇰 Hong Kong",
+  "outbounds": ["{all}"],
+  "filter": [
+    { "action": "include", "keywords": ["🇭🇰|HK|Hong Kong"] },
+    { "action": "exclude", "keywords": ["x10|expired"] }
+  ]
+}
+```
+
+`keywords` are regular expressions (separate alternatives with `|`); `include` keeps only matching nodes, `exclude` removes them. The visual editor exposes them as two inputs, and you can always switch to the code tab and edit the JSON directly.
+
+#### Using the template
+
+- **Bind it to a subscription file**: pick a `.json` template in [Subscription management](/docs/en/subscribe-files); nodes are selected by tags / node filters like any other template.
+- **Make it the system default**: click the star on a sing-box template in the list. When a client fetches a subscription **without a bound template** in sing-box format, this template is applied to that subscription's own nodes.
+
+With neither set, sing-box subscriptions keep returning nodes only, exactly as before.
+
+#### Handled automatically at generation time
+
+- A group left with no nodes after filtering is reduced to `direct` only, so clients do not reject the config
+- Rules, `final` and DNS `detour` entries pointing at a missing outbound lose that reference
+- Snell nodes are not put into templated sing-box subscriptions (sing-box clients do not support them yet); REALITY nodes with an invalid public key are skipped too
+
+:::note[sing-box version]
+The built-in starter template and the community preset use the **sing-box 1.14** format (explicit `http_clients` for rule-set downloads); 1.13 and older do not understand those fields. A template you upload needs a client matching the format you wrote it in.
+:::
+
 ## Supported node types
 
 include-type and exclude-type accept (case-insensitive):

@@ -125,6 +125,14 @@ After the admin creates HK-Direct-rout-hinet (landing HINET) and HK-Direct-rout-
 
 Actual email format: `<username>`\_\_`<short>`\_\_`<label>`, admin placeholder is \_admin\_\_`<short>`\_\_`<label>`. short is a randomly generated identifier when creating the routed outbound, used to distinguish multiple creations with the same label.
 
+### Targets other than a landing node
+
+In "Add landing node → Child node (routed outbound)" an admin has three more options besides picking a landing node:
+
+- **Pick several landing nodes at once**: click multiple nodes; they are created one by one in click order with generated labels.
+- **Use an existing outbound of this server**: lists the outbounds already in the server's Xray config (except the built-in direct / block), including hand-written ones. Entries shown with a landing node's name re-select that landing node; the others are copied from their configuration.
+- **Use an existing balancer of this server**: lists the balancers under "Xray config → Routing → Load balancing". Clicking one creates a child node whose traffic is distributed by that balancer among its member outbounds. No new outbound is created, later changes to the balancer's members or strategy apply immediately, and the node list shows it as `⚖ balancer-name`. A balancer cannot be deleted while a child node points at it.
+
 ## Regular User Perspective (Per-User Private Routed Outbound)
 
 After the admin enables Allow Users to Create Routed Outbounds in System Settings, regular users can create their own exclusive exits, independent of package assignment, effective immediately. Differences from admin path: skips admin placeholder, rule.user is set directly to the user's sub-account email; node routed_owner = 'user', visible and deletable only by the creator.
