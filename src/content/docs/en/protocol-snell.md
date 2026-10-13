@@ -16,7 +16,7 @@ Snell is a lightweight encrypted proxy protocol from Surge (salt + AES-GCM recor
 | ------- | ------------------------------------ | ------------------------------------- | ------------------------------------------------------------------- |
 | v4      | Per-user PSK (trial-decrypt per PSK) | obfs: none / http / tls               | Widest compatibility; supported by mainstream clients               |
 | v5      | Per-user PSK                         | obfs: none / http / tls               | Same wire format as v4, with refinements                            |
-| v6      | Shared PSK + clientID (hidden salt)  | mode: default / unshaped / unsafe-raw | Stronger anti-blocking (hidden salt + shaping); needs newer clients |
+| v6      | Per-user PSK (hidden salt)           | mode: default / unshaped / unsafe-raw | Stronger anti-blocking (hidden salt + shaping); needs newer clients |
 
 ## Adding a node (wizard)
 
@@ -28,11 +28,11 @@ Snell: protocol-specific settings choose the version (v4/v5 or v6), obfs (none /
 
 ### Simple mode
 
-Just enter server address and port; the PSK is auto-generated (and the clientID for v6), then submit.
+Just enter server address and port; the PSK is auto-generated, then submit.
 
 ### Expert mode
 
-Additionally configure obfs / shaping and multiple users: v4 / v5 set obfs (none / http / tls) and obfs-host; v6 set mode (default / unshaped / unsafe-raw). One credential per user (per-user PSK for v4 / v5; shared PSK + per-user clientID for v6).
+Additionally configure obfs / shaping and multiple users: v4 / v5 set obfs (none / http / tls) and obfs-host; v6 set mode (default / unshaped / unsafe-raw). One PSK per user (for v4, v5 and v6 alike).
 
 ## Client compatibility
 
@@ -44,7 +44,7 @@ Additionally configure obfs / shaping and multiple users: v4 / v5 set obfs (none
 ## Notes
 
 - Auth field is settings.users\[\].psk (not clients\[\] / password); Add-Inbound 'Simple mode' auto-generates the PSK
-- v4 and v5 share the same wire format (plaintext salt + AES-128-GCM records); multi-user works by trial-decrypting per PSK. v6 switches to shared PSK + clientID and hides the salt (via PSK-derived shuffle / mask), so each user needs a clientID (auto-generated in Simple mode)
+- v4 and v5 share the same wire format (plaintext salt + AES-128-GCM records); v6 hides the salt (via PSK-derived shuffle / mask) and adds traffic shaping. All three versions use one PSK per user, and the server tells users apart by trial-decrypting with each PSK
 - v6 supports three shaping modes: default (shaped), unshaped, unsafe-raw (raw core, debug only); v4 / v5 support obfs (none / http / tls), v6 no longer uses obfs
 - Snell uses plain TCP transport, no TLS / streamSettings; per-user traffic stats / rate-limit share the same xray dispatcher path as VLESS / Trojan
 
@@ -82,10 +82,9 @@ Additionally configure obfs / shaping and multiple users: v4 / v5 set obfs (none
   "settings": {
     "users": [
       {
-        "psk": "shared-psk",
+        "psk": "your-psk",
         "version": 6,
         "v6Mode": "default",
-        "clientId": "a1b2c3d4e5f6",
         "email": "user@example.com"
       }
     ]
@@ -93,4 +92,4 @@ Additionally configure obfs / shaping and multiple users: v4 / v5 set obfs (none
 }
 ```
 
-v6 uses a shared PSK + per-user clientID; v4 / v5 use a separate PSK per user. obfsMode can be omitted when none; for obfuscation set http or tls plus obfsHost.
+v4, v5 and v6 all use a separate PSK per user. obfsMode applies to v4 / v5 only: omit it when none, or set http or tls plus obfsHost for obfuscation; v6 sets its shaping mode with v6Mode.

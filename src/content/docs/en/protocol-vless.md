@@ -12,15 +12,16 @@ VLESS is Xray's primary protocol. It is lightweight with no encryption overhead 
 
 ## Supported Combinations
 
-| Transport | Security              | Description                                    |
-| --------- | --------------------- | ---------------------------------------------- |
-| TCP       | REALITY               | Recommended, no domain or certificate required |
-| TCP       | REALITY + XTLS-Vision | Recommended, best performance                  |
-| TCP       | TLS                   | Requires domain and certificate                |
-| TCP       | TLS + XTLS-Vision     | Requires domain and certificate                |
-| WebSocket | TLS                   | WSS, suitable for CDN relay                    |
-| gRPC      | REALITY               | Suitable for high concurrency                  |
-| XHTTP     | REALITY               | Next-gen transport, replaces H2                |
+| Transport | Security              | Description                                                                                       |
+| --------- | --------------------- | ------------------------------------------------------------------------------------------------- |
+| TCP       | REALITY               | Recommended, no domain or certificate required                                                    |
+| TCP       | REALITY + XTLS-Vision | Recommended, best performance                                                                     |
+| TCP       | TLS                   | Requires domain and certificate                                                                   |
+| TCP       | TLS + XTLS-Vision     | Requires domain and certificate                                                                   |
+| TCP       | Encryption (ENC)      | VLESS's own encryption, no domain or certificate; not supported by sing-box, Quantumult X or Loon |
+| WebSocket | TLS                   | WSS, suitable for CDN relay                                                                       |
+| gRPC      | REALITY               | Suitable for high concurrency                                                                     |
+| XHTTP     | REALITY               | Next-gen transport, replaces H2                                                                   |
 
 ## XTLS-Vision
 

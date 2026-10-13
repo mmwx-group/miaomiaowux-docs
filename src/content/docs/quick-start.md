@@ -53,7 +53,7 @@ Agent 在线后，服务器卡片上会显示 Xray 运行状态、Nginx 状态�
 
 进入「节点管理」→「添加节点」（或「Xray 入站管理」→「添加入站」），使用向导创建代理入站：
 
-1. 选择协议（VLESS / VMess / Trojan / Shadowsocks / Hysteria2 / AnyTLS / Snell / Mieru 等）
+1. 选择协议（VLESS / VMess / Trojan / Shadowsocks / Hysteria2 / AnyTLS / Snell / Mieru / Miu / WireGuard 等）
 2. 选择传输方式（TCP / WebSocket / gRPC / XHTTP）
 3. 选择安全层（REALITY / TLS / XTLS-Vision / 无）
 4. 简易模式自动生成端口和凭据；专家模式可以逐项修改

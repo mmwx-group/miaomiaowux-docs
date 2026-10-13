@@ -33,6 +33,7 @@ You can additionally set:
 
 - **Transport**: TCP (default, recommended) or UDP. The server listens on both; this only decides **which one the subscription tells clients to use**. TCP is faster and steadier; UDP resists blocking better but has lower throughput.
 - **Users**: one username + password per user. When added from panel users, the username is the user's login name and the password is random; usernames must be unique within one inbound.
+- **Port range** (optional, since v0.5.6): when set, the inbound listens on the whole range (TCP + UDP) and clients pick a port within it, up to 1000 ports; subscriptions carry it as `port-range`.
 
 When bound to a package, every user of the package gets their own username + password on this inbound; subscriptions hand out each user's own credentials, and traffic and rate limits are counted per user.
 

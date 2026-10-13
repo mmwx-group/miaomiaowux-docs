@@ -36,4 +36,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - 路径别名 `@/` → `src/`；UI 基础组件 `src/components/ui/`（shadcn 生成,ESLint/knip 忽略,勿手改）
 - 暗色模式 `.dark` class；类型导入用 inline `import { type Foo }`
-- 支持协议(权威顺序,见 `astro.config.docs.mjs` 的「协议参考」分组 + `src/content/docs/protocol-matrix.md`): VLESS / VMess / Trojan / Shadowsocks / Hysteria2 / AnyTLS / Snell
+- 支持协议(权威顺序,见 `astro.config.docs.mjs` 的「协议参考」分组 + `src/content/docs/protocol-matrix.md`): VLESS / VMess / Trojan / Shadowsocks / Hysteria2 / AnyTLS / Snell / Mieru / Miu / WireGuard(落地页 `src/routes/index.tsx` 的协议卡片与统计数字要跟着一起改)

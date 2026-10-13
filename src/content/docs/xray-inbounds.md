@@ -33,7 +33,7 @@ Xray 入站管理 — 选择服务器后列出该服务器的全部入站：标�
 
 添加入站 - 向导模式：基于 Xray 官方示例配置，右侧实时预览生成的 JSON
 
-1. 选择协议：Shadowsocks / Shadowsocks2022 / SOCKS5 / Trojan / VLESS / VMess / Hysteria2 / AnyTLS / HTTP / Snell / Mieru
+1. 选择协议：Shadowsocks / Shadowsocks2022 / SOCKS5 / Trojan / VLESS / VMess / Hysteria2 / AnyTLS / Miu / HTTP / Snell / Mieru / WireGuard（AnyTLS、Miu、Snell、Mieru、WireGuard 只有内联 Xray 的服务器可选）
 2. 选择传输：TCP / WebSocket / gRPC / XHTTP（随协议变化）
 3. 选择安全层：REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC / 无
 4. 配置模式：简易模式自动分配端口并生成凭据；专家模式可改端口、监听地址、嗅探、中转等
@@ -53,16 +53,18 @@ Xray 入站管理 — 选择服务器后列出该服务器的全部入站：标�
 
 不同协议支持不同的传输和安全层组合。详细的组合矩阵请参考 [协议矩阵](/docs/protocol-matrix)。
 
-| 协议        | 传输                 | 安全层                    |
-| ----------- | -------------------- | ------------------------- |
-| VLESS       | TCP, WS, gRPC, XHTTP | TLS, REALITY, XTLS-Vision |
-| VMess       | TCP, WS              | TLS, None                 |
-| Trojan      | TCP, gRPC            | TLS, REALITY              |
-| Shadowsocks | TCP                  | None                      |
-| Hysteria2   | UDP                  | TLS                       |
-| AnyTLS      | TCP                  | TLS, REALITY              |
-| Snell       | TCP                  | None（obfs 可选）         |
-| Mieru       | TCP / UDP            | None                      |
+| 协议        | 传输                 | 安全层                         |
+| ----------- | -------------------- | ------------------------------ |
+| VLESS       | TCP, WS, gRPC, XHTTP | TLS, REALITY, XTLS-Vision, ENC |
+| VMess       | TCP, WS              | TLS, None                      |
+| Trojan      | TCP, gRPC            | TLS, REALITY                   |
+| Shadowsocks | TCP                  | None                           |
+| Hysteria2   | UDP                  | TLS                            |
+| AnyTLS      | TCP                  | TLS, REALITY                   |
+| Miu         | TCP                  | TLS, REALITY                   |
+| Snell       | TCP                  | None（obfs 可选）              |
+| Mieru       | TCP / UDP            | None                           |
+| WireGuard   | UDP                  | None                           |
 
 ## 入站操作
 

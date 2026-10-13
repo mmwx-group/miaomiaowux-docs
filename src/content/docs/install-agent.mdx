@@ -31,7 +31,7 @@ Agent 连上后：在线、锁图标（加密通信）、WS 连接、Xray 运行
 | 内联 Xray | embedded | Agent 自身内嵌 xray-core,与 Agent 共进退,不需要 /usr/local/bin/xray 独立二进制;升级 Agent 即升级 Xray。资源占用更小,适合配置稳定且不需要手工干预 xray 的场景。 |
 | 外置 Xray | external | 走标准 XTLS/Xray-install 脚本安装独立 xray,Agent 通过 gRPC 控制;Xray 可独立升级、配置文件按官方布局,排障熟悉。一键脚本默认就是这种。                           |
 
-提示:Hysteria2 / AnyTLS 等较新协议两种模式都支持;内联模式启动失败时,Agent 日志会输出 \[EmbeddedXray\] 前缀,可据此排障。
+提示:AnyTLS / Snell / Mieru / Miu / WireGuard 只有内联模式支持,外置模式的服务器上建不了这些协议的节点;其余协议两种模式都支持。内联模式启动失败时,Agent 日志会输出 \[EmbeddedXray\] 前缀,可据此排障。
 
 ## 一键安装（推荐）
 

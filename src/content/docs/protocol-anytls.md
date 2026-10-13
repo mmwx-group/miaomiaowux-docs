@@ -12,10 +12,10 @@ AnyTLS 是基于 TLS 的代理协议，在 TLS 之上叠加 padding + framing + 
 
 ## 支持的组合
 
-| 传输 | 安全层  | 说明                                                                                                |
-| ---- | ------- | --------------------------------------------------------------------------------------------------- |
-| TCP  | TLS     | 推荐组合，需要域名 + TLS 证书；可自动匹配现有泛域名证书                                             |
-| TCP  | REALITY | 妙妙屋X 后端支持，但客户端兼容性差：mihomo / clash / sing-box 均不支持 AnyTLS-REALITY，仅作专家保留 |
+| 传输 | 安全层  | 说明                                                                                                            |
+| ---- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| TCP  | TLS     | 推荐组合，需要域名 + TLS 证书；可自动匹配现有泛域名证书                                                         |
+| TCP  | REALITY | 不需要证书；只有官方客户端 MeowX 支持，官方 mihomo / sing-box 不支持。v0.5.6 起订阅对其它客户端自动滤掉这类节点 |
 
 ## 客户端兼容性
 
@@ -45,7 +45,7 @@ stop=8
 ## 注意事项
 
 - 鉴权字段为 settings.users\[\].password（不是 clients\[\]），妙妙屋X 已在 mmw-agent 和主控订阅生成器中区分处理
-- AnyTLS-REALITY 在所有主流客户端(Clash/Mihomo/sing-box)中均无支持计划，简易模式安全协议默认 TLS
+- AnyTLS-REALITY 只有官方客户端 MeowX 支持；官方 mihomo 会忽略 reality-opts、按普通 TLS 握手，节点永远超时。v0.5.6 起 Clash 订阅对非官方客户端自动滤掉这类节点，简易模式安全协议仍默认 TLS
 - 添加入站「简易模式」+ TLS 时，妙妙屋X 自动用服务器域名匹配证书管理里的泛域名证书（如 \*.example.com 匹配 a.example.com）
 - mihomo 节点字段使用 password + sni（与 Trojan 同源），由主控的 inboundToClashProxy 自动产出
 

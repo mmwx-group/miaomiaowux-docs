@@ -25,6 +25,9 @@ import {
   Sparkles,
   FileText,
   ShoppingCart,
+  Cat,
+  Shuffle,
+  Waypoints,
 } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
@@ -60,15 +63,23 @@ const quickLinkDefs = [
   { key: 'fullDocs', href: '/docs', icon: BookOpen },
 ]
 
-// 当前支持的入站协议(权威顺序参照 x-doc-sidebar 的 protocol-ref 分组);各卡链到对应协议文档专页。
+// 协议矩阵(docs 的 protocol-matrix 页)里的组合数。加减协议或组合时,这个数、下面的 protocolDefs
+// 和 landing.json 里写着数字的几处文案要一起改。
+const PROTOCOL_COMBOS = 27
+
+// 当前支持的入站协议(权威顺序参照文档侧栏「协议参考」分组);各卡链到对应协议文档专页。
+// 首页的「协议支持」数字直接取这张表的长度。
 const protocolDefs = [
   { key: 'vless', name: 'VLESS', href: '/docs/protocol-vless', icon: Shield, color: 'text-purple-500' },
   { key: 'vmess', name: 'VMess', href: '/docs/protocol-vmess', icon: Lock, color: 'text-blue-500' },
   { key: 'trojan', name: 'Trojan', href: '/docs/protocol-trojan', icon: Activity, color: 'text-red-500' },
   { key: 'shadowsocks', name: 'Shadowsocks', href: '/docs/protocol-shadowsocks', icon: Network, color: 'text-green-500' },
   { key: 'hysteria2', name: 'Hysteria2', href: '/docs/protocol-hysteria2', icon: Zap, color: 'text-indigo-500' },
-  { key: 'anytls', name: 'AnyTLS', href: '/docs/protocol-anytls', icon: Globe, color: 'text-teal-500', badge: 'NEW' },
-  { key: 'snell', name: 'Snell', href: '/docs/protocol-snell', icon: Server, color: 'text-lime-500', badge: 'NEW' },
+  { key: 'anytls', name: 'AnyTLS', href: '/docs/protocol-anytls', icon: Globe, color: 'text-teal-500' },
+  { key: 'snell', name: 'Snell', href: '/docs/protocol-snell', icon: Server, color: 'text-lime-500' },
+  { key: 'mieru', name: 'Mieru', href: '/docs/protocol-mieru', icon: Shuffle, color: 'text-amber-500' },
+  { key: 'miu', name: 'Miu', href: '/docs/protocol-miu', icon: Cat, color: 'text-pink-500', badge: 'NEW' },
+  { key: 'wireguard', name: 'WireGuard', href: '/docs/protocol-wireguard', icon: Waypoints, color: 'text-sky-500', badge: 'NEW' },
 ]
 
 function ScreenshotCard({ src, srcs, title, desc, srcAlts }: {
@@ -216,11 +227,11 @@ function XHomePage() {
 
           <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
             <div className="pixel-card p-4 text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary">19</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">{PROTOCOL_COMBOS}</div>
               <div className="text-sm text-muted-foreground">{t('xHome.stats.protocolCombos')}</div>
             </div>
             <div className="pixel-card p-4 text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary">7</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">{protocolDefs.length}</div>
               <div className="text-sm text-muted-foreground">{t('xHome.stats.protocols')}</div>
             </div>
             <div className="pixel-card p-4 text-center">
@@ -240,7 +251,7 @@ function XHomePage() {
         </div>
       </section>
 
-      {/* 支持的协议:7 种入站协议卡片,点进各协议文档专页 */}
+      {/* 支持的协议:每种入站协议一张卡片,点进各协议文档专页 */}
       <section className="py-16 sm:py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
