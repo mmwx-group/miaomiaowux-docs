@@ -24,7 +24,7 @@ Master-Agent 架构，通过 WebSocket/HTTP/Pull 三种模式管理远程服务�
 
 ### Xray 入站管理
 
-可视化入站配置向导，支持 VLESS/VMess/Trojan/Shadowsocks/Hysteria2/AnyTLS/Snell/Mieru 全协议，TCP/WS/gRPC/XHTTP 传输，TLS/REALITY 安全层。见 [节点管理](/docs/nodes)。
+可视化入站配置向导，支持 VLESS/VMess/Trojan/Shadowsocks/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard 全协议，TCP/WS/gRPC/XHTTP 传输，TLS/REALITY 安全层。见 [节点管理](/docs/nodes)。
 
 ![添加节点向导截图](../../assets/screenshots/nodes-add-vless-reality.webp)
 

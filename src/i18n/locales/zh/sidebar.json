@@ -108,6 +108,9 @@
     "faq-protocol-inbound": "协议与入站",
     "faq-sub-client": "订阅与客户端",
     "faq-node-management": "节点的创建与使用",
-    "protocol-snell": "Snell"
+    "protocol-snell": "Snell",
+    "protocol-mieru": "Mieru",
+    "protocol-miu": "Miu",
+    "protocol-wireguard": "WireGuard"
   }
 }

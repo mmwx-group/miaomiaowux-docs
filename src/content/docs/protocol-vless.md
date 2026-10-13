@@ -12,15 +12,16 @@ VLESS 是 Xray 的主力协议，轻量无加密开销（依赖传输层加密�
 
 ## 支持的组合
 
-| 传输      | 安全层                | 说明                 |
-| --------- | --------------------- | -------------------- |
-| TCP       | REALITY               | 推荐，无需域名和证书 |
-| TCP       | REALITY + XTLS-Vision | 推荐，最佳性能       |
-| TCP       | TLS                   | 需要域名和证书       |
-| TCP       | TLS + XTLS-Vision     | 需要域名和证书       |
-| WebSocket | TLS                   | WSS，适合 CDN 中转   |
-| gRPC      | REALITY               | 适合高并发场景       |
-| XHTTP     | REALITY               | 新一代传输，替代 H2  |
+| 传输      | 安全层                | 说明                                                                  |
+| --------- | --------------------- | --------------------------------------------------------------------- |
+| TCP       | REALITY               | 推荐，无需域名和证书                                                  |
+| TCP       | REALITY + XTLS-Vision | 推荐，最佳性能                                                        |
+| TCP       | TLS                   | 需要域名和证书                                                        |
+| TCP       | TLS + XTLS-Vision     | 需要域名和证书                                                        |
+| TCP       | Encryption（ENC）     | VLESS 自带加密，不需要域名和证书；sing-box、Quantumult X、Loon 不支持 |
+| WebSocket | TLS                   | WSS，适合 CDN 中转                                                    |
+| gRPC      | REALITY               | 适合高并发场景                                                        |
+| XHTTP     | REALITY               | 新一代传输，替代 H2                                                   |
 
 ## XTLS-Vision
 

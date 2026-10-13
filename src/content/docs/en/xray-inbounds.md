@@ -33,7 +33,7 @@ The wizard walks through protocol, transport, security and parameters and genera
 
 Add inbound - wizard mode: based on official Xray examples, with a live JSON preview on the right
 
-1. Protocol: Shadowsocks / Shadowsocks2022 / SOCKS5 / Trojan / VLESS / VMess / Hysteria2 / AnyTLS / HTTP / Snell / Mieru
+1. Protocol: Shadowsocks / Shadowsocks2022 / SOCKS5 / Trojan / VLESS / VMess / Hysteria2 / AnyTLS / Miu / HTTP / Snell / Mieru / WireGuard (AnyTLS, Miu, Snell, Mieru and WireGuard are selectable on embedded-Xray servers only)
 2. Transport: TCP / WebSocket / gRPC / XHTTP (depends on the protocol)
 3. Security: REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC / none
 4. Mode: simple assigns a port and generates credentials; expert exposes port, listen address, sniffing, relay …
@@ -53,16 +53,18 @@ Add inbound - wizard mode: based on official Xray examples, with a live JSON pre
 
 Protocols support different transport and security combinations. See the [Protocol Matrix](/docs/en/protocol-matrix).
 
-| Protocol    | Transport            | Security                  |
-| ----------- | -------------------- | ------------------------- |
-| VLESS       | TCP, WS, gRPC, XHTTP | TLS, REALITY, XTLS-Vision |
-| VMess       | TCP, WS              | TLS, None                 |
-| Trojan      | TCP, gRPC            | TLS, REALITY              |
-| Shadowsocks | TCP                  | None                      |
-| Hysteria2   | UDP                  | TLS                       |
-| AnyTLS      | TCP                  | TLS, REALITY              |
-| Snell       | TCP                  | None (optional obfs)      |
-| Mieru       | TCP / UDP            | None                      |
+| Protocol    | Transport            | Security                       |
+| ----------- | -------------------- | ------------------------------ |
+| VLESS       | TCP, WS, gRPC, XHTTP | TLS, REALITY, XTLS-Vision, ENC |
+| VMess       | TCP, WS              | TLS, None                      |
+| Trojan      | TCP, gRPC            | TLS, REALITY                   |
+| Shadowsocks | TCP                  | None                           |
+| Hysteria2   | UDP                  | TLS                            |
+| AnyTLS      | TCP                  | TLS, REALITY                   |
+| Miu         | TCP                  | TLS, REALITY                   |
+| Snell       | TCP                  | None (optional obfs)           |
+| Mieru       | TCP / UDP            | None                           |
+| WireGuard   | UDP                  | None                           |
 
 ## Inbound operations
 

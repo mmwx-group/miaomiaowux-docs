@@ -12,10 +12,10 @@ AnyTLS is a TLS-based proxy protocol that layers padding + framing + built-in mu
 
 ## Supported combinations
 
-| Transport | Security | Note                                                                                                                   |
-| --------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
-| TCP       | TLS      | Recommended; requires a domain + TLS cert; existing wildcard certs can be auto-matched                                 |
-| TCP       | REALITY  | Backend supported but no client support: mihomo / clash / sing-box all do NOT support AnyTLS-REALITY; expert mode only |
+| Transport | Security | Note                                                                                                                                                          |
+| --------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TCP       | TLS      | Recommended; requires a domain + TLS cert; existing wildcard certs can be auto-matched                                                                        |
+| TCP       | REALITY  | No certificate; supported by the official client MeowX only, not by official mihomo / sing-box. Since v0.5.6 subscriptions drop these nodes for other clients |
 
 ## Client compatibility
 
@@ -45,7 +45,7 @@ stop=8
 ## Notes
 
 - Auth field is settings.users\[\].password (NOT clients\[\]); both mmw-agent and the master subscription generator handle this distinction
-- AnyTLS-REALITY is not on any major client's roadmap (Clash/Mihomo/sing-box); Simple mode defaults the security layer to TLS
+- AnyTLS-REALITY is supported by the official client MeowX only; official mihomo ignores reality-opts and handshakes as plain TLS, so the node always times out. Since v0.5.6 Clash subscriptions drop these nodes for non-official clients, and Simple mode still defaults the security layer to TLS
 - Inbound wizard Simple mode + TLS auto-matches the server's domain against wildcard certs in Certificate Management (e.g. a.example.com matches \*.example.com)
 - Mihomo node fields use password + sni (same as Trojan), produced automatically by the master's inboundToClashProxy
 

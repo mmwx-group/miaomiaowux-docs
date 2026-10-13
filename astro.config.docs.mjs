@@ -115,6 +115,8 @@ export default defineConfig({
             "protocol-anytls",
             "protocol-snell",
             "protocol-mieru",
+            "protocol-miu",
+            "protocol-wireguard",
           ],
         },
         {

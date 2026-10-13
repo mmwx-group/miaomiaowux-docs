@@ -53,7 +53,7 @@ In short: MiaoMiaoWu is a subscription management platform, while MiaoMiaoWu X i
 
 ### MiaoMiaoWu X
 
-- Create nodes for all protocols (VLESS/VMess/Trojan/SS/Hysteria2) via UI, 19 protocol combos with one click
+- Create nodes for all protocols (VLESS/VMess/Trojan/SS/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard) via UI, 27 protocol combos with one click
 - Steal-self: reuse existing inbound configs to quickly create new nodes
 - Routed Outbound: transit node reuse for traffic splitting and multi-layer forwarding
 - Port Forwarding Tunnel (dokodemo-door): create outbounds on existing servers, designate nodes as outbound targets

@@ -53,7 +53,7 @@ tableOfContents:
 
 ### 妙妙屋X
 
-- 通过页面创建各种协议节点（VLESS/VMess/Trojan/SS/Hysteria2），19 种协议组合一键配置
+- 通过页面创建各种协议节点（VLESS/VMess/Trojan/SS/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard），27 种协议组合一键配置
 - 偷自己：复用已有入站配置，快速创建新节点
 - 路由出站：支持中转节点复用，实现流量分流和多层转发
 - 端口转发 Tunnel（dokodemo-door）：在已有服务器创建出站，指定节点为出站目标

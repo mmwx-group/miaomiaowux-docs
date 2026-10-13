@@ -108,6 +108,9 @@
     "faq-protocol-inbound": "Protocol & inbound",
     "faq-sub-client": "Subscription & client",
     "faq-node-management": "Node creation & usage",
-    "protocol-snell": "Snell"
+    "protocol-snell": "Snell",
+    "protocol-mieru": "Mieru",
+    "protocol-miu": "Miu",
+    "protocol-wireguard": "WireGuard"
   }
 }

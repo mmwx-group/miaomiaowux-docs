@@ -31,7 +31,7 @@ MiaomiaowuX Agent now supports two Xray runtime modes; pick one via the xray_mod
 | Embedded Xray | embedded | Xray-core is embedded inside the Agent — they share the same process; no standalone /usr/local/bin/xray needed; upgrading the Agent upgrades Xray. Lower footprint, fits stable setups that do not need manual xray surgery. |
 | External Xray | external | Installs standalone xray via the official XTLS/Xray-install script; Agent controls it over gRPC. Xray can be upgraded independently, follows the official file layout. The one-click installer defaults to this mode.        |
 
-Note: Hysteria2 / AnyTLS and other newer protocols are supported in both modes. In embedded mode, startup errors are logged with the \[EmbeddedXray\] prefix in the Agent log.
+Note: AnyTLS, Snell, Mieru, Miu and WireGuard are available in embedded mode only — a server in external mode cannot host nodes of these protocols; every other protocol works in both modes. In embedded mode, startup errors are logged with the \[EmbeddedXray\] prefix in the Agent log.
 
 ## One-Click Installation (Recommended)
 

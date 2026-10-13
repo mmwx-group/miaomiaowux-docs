@@ -49,7 +49,7 @@ Inbound parameters: protocol → transport → security → mode → node name �
 
 | Area              | Description                                                                                                       |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Protocol          | SHADOWSOCKS / SHADOWSOCKS2022 / SOCKS5 / TROJAN / VLESS / VMESS / HYSTERIA2 / ANYTLS / HTTP / SNELL / MIERU        |
+| Protocol          | SHADOWSOCKS / SHADOWSOCKS2022 / SOCKS5 / TROJAN / VLESS / VMESS / HYSTERIA2 / ANYTLS / MIU / HTTP / SNELL / MIERU / WIREGUARD        |
 | Transport         | Depends on protocol, e.g. VLESS offers GRPC / TCP / WSS / XHTTP                                                   |
 | Security          | REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC …, see [Protocol Matrix](/docs/en/protocol-matrix)        |
 | Config mode       | Simple: port and UUID / password auto-generated; Expert: edit port, listen address, sniffing, relay address …     |
@@ -163,7 +163,7 @@ The buttons at the top right of the list:
 | Sync external subs     | Re-fetch all external subscriptions now                                                                   |
 | Clear all              | Delete every node (dangerous)                                                                             |
 | Remove duplicates      | Delete nodes with the same address + port + protocol                                                       |
-| Helpers                | Bulk disable skip-cert-verify, Snell parameters, show per-node traffic in names …                           |
+| Utilities              | Bulk disable skip-cert-verify, Snell parameters, show per-node traffic in names, send Miu nodes to all clients (see [Miu](/docs/en/protocol-miu#subscription-rule)) … |
 
 ![Speed test workbench screenshot](../../../assets/screenshots/nodes-toolbar-speedtest.webp)
 

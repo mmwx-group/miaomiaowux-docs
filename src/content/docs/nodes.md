@@ -49,7 +49,7 @@ SSL 配置提示：列出 443 端口尚不可用的服务器，可一键配置
 
 | 区域           | 说明                                                                                                           |
 | -------------- | -------------------------------------------------------------------------------------------------------------- |
-| 选择协议       | SHADOWSOCKS / SHADOWSOCKS2022 / SOCKS5 / TROJAN / VLESS / VMESS / HYSTERIA2 / ANYTLS / HTTP / SNELL / MIERU     |
+| 选择协议       | SHADOWSOCKS / SHADOWSOCKS2022 / SOCKS5 / TROJAN / VLESS / VMESS / HYSTERIA2 / ANYTLS / MIU / HTTP / SNELL / MIERU / WIREGUARD     |
 | 传输协议       | 随协议变化，如 VLESS 可选 GRPC / TCP / WSS / XHTTP                                                             |
 | 安全协议       | REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC 等，可用组合见 [协议矩阵](/docs/protocol-matrix)        |
 | 配置模式       | 简易模式：端口、UUID / 密码全部自动生成；专家模式：可改端口、监听地址、嗅探、中转地址等高级参数                  |
@@ -163,7 +163,7 @@ SSL 配置提示：列出 443 端口尚不可用的服务器，可一键配置
 | 同步外部订阅 | 立即重新拉取所有外部订阅                                                                                    |
 | 清空所有     | 删除全部节点（危险操作）                                                                                    |
 | 删除重复     | 删除地址 + 端口 + 协议重复的节点                                                                            |
-| 辅助功能     | 批量关闭跳过证书验证、Snell 参数配置、节点名称显示独立流量等                                                 |
+| 辅助功能     | 批量关闭跳过证书验证、Snell 参数配置、节点名称显示独立流量、向所有客户端下发 Miu 节点（见 [Miu](/docs/protocol-miu#订阅下发规则)）等                                                 |
 
 ![节点测速工作台截图](../../assets/screenshots/nodes-toolbar-speedtest.webp)
 

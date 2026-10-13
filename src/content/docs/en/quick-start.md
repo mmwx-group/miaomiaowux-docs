@@ -53,7 +53,7 @@ Server card: online, embedded Xray, WS connection, Xray running, Agent version
 
 Open "Nodes" → "Add Node" (or "Xray Inbounds" → "Add Inbound") and use the wizard:
 
-1. Choose a protocol (VLESS / VMess / Trojan / Shadowsocks / Hysteria2 / AnyTLS / Snell / Mieru …)
+1. Choose a protocol (VLESS / VMess / Trojan / Shadowsocks / Hysteria2 / AnyTLS / Snell / Mieru / Miu / WireGuard …)
 2. Choose a transport (TCP / WebSocket / gRPC / XHTTP)
 3. Choose a security layer (REALITY / TLS / XTLS-Vision / none)
 4. Simple mode generates port and credentials; expert mode lets you edit everything

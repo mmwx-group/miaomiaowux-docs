@@ -24,7 +24,7 @@ Remote install/uninstall Xray and Nginx, service start/stop control, SSE streami
 
 ### Xray Inbound Management
 
-Visual inbound configuration wizard supporting VLESS/VMess/Trojan/Shadowsocks/Hysteria2/AnyTLS/Snell/Mieru protocols, TCP/WS/gRPC/XHTTP transport, TLS/REALITY security. See [Node Management](/docs/en/nodes).
+Visual inbound configuration wizard supporting VLESS/VMess/Trojan/Shadowsocks/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard protocols, TCP/WS/gRPC/XHTTP transport, TLS/REALITY security. See [Node Management](/docs/en/nodes).
 
 ![Add node wizard screenshot](../../../assets/screenshots/nodes-add-vless-reality.webp)
 
