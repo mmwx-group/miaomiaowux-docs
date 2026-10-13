@@ -173,7 +173,19 @@
       "renewToday": "今天",
       "renewDay": "{{count}} 天",
       "renewLeft": "剩 {{count}} 天",
-      "renewAuto": "自动续期"
+      "renewAuto": "自动续期",
+      "renewalsDescSum": "未来 60 天到期的服务器 · 30 天内合计 {{amount}}",
+      "renewExpired": "已过期:",
+      "renewDueToday": "今天到期",
+      "renewProjected": "按周期预估",
+      "renewThisMonth": "本月剩余未续费",
+      "renewThisMonthHint": "已过期未续的,加上今天到月底之间到期的;按汇率折成人民币",
+      "renewNextMonth": "下月预估",
+      "renewNextMonthHint": "按每台的续费周期从当前到期日往后推,落在下个月的每一次都计入(月付的本月续完下月还要再续)",
+      "renewCount": "{{count}} 笔",
+      "renewOverdue": "已过期",
+      "renewRateSource": "汇率来自许可证服务,每 24 小时更新",
+      "noRenewals": "未来 60 天没有到期的服务器"
     }
   },
   "timeRange": {

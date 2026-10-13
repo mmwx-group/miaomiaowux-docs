@@ -37,6 +37,8 @@ export function pseudoRandom(seed: number): number {
   return x - Math.floor(x);
 }
 
+export type Currency = "USD" | "CNY";
+
 export type DemoServer = {
   id: number;
   name: string;
@@ -49,8 +51,10 @@ export type DemoServer = {
   baseDown: number;
   /** 多少天后到期;null = 没有到期日 */
   expires: number | null;
-  price?: string;
-  provider?: string;
+  /** 续费价格与币种;cycle 是续费周期(月) */
+  price?: number;
+  currency?: Currency;
+  cycle?: number;
   autoRenew?: boolean;
 };
 
@@ -65,8 +69,9 @@ export const SERVERS: DemoServer[] = [
     baseUp: 8 * MB,
     baseDown: 32 * MB,
     expires: 23,
-    price: "$12.9",
-    provider: "GoMami",
+    price: 12.9,
+    currency: "USD",
+    cycle: 1,
   },
   {
     id: 2,
@@ -78,8 +83,9 @@ export const SERVERS: DemoServer[] = [
     baseUp: 3 * MB,
     baseDown: 15 * MB,
     expires: 5,
-    price: "$6.5",
-    provider: "Megabox",
+    price: 6.5,
+    currency: "USD",
+    cycle: 1,
     autoRenew: true,
   },
   {
@@ -92,8 +98,9 @@ export const SERVERS: DemoServer[] = [
     baseUp: 1 * MB,
     baseDown: 5 * MB,
     expires: 41,
-    price: "¥980",
-    provider: "Pulse",
+    price: 68,
+    currency: "CNY",
+    cycle: 3,
   },
   {
     id: 4,
@@ -104,7 +111,11 @@ export const SERVERS: DemoServer[] = [
     progress: 0.42,
     baseUp: 0.6 * MB,
     baseDown: 3 * MB,
-    expires: null,
+    // 已经过了到期日还没续
+    expires: -3,
+    price: 35,
+    currency: "CNY",
+    cycle: 1,
   },
 ];
 
@@ -536,3 +547,110 @@ export function buildModel(range: TimeRange, tick: number) {
 }
 
 export type Model = ReturnType<typeof buildModel>;
+
+// ───────── 续费 ─────────
+
+/** 1 单位外币折合多少人民币(面板里由许可证服务提供,这里写死)。 */
+export const CNY_RATE: Record<Currency, number> = { CNY: 1, USD: 7.1 };
+export const currencySymbol = (c?: Currency) => (c === "USD" ? "$" : "¥");
+export const priceText = (s: { price?: number; currency?: Currency }) =>
+  s.price ? `${currencySymbol(s.currency)}${s.price}` : "—";
+
+/** 今天往后 days 天的那一天(零点)。 */
+export function dateAfter(days: number): Date {
+  const d = new Date(TODAY);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+export const shortDate = (d: Date) => `${d.getMonth() + 1}-${d.getDate()}`;
+
+/** 加 n 个月;目标月没有这一天就落在月底(1 月 31 日加一个月是 2 月最后一天)。 */
+function addMonths(d: Date, n: number): Date {
+  const first = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  const lastDay = new Date(
+    first.getFullYear(),
+    first.getMonth() + 1,
+    0,
+  ).getDate();
+  first.setDate(Math.min(d.getDate(), lastDay));
+  return first;
+}
+
+export const RENEW_SPAN = 60;
+export type RenewalItem = {
+  name: string;
+  /** 多少天后到期;负数 = 已过期 */
+  days: number;
+  price: number;
+  currency?: Currency;
+  autoRenew?: boolean;
+  /** 按续费周期往后推出来的下一次,而不是当前的到期日 */
+  projected?: boolean;
+};
+
+/** 未来 60 天里的每一次续费:当前到期日,加上按周期往后推、还落在 60 天内的每一次。 */
+export function buildRenewals(servers: DemoServer[]): RenewalItem[] {
+  const out: RenewalItem[] = [];
+  for (const s of servers) {
+    if (s.expires == null || s.expires > RENEW_SPAN) continue;
+    const base = {
+      name: s.name,
+      price: s.price ?? 0,
+      currency: s.currency,
+      autoRenew: s.autoRenew,
+    };
+    out.push({ ...base, days: s.expires });
+    if (s.expires < 0) continue;
+    const due = dateAfter(s.expires);
+    for (let k = 1; k < 60; k++) {
+      const next = addMonths(due, (s.cycle ?? 1) * k);
+      const days = Math.round(
+        (next.getTime() - dateAfter(0).getTime()) / 864e5,
+      );
+      if (days > RENEW_SPAN) break;
+      out.push({ ...base, days, projected: true });
+    }
+  }
+  return out.sort((a, b) => a.days - b.days);
+}
+
+export type RenewalLine = {
+  name: string;
+  date: Date;
+  price: number;
+  currency?: Currency;
+  cny: number;
+  overdue?: boolean;
+};
+
+/** 本月剩余未续费(已过期没续的 + 到月底前到期的)与下月预估(按周期推,落在下个月的每一次)。 */
+export function renewalMonths(servers: DemoServer[]) {
+  const today = dateAfter(0);
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const nextStart = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+  const nextEnd = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+  const thisMonth: RenewalLine[] = [];
+  const nextMonth: RenewalLine[] = [];
+  for (const s of servers) {
+    if (s.expires == null || !s.price) continue;
+    const line = (date: Date, overdue?: boolean): RenewalLine => ({
+      name: s.name,
+      date,
+      price: s.price!,
+      currency: s.currency,
+      cny: s.price! * CNY_RATE[s.currency ?? "CNY"],
+      overdue,
+    });
+    const due = dateAfter(s.expires);
+    if (s.expires < 0 || due <= monthEnd)
+      thisMonth.push(line(due, s.expires < 0));
+    for (
+      let d = due, guard = 0;
+      d <= nextEnd && guard < 40;
+      d = addMonths(d, s.cycle ?? 1), guard++
+    )
+      if (d >= nextStart) nextMonth.push(line(d));
+  }
+  return { thisMonth, nextMonth };
+}
