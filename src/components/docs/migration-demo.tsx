@@ -167,7 +167,7 @@ const MOCK_PATCH: PatchClientEmailsResp = {
     { server_name: 'us1.example.com', inbound_tag: 'vless-443',  email: 'admin@us1-443',     was_new: true },
     { server_name: 'jp1.example.com', inbound_tag: 'hy2-8443',   email: 'admin@jp1-hy2',     was_new: true },
     { server_name: 'de1.example.com', inbound_tag: 'trojan-443', email: 'admin@de1-trojan',  was_new: true },
-    { server_name: 'sg1.example.com', inbound_tag: 'vless-443',  email: 'jimlee@sg1-443',    was_new: false },
+    { server_name: 'sg1.example.com', inbound_tag: 'vless-443',  email: 'henry@sg1-443',     was_new: false },
   ],
   ss2022_inbounds: [
     { server_name: 'hk1.example.com', inbound_tag: 'ss2022-51820', method: '2022-blake3-aes-256-gcm' },

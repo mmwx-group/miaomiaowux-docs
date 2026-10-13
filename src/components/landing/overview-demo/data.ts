@@ -238,7 +238,7 @@ export type DemoUser = {
 
 export const USERS: DemoUser[] = [
   {
-    username: "jimlee",
+    username: "henry",
     packages: ["旗舰 500G"],
     limit: 500 * GB,
     cycleUsed: 213 * GB,
