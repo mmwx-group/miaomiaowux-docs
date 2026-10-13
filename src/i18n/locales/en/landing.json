@@ -292,7 +292,8 @@
         "mieru": "Encrypted protocol without TLS, over TCP or UDP",
         "miu": "In-house protocol: lane pool, inner TLS 1.3 forwarded as is",
         "wireguard": "UDP tunnel; keys and addresses assigned by the master"
-      }
+      },
+      "credits": "Protocol names and logos belong to their respective projects: the Xray and V2Fly logos come from their official documentation sites (CC BY-SA 4.0), the Shadowsocks and Hysteria logos from their official projects. “WireGuard” is a registered trademark of Jason A. Donenfeld."
     }
   }
 }

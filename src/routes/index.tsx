@@ -67,18 +67,48 @@ const quickLinkDefs = [
 // 和 landing.json 里写着数字的几处文案要一起改。
 const PROTOCOL_COMBOS = 27
 
+// Miu 的标志(μ 加一对猫耳),与面板里的 miu-mark.svg 同一份路径;跟随文字颜色,明暗主题都能用。
+function MiuMark({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="120 90 272 332" role="img" aria-label="Miu" className={className}>
+      <g transform="translate(-13 -14)" fill="none" stroke="currentColor" strokeWidth="40" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M196 204V400" />
+        <path d="M196 204V296a60 60 0 0 0 120 0V204" />
+        <path d="M316 296q0 52 44 52" />
+        <path d="M182 204L182 134L210 204Z" fill="currentColor" strokeWidth="12" />
+        <path d="M330 204L330 134L302 204Z" fill="currentColor" strokeWidth="12" />
+      </g>
+    </svg>
+  )
+}
+
 // 当前支持的入站协议(权威顺序参照文档侧栏「协议参考」分组);各卡链到对应协议文档专页。
 // 首页的「协议支持」数字直接取这张表的长度。
-const protocolDefs = [
-  { key: 'vless', name: 'VLESS', href: '/docs/protocol-vless', icon: Shield, color: 'text-purple-500' },
-  { key: 'vmess', name: 'VMess', href: '/docs/protocol-vmess', icon: Lock, color: 'text-blue-500' },
+//
+// logo 是各项目自己的标志(文件在 public/images/protocols/,来源见卡片下方的说明文案):
+//   - VLESS 用 Xray 的,VMess 用 V2Fly 的,Hysteria2 用 Hysteria 的;logoDark 是暗色主题下的版本。
+//   - AnyTLS / Snell / Mieru / Trojan 没有可用的官方标志,保留图标。
+//   - WireGuard 的商标政策不允许把它的标志用在销售产品或服务的页面上,只用名称,不放标志。
+const protocolDefs: {
+  key: string
+  name: string
+  href: string
+  icon: typeof Shield
+  color: string
+  badge?: string
+  logo?: string
+  logoDark?: string
+  mark?: typeof MiuMark
+}[] = [
+  { key: 'vless', name: 'VLESS', href: '/docs/protocol-vless', icon: Shield, color: 'text-purple-500', logo: '/images/protocols/xray-light.svg', logoDark: '/images/protocols/xray-dark.svg' },
+  { key: 'vmess', name: 'VMess', href: '/docs/protocol-vmess', icon: Lock, color: 'text-blue-500', logo: '/images/protocols/v2fly.png' },
   { key: 'trojan', name: 'Trojan', href: '/docs/protocol-trojan', icon: Activity, color: 'text-red-500' },
-  { key: 'shadowsocks', name: 'Shadowsocks', href: '/docs/protocol-shadowsocks', icon: Network, color: 'text-green-500' },
-  { key: 'hysteria2', name: 'Hysteria2', href: '/docs/protocol-hysteria2', icon: Zap, color: 'text-indigo-500' },
+  { key: 'shadowsocks', name: 'Shadowsocks', href: '/docs/protocol-shadowsocks', icon: Network, color: 'text-green-500', logo: '/images/protocols/shadowsocks.png' },
+  { key: 'hysteria2', name: 'Hysteria2', href: '/docs/protocol-hysteria2', icon: Zap, color: 'text-indigo-500', logo: '/images/protocols/hysteria-light.svg', logoDark: '/images/protocols/hysteria-dark.svg' },
   { key: 'anytls', name: 'AnyTLS', href: '/docs/protocol-anytls', icon: Globe, color: 'text-teal-500' },
   { key: 'snell', name: 'Snell', href: '/docs/protocol-snell', icon: Server, color: 'text-lime-500' },
   { key: 'mieru', name: 'Mieru', href: '/docs/protocol-mieru', icon: Shuffle, color: 'text-amber-500' },
-  { key: 'miu', name: 'Miu', href: '/docs/protocol-miu', icon: Cat, color: 'text-pink-500', badge: 'NEW' },
+  { key: 'miu', name: 'Miu', href: '/docs/protocol-miu', icon: Cat, color: 'text-pink-500', badge: 'NEW', mark: MiuMark },
   { key: 'wireguard', name: 'WireGuard', href: '/docs/protocol-wireguard', icon: Waypoints, color: 'text-sky-500', badge: 'NEW' },
 ]
 
@@ -265,7 +295,16 @@ function XHomePage() {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="w-12 h-12 pixel-border flex items-center justify-center bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                        <p.icon className={`size-6 ${p.color}`} />
+                        {p.mark ? (
+                          <p.mark className="size-7 text-foreground" />
+                        ) : p.logo ? (
+                          <>
+                            <img src={p.logo} alt={`${p.name} logo`} className={`size-7 object-contain ${p.logoDark ? 'dark:hidden' : ''}`} />
+                            {p.logoDark && <img src={p.logoDark} alt="" aria-hidden="true" className="hidden size-7 object-contain dark:block" />}
+                          </>
+                        ) : (
+                          <p.icon className={`size-6 ${p.color}`} />
+                        )}
                       </div>
                       {p.badge && (
                         <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-primary/15 text-primary">
@@ -287,6 +326,7 @@ function XHomePage() {
               </a>
             ))}
           </div>
+          <p className="mt-6 text-center text-xs text-muted-foreground">{t('xHome.protocols.credits')}</p>
         </div>
       </section>
 

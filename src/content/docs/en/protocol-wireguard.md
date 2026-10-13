@@ -61,3 +61,7 @@ The mihomo node generated for subscriptions (keys and addresses differ per user)
   udp: true
   mtu: 1420
 ```
+
+---
+
+"WireGuard" and the "WireGuard" logo are registered trademarks of Jason A. Donenfeld.

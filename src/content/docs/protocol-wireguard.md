@@ -61,3 +61,7 @@ WireGuard 是基于 UDP 的隧道协议，自带加密，不需要证书，也�
   udp: true
   mtu: 1420
 ```
+
+---
+
+“WireGuard” 及 “WireGuard” 标志是 Jason A. Donenfeld 的注册商标。
