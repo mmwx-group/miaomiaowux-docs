@@ -8,6 +8,7 @@ import enSidebar from "./locales/en/sidebar.json";
 import enLanding from "./locales/en/landing.json";
 import enSearch from "./locales/en/search.json";
 import enXdocs from "./locales/en/xdocs.json";
+import enOverview from "./locales/en/overview.json";
 
 import zhCommon from "./locales/zh/common.json";
 import zhLayout from "./locales/zh/layout.json";
@@ -15,6 +16,7 @@ import zhSidebar from "./locales/zh/sidebar.json";
 import zhLanding from "./locales/zh/landing.json";
 import zhSearch from "./locales/zh/search.json";
 import zhXdocs from "./locales/zh/xdocs.json";
+import zhOverview from "./locales/zh/overview.json";
 
 i18n
   .use(LanguageDetector)
@@ -23,7 +25,15 @@ i18n
     fallbackLng: "en",
     supportedLngs: ["en", "zh"],
     defaultNS: "common",
-    ns: ["common", "layout", "sidebar", "landing", "search", "xdocs"],
+    ns: [
+      "common",
+      "layout",
+      "sidebar",
+      "landing",
+      "search",
+      "xdocs",
+      "overview",
+    ],
     detection: {
       order: ["localStorage", "navigator"],
       lookupLocalStorage: "mmw-lang",
@@ -40,6 +50,7 @@ i18n
         landing: enLanding,
         search: enSearch,
         xdocs: enXdocs,
+        overview: enOverview,
       },
       zh: {
         common: zhCommon,
@@ -48,6 +59,7 @@ i18n
         landing: zhLanding,
         search: zhSearch,
         xdocs: zhXdocs,
+        overview: zhOverview,
       },
     },
   });
