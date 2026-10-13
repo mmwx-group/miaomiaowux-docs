@@ -87,7 +87,8 @@ function MiuMark({ className }: { className?: string }) {
 //
 // logo 是各项目自己的标志(文件在 public/images/protocols/,来源见卡片下方的说明文案):
 //   - VLESS 用 Xray 的,VMess 用 V2Fly 的,Hysteria2 用 Hysteria 的;logoDark 是暗色主题下的版本。
-//   - AnyTLS / Snell / Mieru / Trojan 没有可用的官方标志,保留图标。
+//   - Snell 用 Surge 知识库(Snell 的官方文档所在)的图标。
+//   - AnyTLS / Mieru / Trojan 没有可用的官方标志,保留图标。
 //   - WireGuard 的商标政策不允许把它的标志用在销售产品或服务的页面上,只用名称,不放标志。
 const protocolDefs: {
   key: string
@@ -106,7 +107,7 @@ const protocolDefs: {
   { key: 'shadowsocks', name: 'Shadowsocks', href: '/docs/protocol-shadowsocks', icon: Network, color: 'text-green-500', logo: '/images/protocols/shadowsocks.png' },
   { key: 'hysteria2', name: 'Hysteria2', href: '/docs/protocol-hysteria2', icon: Zap, color: 'text-indigo-500', logo: '/images/protocols/hysteria-light.svg', logoDark: '/images/protocols/hysteria-dark.svg' },
   { key: 'anytls', name: 'AnyTLS', href: '/docs/protocol-anytls', icon: Globe, color: 'text-teal-500' },
-  { key: 'snell', name: 'Snell', href: '/docs/protocol-snell', icon: Server, color: 'text-lime-500' },
+  { key: 'snell', name: 'Snell', href: '/docs/protocol-snell', icon: Server, color: 'text-lime-500', logo: '/images/protocols/snell.png' },
   { key: 'mieru', name: 'Mieru', href: '/docs/protocol-mieru', icon: Shuffle, color: 'text-amber-500' },
   { key: 'miu', name: 'Miu', href: '/docs/protocol-miu', icon: Cat, color: 'text-pink-500', badge: 'NEW', mark: MiuMark },
   { key: 'wireguard', name: 'WireGuard', href: '/docs/protocol-wireguard', icon: Waypoints, color: 'text-sky-500', badge: 'NEW' },
