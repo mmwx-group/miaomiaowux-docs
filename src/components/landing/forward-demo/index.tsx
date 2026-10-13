@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Search, Waypoints } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { formatBytes } from "../overview-demo/data";
 import { useTick } from "../use-tick";
@@ -23,9 +24,14 @@ import {
 import { Sparkline, Tag } from "./parts";
 import { BTN, BTN_OUTLINE, BTN_SOLID, STATUS_DOT, STATUS_TAG } from "./styles";
 import { ForwardTopology } from "./topology";
+import type { CanvasState } from "./canvas";
+import { docFromChain, type CDoc } from "./canvas/model";
+
+// 画布带着 React Flow,拆成单独的块,点开才加载
+const ForwardCanvas = lazy(() => import("./canvas"));
 
 // 首页的「转发链」演示:照着面板的转发页做的 —— 指标条、网络拓扑、待处理、链列表(路线 / 紧凑两种视图)。
-// 数据全是本地编出来的;「立即下发」会真的把那条待下发的链变成健康。
+// 数据全是本地编出来的;「立即下发」会真的把那条待下发的链变成健康。「打开画布」进编排画布的演示。
 
 type Filter = "all" | "problem" | ChainStatus;
 type Alert = {
@@ -40,6 +46,8 @@ const SEVERITY: Record<Alert["kind"], number> = {
   degraded: 1,
   pending: 2,
 };
+/** 那条「待下发」的链:在画布里保存并下发,总览里它也跟着变健康 */
+const PENDING_CHAIN_ID = 5;
 const rowId = (id: number) => `fwd-demo-chain-${id}`;
 const stopName = (c: Chain, i: number) => {
   const s = stopsOf(c)[i];
@@ -80,6 +88,12 @@ function ForwardPanel() {
   const [highlight, setHighlight] = useState<number | null>(null);
   const [topoOpen, setTopoOpen] = useState(true);
   const [topoProblemsOnly, setTopoProblemsOnly] = useState(false);
+  const [canvas, setCanvas] = useState<{
+    key: number;
+    doc: CDoc | null;
+    state: CanvasState;
+    chainId?: number;
+  } | null>(null);
 
   const chains = useMemo(() => buildChains(tick, pushed), [tick, pushed]);
   const counts = useMemo(() => {
@@ -155,8 +169,13 @@ function ForwardPanel() {
       );
   }, [chains, filter, q]);
 
+  // 选路段里路上的中转组也算在内
   const servers = new Set(
-    chains.flatMap((c) => c.groups.flatMap((g) => g.members.map((m) => m.id))),
+    chains.flatMap((c) =>
+      [...c.groups, ...(c.pathSet?.paths.flatMap((p) => p.via) ?? [])].flatMap(
+        (g) => g.members.map((m) => m.id),
+      ),
+    ),
   ).size;
   const nodes = chains.reduce((a, c) => a + c.nodes, 0);
   const portsTotal = chains.reduce((a, c) => a + portCount(c), 0);
@@ -188,6 +207,15 @@ function ForwardPanel() {
     );
   };
 
+  // 打开画布:传一条链就是编辑它,不传就是新建
+  const openCanvas = (c: Chain | null) =>
+    setCanvas((prev) => ({
+      key: (prev?.key ?? 0) + 1,
+      doc: c ? docFromChain(c) : null,
+      state: !c || c.status === "pending" ? "draft" : "saved",
+      chainId: c?.id,
+    }));
+
   const kpi = "bg-card flex items-center gap-4 rounded-xl border px-4 py-3";
   return (
     <div className="bg-background flex flex-col gap-5 rounded-xl border p-3 text-left shadow-sm sm:p-5">
@@ -206,18 +234,26 @@ function ForwardPanel() {
             {t("summary", { chains: chains.length, servers, nodes })}
           </div>
         </div>
-        {/* 这两个按钮在面板里打开创建对话框 / 画布,演示里只是摆着 */}
-        <div
-          className="pointer-events-none flex flex-wrap gap-2 select-none"
-          aria-hidden="true"
-        >
-          <span className={cn(BTN, BTN_OUTLINE, "h-9 text-sm")}>
+        <div className="flex flex-wrap gap-2">
+          {/* 经典模式在面板里是一个分步对话框,演示里只是摆着 */}
+          <span
+            className={cn(
+              BTN,
+              BTN_OUTLINE,
+              "pointer-events-none h-9 text-sm select-none",
+            )}
+            aria-hidden="true"
+          >
             {t("actions.classic")}
           </span>
-          <span className={cn(BTN, BTN_SOLID, "h-9 text-sm")}>
+          <button
+            type="button"
+            className={cn(BTN, BTN_SOLID, "h-9 text-sm")}
+            onClick={() => openCanvas(null)}
+          >
             <Plus className="size-4" />
             {t("actions.canvas")}
-          </span>
+          </button>
         </div>
       </div>
 
@@ -471,6 +507,7 @@ function ForwardPanel() {
                 expanded={expanded === c.id}
                 onToggle={() => setExpanded(expanded === c.id ? null : c.id)}
                 onPush={push}
+                onCanvas={() => openCanvas(c)}
               />
             </div>
           ))}
@@ -496,6 +533,33 @@ function ForwardPanel() {
         <span>{t("legend.dots")}</span>
         <span>{t("legend.lan")}</span>
       </div>
+
+      <Dialog
+        open={canvas !== null}
+        onOpenChange={(o) => !o && setCanvas(null)}
+      >
+        <DialogContent
+          showCloseButton={false}
+          aria-describedby={undefined}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          className="block h-dvh w-screen max-w-none gap-0 rounded-none border-0 p-0 data-[state=closed]:zoom-out-100 data-[state=open]:zoom-in-100 sm:max-w-none"
+        >
+          <DialogTitle className="sr-only">{t("canvas.a11yTitle")}</DialogTitle>
+          {canvas && (
+            <Suspense
+              fallback={<div className="bg-muted/40 h-full animate-pulse" />}
+            >
+              <ForwardCanvas
+                key={canvas.key}
+                initial={canvas.doc}
+                initialState={canvas.state}
+                onClose={() => setCanvas(null)}
+                onSaved={canvas.chainId === PENDING_CHAIN_ID ? push : undefined}
+              />
+            </Suspense>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

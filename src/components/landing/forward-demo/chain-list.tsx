@@ -65,12 +65,14 @@ export function ChainRow({
   expanded,
   onToggle,
   onPush,
+  onCanvas,
 }: {
   c: Chain;
   highlighted: boolean;
   expanded: boolean;
   onToggle: () => void;
   onPush: () => void;
+  onCanvas: () => void;
 }) {
   const { t } = useTranslation("forward");
   const text = useChainText();
@@ -106,6 +108,7 @@ export function ChainRow({
             <Tag className="tabular-nums">{c.engine}</Tag>
             {c.sticky && <Tag>{t("tag.sticky")}</Tag>}
             {c.clientIp && <Tag>{t("tag.clientIp")}</Tag>}
+            {c.pathSet && <Tag>{t("path.title")}</Tag>}
             {c.terminus && <Tag>{t("tag.landing")}</Tag>}
           </div>
           <div className="text-muted-foreground text-xs leading-5 tabular-nums">
@@ -193,6 +196,13 @@ export function ChainRow({
                 )}
               />
             </button>
+            <button
+              type="button"
+              className={cn(BTN, BTN_OUTLINE, "flex-1")}
+              onClick={onCanvas}
+            >
+              {t("canvas.open")}
+            </button>
           </div>
         </div>
       </div>
@@ -259,6 +269,40 @@ export function ChainRow({
                 );
               })}
             </div>
+            {c.pathSet && (
+              <>
+                <span className="text-muted-foreground mt-2 text-xs">
+                  {t("path.title")} · {t("path.hint")}
+                </span>
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  {c.pathSet.paths.map((p, k) => (
+                    <div
+                      key={k}
+                      className={cn(
+                        "bg-card flex items-center gap-2 rounded-lg border px-3 py-2 text-sm",
+                        k === c.pathSet!.active &&
+                          "border-teal-600 dark:border-teal-500",
+                      )}
+                    >
+                      {k === c.pathSet!.active && (
+                        <Tag className={STATUS_TAG.healthy}>
+                          {t("path.active")}
+                        </Tag>
+                      )}
+                      <span className="min-w-0 flex-1 truncate">
+                        {t("path.item", { n: k + 1 })} ·{" "}
+                        {p.via.length
+                          ? t("path.via", {
+                              names: p.via.map((g) => g.name).join(" → "),
+                            })
+                          : t("path.direct")}
+                      </span>
+                      <b className="tabular-nums">{fmtMs(p.total)}</b>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

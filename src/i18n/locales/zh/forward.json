@@ -71,6 +71,16 @@
     "clientIp": "透传客户端 IP",
     "landing": "中继到落地节点"
   },
+  "path": {
+    "title": "选路段",
+    "pick": "选路",
+    "active": "在用",
+    "item": "路 {{n}}",
+    "direct": "直连",
+    "via": "经 {{names}}",
+    "summary": "{{count}} 条路 · 路 {{n}} 在用",
+    "hint": "每 15 秒按到出口的总延迟挑一条路;新路要连续两轮都明显更快才切换。"
+  },
   "row": {
     "port": "端口 {{range}}",
     "nodes": "{{count}} 个节点",
@@ -120,5 +130,184 @@
     "bad": "不通",
     "dots": "站点圆点 = 成员在线(空心为离线)",
     "lan": "「经内网」= 这一跳按探测结果走了内网地址"
+  },
+  "canvas": {
+    "a11yTitle": "转发编排画布",
+    "open": "打开画布",
+    "crumb": "转发管理 / 编排",
+    "newName": "新转发链",
+    "newGroup": "组 {{n}}",
+    "saved": "已下发到 {{count}} 台服务器",
+    "state": {
+      "draft": "草稿 · 未下发",
+      "dirty": "有未保存的修改",
+      "saved": "已下发",
+      "saving": "下发中…"
+    },
+    "summary": "{{hops}} 跳 · {{branches}} 个分支 · {{paths}} 个选路段",
+    "problems": "{{count}} 个问题",
+    "problem": {
+      "tooShort": "链至少要有入口组和出口组,并用线连起来",
+      "multiEntry": "主干必须是一条直线:现在有 {{count}} 个组没有上一跳",
+      "loose": "「{{group}}」还没连到链上",
+      "empty": "「{{group}}」里还没有服务器",
+      "branchOpen": "「{{group}}」的分支还没有汇合回主干",
+      "pathOpen": "从「{{group}}」出发的几条路没有在同一个组汇合"
+    },
+    "toolbar": {
+      "back": "返回",
+      "layout": "自动排版",
+      "probe": "探测延迟",
+      "iperf": "iperf3 测速",
+      "save": "保存并下发"
+    },
+    "pool": {
+      "servers": "服务器池 {{used}}/{{total}}",
+      "nodes": "节点池 {{count}}",
+      "search": "搜索名称 / IP",
+      "all": "全部",
+      "unused": "未使用",
+      "onCanvas": "画布中",
+      "hint": "拖到画布上新建一组,拖到组上加入该组;也可以直接点一下。",
+      "hintNodes": "落地节点拖进出口组:链的最后一跳中继到这个节点。"
+    },
+    "role": {
+      "entry": "入口",
+      "relay": "中转",
+      "exit": "出口",
+      "pathRelay": "路上中转",
+      "branchRelay": "分支中转",
+      "loose": "未连接"
+    },
+    "node": {
+      "empty": "把服务器拖进来",
+      "pathPick": "选路 · 最低延迟优先",
+      "remove": "移除"
+    },
+    "edge": {
+      "path": "路{{n}}",
+      "active": "在用",
+      "down": "不通"
+    },
+    "empty": {
+      "title": "画布还是空的",
+      "desc": "从服务器池把服务器拖进来(或点一下),再从组右侧的圆点拉线连到下一个组。双击一条线可以删除。",
+      "sample": "载入一个示例"
+    },
+    "sample": {
+      "name": "示例-选路段与分支",
+      "entry": "入口组",
+      "relay": "中转组",
+      "exit": "出口组",
+      "branch": "分支中转"
+    },
+    "chain": {
+      "title": "链设置",
+      "hint": "点画布上的组可编辑组",
+      "name": "链名",
+      "ports": "端口段(链上节点的入口端口从这里分配)",
+      "engine": "默认转发引擎",
+      "engineHint": "没单独设置引擎的组都用它。内核引擎更省 CPU;限速、IPv6 等内核做不了的规则会自动回落 relay。",
+      "clientIp": "透传客户端真实 IP",
+      "clientIpHint": "入口在连接开头加一个 PROXY 头,出口节点就能看到客户端真实 IP。",
+      "sticky": "连接保持",
+      "stickyHint": "同一个客户端的连接,在每一跳都落到同一台服务器上。",
+      "domain": "入口域名(可选)",
+      "domainHint": "主控按入口组的健康状况自动维护 A / AAAA 记录,入口机挂了会从解析里摘掉。"
+    },
+    "engine": {
+      "relay": "用户态 relay",
+      "iptables": "内核 iptables",
+      "nftables": "内核 nftables",
+      "inherit": "跟随链的默认引擎"
+    },
+    "group": {
+      "title": "组设置",
+      "back": "回到链设置",
+      "name": "组名",
+      "strategy": "负载策略",
+      "strategyHint": "策略决定流量怎么分给本组的成员,由上一跳执行。",
+      "strategyEntry": "入口组没有上一跳,负载策略不适用。",
+      "engine": "转发引擎",
+      "engineHint": "只管从这个组出发的那一跳。",
+      "failover": "故障转移",
+      "threshold": "不健康阈值(毫秒)",
+      "members": "成员",
+      "noMembers": "还没有成员",
+      "up": "上移",
+      "down": "下移",
+      "removeMember": "移出该组",
+      "branchHint": "画布上每台右边的紫色小圆点可以拉线到另一个组:这台单独绕行,必须再连回主干的下一跳。",
+      "pathTitle": "选路策略",
+      "pathPolicy": "最低延迟优先:每 15 秒按到出口的总延迟挑一条路。",
+      "delete": "删除这个组"
+    },
+    "probe": {
+      "title": "延迟探测",
+      "done": "完成于 {{at}} · {{proto}} × 5 次",
+      "running": "探测中…",
+      "idle": "还没有探测过",
+      "again": "重新探测",
+      "close": "关闭",
+      "route": "路 {{n}}",
+      "trunk": "主干",
+      "link": "链路",
+      "latency": "延迟",
+      "loss": "丢包",
+      "jitter": "抖动",
+      "e2e": "端到端路径(逐跳相加,共 {{count}} 条)",
+      "best": "最优",
+      "branch": "分支",
+      "noPath": "没有走得通的路径",
+      "handshake": "穿链握手",
+      "handshakeRun": "测一次",
+      "handshakeHint": "从主控对链上每个节点的入口做 TLS 握手:报文真的经过每一跳到落地再回来。只支持 TLS / Reality 节点。",
+      "handshakeRow": "握手 {{ms}} · 链内往返 {{inner}}",
+      "handshakeNode": "已绑定节点 {{n}}",
+      "needChain": "先把链搭好:至少要有连起来的入口组和出口组。"
+    },
+    "iperf": {
+      "title": "iperf3 打流测速",
+      "subServers": "接收端在链端口段临时起一次性服务,测完即关",
+      "subProxy": "发起端临时把落地节点挂成出站,经它下载大文件测吞吐",
+      "modeServers": "服务器之间",
+      "modeProxy": "经落地节点",
+      "from": "发起端(客户端)",
+      "to": "接收端(iperf3 -s)",
+      "proxyFrom": "发起端",
+      "proxyTo": "落地节点",
+      "direction": "方向",
+      "up": "上行",
+      "down": "下行 -R",
+      "bidir": "双向",
+      "proto": "协议",
+      "parallel": "并发流 -P",
+      "duration": "时长(秒)",
+      "bitrate": "UDP 速率 Mbps",
+      "start": "开始测速",
+      "phase": {
+        "prepare": "准备中",
+        "server": "接收端启动 iperf3",
+        "running": "第 {{t}} / {{total}} 秒",
+        "done": "完成"
+      },
+      "avg": "平均",
+      "peak": "峰值",
+      "retrans": "重传",
+      "sender": "发送端",
+      "lossPct": "丢包",
+      "jitter": "抖动",
+      "bytes": "下载量",
+      "firstByte": "首字节",
+      "history": "历史结果",
+      "noHistory": "还没有测过。",
+      "viaNode": "经节点下载",
+      "noteServers": "服务器没装 iperf3 时会自动安装。测速流量不计入用户账单,但会占用服务器带宽和流量配额。",
+      "noteProxy": "经节点测速用系统凭据,不计入任何用户账单,但会占用发起端和落地节点所在服务器的带宽与流量。"
+    },
+    "mobile": {
+      "pool": "服务器池",
+      "panel": "面板"
+    }
   }
 }
