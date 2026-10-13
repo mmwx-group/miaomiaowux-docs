@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import {
@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTick } from "../use-tick";
 import { DashboardView } from "./dashboard";
 import {
   buildModel,
@@ -35,15 +36,6 @@ type Drill =
 
 const RANGES: TimeRange[] = ["today", "week", "month"];
 const LIVE_POINTS = 40;
-
-function useTick(intervalMs: number) {
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setTick((n) => n + 1), intervalMs);
-    return () => window.clearInterval(id);
-  }, [intervalMs]);
-  return tick;
-}
 
 export default function OverviewDemo() {
   const { t } = useTranslation("overview");

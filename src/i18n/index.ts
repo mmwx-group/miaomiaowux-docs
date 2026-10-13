@@ -9,6 +9,7 @@ import enLanding from "./locales/en/landing.json";
 import enSearch from "./locales/en/search.json";
 import enXdocs from "./locales/en/xdocs.json";
 import enOverview from "./locales/en/overview.json";
+import enForward from "./locales/en/forward.json";
 
 import zhCommon from "./locales/zh/common.json";
 import zhLayout from "./locales/zh/layout.json";
@@ -17,6 +18,7 @@ import zhLanding from "./locales/zh/landing.json";
 import zhSearch from "./locales/zh/search.json";
 import zhXdocs from "./locales/zh/xdocs.json";
 import zhOverview from "./locales/zh/overview.json";
+import zhForward from "./locales/zh/forward.json";
 
 i18n
   .use(LanguageDetector)
@@ -33,6 +35,7 @@ i18n
       "search",
       "xdocs",
       "overview",
+      "forward",
     ],
     detection: {
       order: ["localStorage", "navigator"],
@@ -51,6 +54,7 @@ i18n
         search: enSearch,
         xdocs: enXdocs,
         overview: enOverview,
+        forward: enForward,
       },
       zh: {
         common: zhCommon,
@@ -60,6 +64,7 @@ i18n
         search: zhSearch,
         xdocs: zhXdocs,
         overview: zhOverview,
+        forward: zhForward,
       },
     },
   });

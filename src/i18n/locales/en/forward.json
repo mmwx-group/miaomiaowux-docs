@@ -1,0 +1,124 @@
+{
+  "crumb": "Forwarding",
+  "title": "Forwarding chains",
+  "live": "Live · probed {{sec}}s ago · refreshes every 15s",
+  "summary": "{{chains}} chains · {{servers}} servers · {{nodes}} bound nodes",
+  "actions": {
+    "classic": "Classic builder",
+    "canvas": "New on canvas"
+  },
+  "kpi": {
+    "health": "Healthy chains · degraded {{degraded}} · broken {{broken}} · pending {{pending}}",
+    "today": "Forwarded today",
+    "avgE2E": "Average end-to-end",
+    "fastSlow": "Fastest {{min}} · slowest {{max}}",
+    "ports": "Ports in use (chain port ranges)"
+  },
+  "topo": {
+    "title": "Network topology",
+    "hint": "Line colour = chain · line width = traffic today · pick a chain to isolate it",
+    "all": "All chains",
+    "problems": "Problems only",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "byServer": "By server",
+    "byGroup": "By group",
+    "msAll": "Latency: show all",
+    "msPick": "Latency: on pick / hover",
+    "entry": "Entry",
+    "relay": "Relay {{n}}",
+    "exit": "Exit",
+    "down": "Down",
+    "chainsThrough": "{{count}} chains",
+    "offline": "Offline",
+    "landing": "Landing node",
+    "none": "No chain has a problem"
+  },
+  "alerts": {
+    "title": "Needs attention",
+    "sub": "{{count}} items · by severity · same source as Telegram alerts",
+    "push": "Push now",
+    "view": "View",
+    "since": "since {{clock}} · {{dur}}",
+    "msg": {
+      "broken": "Every member of {{group}} is offline; hop {{hop}} is down",
+      "degraded": "{{from}} → {{to}}: {{loss}} loss, {{ms}} latency is over the {{threshold}} alert threshold",
+      "pending": "Config changed and not yet pushed to {{count}} servers"
+    }
+  },
+  "filter": {
+    "all": "All",
+    "problem": "Problems",
+    "healthy": "Healthy",
+    "degraded": "Degraded",
+    "broken": "Broken",
+    "pending": "Pending"
+  },
+  "search": "Search chains, servers, domains",
+  "view": {
+    "route": "Route",
+    "compact": "Compact"
+  },
+  "empty": "No chain matches",
+  "status": {
+    "healthy": "Healthy",
+    "degraded": "Degraded",
+    "broken": "Broken",
+    "pending": "Pending"
+  },
+  "tag": {
+    "sticky": "Sticky",
+    "clientIp": "Client IP passthrough",
+    "landing": "Relays to a landing node"
+  },
+  "row": {
+    "port": "Ports {{range}}",
+    "nodes": "{{count}} nodes",
+    "conns": "{{count}} conns",
+    "e2e": "End-to-end",
+    "loss": "Loss {{value}}",
+    "avail": "Availability 24h",
+    "today": "Today",
+    "detail": "Details",
+    "memberLatency": "Latency from each member to the next group",
+    "lan": "LAN",
+    "viaLan": "via LAN",
+    "down": "Down",
+    "waiting": "Awaiting probe",
+    "keepDown": "Still down"
+  },
+  "role": {
+    "entry": "Entry",
+    "relay": "Relay",
+    "exit": "Exit"
+  },
+  "strategy": {
+    "direct": "Direct",
+    "round_robin": "Round robin",
+    "lowest_latency": "Lowest latency",
+    "least_conn": "Least conns",
+    "failover": "failover"
+  },
+  "members": {
+    "online": "{{online}}/{{total}} online"
+  },
+  "duration": {
+    "min": "{{count}} min"
+  },
+  "compact": {
+    "status": "Status",
+    "chain": "Chain",
+    "route": "Route",
+    "loss": "Loss",
+    "avail": "Availability",
+    "conns": "Conns"
+  },
+  "legend": {
+    "title": "Latency colours:",
+    "ok": "normal",
+    "warn": "over the group's alert threshold, or loss ≥ 1%",
+    "bad": "down",
+    "dots": "Station dots = members online (hollow = offline)",
+    "lan": "\"via LAN\" = this hop uses a private address, as chosen by probing"
+  }
+}
