@@ -309,5 +309,57 @@
       "pool": "Servers",
       "panel": "Panel"
     }
+  },
+  "matrix": {
+    "button": "Full-chain test",
+    "title": "Full-chain speed test",
+    "desc": "iperf3 · every entry server → every exit server, over the chain's real forwarding path",
+    "port": "Port",
+    "portAuto": "auto",
+    "proto": "Protocol",
+    "direction": "Direction",
+    "dir": {
+      "up": "Entry → exit",
+      "down": "Exit → entry",
+      "bidir": "Both"
+    },
+    "duration": "Per pair",
+    "seconds": "{{n}} s",
+    "perPair": "{{n}} s per pair",
+    "rateTcp": "Rate limit",
+    "rateUdp": "Target rate",
+    "unlimited": "None",
+    "start": "Start test",
+    "again": "Test again",
+    "stop": "Stop",
+    "progress": "Pair {{k}} / {{n}}",
+    "plan": "{{entries}} entries × {{exits}} exits = {{pairs}} pairs · about {{sec}} s",
+    "noPairs": "This chain has no entry and exit to test yet",
+    "note": "The master picks a free port in the chain's port range and pushes a temporary set of forwarding rules used only for the test: the exit starts an iperf3 server, the entry runs the client, and everything is removed afterwards. The temporary rules do not count toward traffic, billing or alerts. Closing this dialog does not interrupt a test.",
+    "landingNote": "The exit is a landing node, so the test stops at the last group of forwarding servers.",
+    "aborted": "stopped",
+    "latest": "Latest run",
+    "live": "This run (in progress)",
+    "noCompare": "No comparison",
+    "compare": "Compare with {{at}}",
+    "empty": "Nothing tested yet. Press \"Start test\" to measure every entry server against every exit server.",
+    "kpi": {
+      "best": "Fastest",
+      "worst": "Slowest",
+      "avg": "Average",
+      "valid": "{{count}} pairs OK",
+      "failed": "Down"
+    },
+    "heat": "Heat matrix",
+    "heatHint": {
+      "tcp": "Mbps, retransmits in brackets; click a cell to see that pair's curve",
+      "udp": "Mbps, loss in brackets; click a cell to see that pair's curve"
+    },
+    "corner": "Entry \\ exit",
+    "rowAvg": "Row avg",
+    "bars": "Exits compared per entry",
+    "barsHint": " · thin pale bars are the run being compared",
+    "curves": "Per-second curves",
+    "curvesHint": " · with both directions, entry → exit is drawn"
   }
 }

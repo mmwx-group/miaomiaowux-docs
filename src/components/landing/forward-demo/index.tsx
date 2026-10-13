@@ -21,6 +21,7 @@ import {
   type Chain,
   type ChainStatus,
 } from "./data";
+import { MatrixSpeedDialog } from "./matrix-speed";
 import { Sparkline, Tag } from "./parts";
 import { BTN, BTN_OUTLINE, BTN_SOLID, STATUS_DOT, STATUS_TAG } from "./styles";
 import { ForwardTopology } from "./topology";
@@ -88,6 +89,7 @@ function ForwardPanel() {
   const [highlight, setHighlight] = useState<number | null>(null);
   const [topoOpen, setTopoOpen] = useState(true);
   const [topoProblemsOnly, setTopoProblemsOnly] = useState(false);
+  const [matrixId, setMatrixId] = useState<number | null>(null);
   const [canvas, setCanvas] = useState<{
     key: number;
     doc: CDoc | null;
@@ -508,6 +510,7 @@ function ForwardPanel() {
                 onToggle={() => setExpanded(expanded === c.id ? null : c.id)}
                 onPush={push}
                 onCanvas={() => openCanvas(c)}
+                onMatrix={() => setMatrixId(c.id)}
               />
             </div>
           ))}
@@ -533,6 +536,12 @@ function ForwardPanel() {
         <span>{t("legend.dots")}</span>
         <span>{t("legend.lan")}</span>
       </div>
+
+      {/* 取最新的链数据:选路段在用的是哪条路,开测时按当时的算 */}
+      <MatrixSpeedDialog
+        chain={chains.find((c) => c.id === matrixId) ?? null}
+        onClose={() => setMatrixId(null)}
+      />
 
       <Dialog
         open={canvas !== null}

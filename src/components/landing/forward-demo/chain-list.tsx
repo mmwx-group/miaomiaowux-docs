@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Gauge } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatBytes, formatSpeed } from "../overview-demo/data";
@@ -66,6 +66,7 @@ export function ChainRow({
   onToggle,
   onPush,
   onCanvas,
+  onMatrix,
 }: {
   c: Chain;
   highlighted: boolean;
@@ -73,6 +74,7 @@ export function ChainRow({
   onToggle: () => void;
   onPush: () => void;
   onCanvas: () => void;
+  onMatrix: () => void;
 }) {
   const { t } = useTranslation("forward");
   const text = useChainText();
@@ -172,7 +174,7 @@ export function ChainRow({
             </span>
             <Sparkline values={c.trend} className={trendTone(c)} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {c.status === "pending" && (
               <button
                 type="button"
@@ -202,6 +204,14 @@ export function ChainRow({
               onClick={onCanvas}
             >
               {t("canvas.open")}
+            </button>
+            <button
+              type="button"
+              className={cn(BTN, BTN_OUTLINE, "flex-1")}
+              onClick={onMatrix}
+            >
+              <Gauge className="size-3.5" />
+              {t("matrix.button")}
             </button>
           </div>
         </div>
