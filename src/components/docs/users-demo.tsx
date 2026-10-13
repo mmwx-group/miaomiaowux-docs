@@ -53,7 +53,7 @@ const INITIAL: DemoUser[] = [
   { id: 2, username: 'bob',     email: 'bob@example.com',     packageId: 1, enabled: true,  usedGb:  62.1, totalGb: 100,  expiresAt: '2026-08-05', createdAt: '2026-05-01', subToken: 'bobXY5678' },
   { id: 3, username: 'charlie', email: 'charlie@example.com', packageId: 3, enabled: true,  usedGb: 412.6, totalGb: 1024, expiresAt: '2027-01-15', createdAt: '2026-02-28', subToken: 'charlieAB' },
   { id: 4, username: 'diana',   email: 'diana@example.com',   packageId: 4, enabled: false, usedGb:  18.9, totalGb: 20,   expiresAt: '2026-06-10', createdAt: '2026-06-03', subToken: 'dianaCD' },
-  { id: 5, username: 'jimlee',  email: 'jim@example.com',     packageId: 2, enabled: true,  usedGb: 156.0, totalGb: 300,  expiresAt: '2026-12-31', createdAt: '2026-01-10', subToken: 'jimEFGH' },
+  { id: 5, username: 'henry',   email: 'henry@example.com',   packageId: 2, enabled: true,  usedGb: 156.0, totalGb: 300,  expiresAt: '2026-12-31', createdAt: '2026-01-10', subToken: 'henryEFGH' },
   { id: 6, username: 'kate',    email: 'kate@example.com',    packageId: null, enabled: true, usedGb: 0, totalGb: 0,    expiresAt: '-',          createdAt: '2026-06-06', subToken: 'kateIJ' },
 ]
 
