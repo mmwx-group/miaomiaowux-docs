@@ -232,6 +232,11 @@
       "drillNode": "{{name}} 上各用户的流量",
       "drillNodeDesc": "该节点上所有用户的流量明细(降序)"
     },
+    "forwardDemo": {
+      "live": "实时演示",
+      "heading": "转发链路一眼看清",
+      "description": "面板的转发链页面:每条链经过哪些服务器、每一跳的延迟与丢包、哪里断了,都画在一张图上。下面是用模拟数据搭的演示,可以点一条链看拓扑、切换视图,或者试试「立即下发」。"
+    },
     "screenshotsWall": {
       "heading": "核心功能截图",
       "description": "从节点管理到 TG Mini App,每个功能都打磨过细节。",

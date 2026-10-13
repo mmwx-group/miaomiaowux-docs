@@ -7,6 +7,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitch } from '@/components/language-switch'
 import { AnimatedX } from '@/components/animated-x'
 import { TrafficDemo } from '@/components/landing/traffic-demo'
+import { ForwardDemo } from '@/components/landing/forward-demo'
 import { useTranslation } from 'react-i18next'
 import {
   Server,
@@ -333,6 +334,9 @@ function XHomePage() {
 
       {/* 实时演示:流量信息 mock(网速跳动 + 用户/节点/服务器三维度 + 下钻 Dialog) */}
       <TrafficDemo />
+
+      {/* 实时演示:转发链 mock(指标条 + 网络拓扑 + 待处理 + 链列表) */}
+      <ForwardDemo />
 
       {/* 功能截图墙:展示几个核心功能的实际 UI 截图 */}
       <section className="py-16 sm:py-20 px-4 sm:px-6 bg-muted/30">

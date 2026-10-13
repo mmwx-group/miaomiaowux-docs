@@ -1,0 +1,124 @@
+{
+  "crumb": "转发管理",
+  "title": "转发链",
+  "live": "实时 · {{sec}} 秒前探测 · 每 15 秒刷新",
+  "summary": "{{chains}} 条链路 · {{servers}} 台服务器 · {{nodes}} 个已绑定节点",
+  "actions": {
+    "classic": "经典模式创建",
+    "canvas": "画布编排新建"
+  },
+  "kpi": {
+    "health": "链路健康 · 降级 {{degraded}} · 中断 {{broken}} · 待下发 {{pending}}",
+    "today": "今日转发流量",
+    "avgE2E": "平均端到端",
+    "fastSlow": "最快 {{min}} · 最慢 {{max}}",
+    "ports": "端口占用(各链端口段)"
+  },
+  "topo": {
+    "title": "网络拓扑",
+    "hint": "线色 = 链 · 线宽 = 今日流量 · 点一条链单独看",
+    "all": "全部链",
+    "problems": "只看有问题的",
+    "collapse": "收起",
+    "expand": "展开",
+    "byServer": "按服务器",
+    "byGroup": "按组",
+    "msAll": "延迟:全部显示",
+    "msPick": "延迟:点选 / 悬停显示",
+    "entry": "入口",
+    "relay": "中转 {{n}}",
+    "exit": "出口",
+    "down": "不通",
+    "chainsThrough": "{{count}} 链",
+    "offline": "离线",
+    "landing": "落地节点",
+    "none": "没有有问题的链"
+  },
+  "alerts": {
+    "title": "待处理",
+    "sub": "{{count}} 项 · 按严重程度 · 与 TG 告警同源",
+    "push": "立即下发",
+    "view": "查看",
+    "since": "{{clock}} 起 · {{dur}}",
+    "msg": {
+      "broken": "{{group}} 全部成员离线,第 {{hop}} 跳不通",
+      "degraded": "{{from}} → {{to}} 丢包 {{loss}},延迟 {{ms}} 超过告警阈值 {{threshold}}",
+      "pending": "配置已修改,还没有下发到 {{count}} 台服务器"
+    }
+  },
+  "filter": {
+    "all": "全部",
+    "problem": "有问题",
+    "healthy": "健康",
+    "degraded": "降级",
+    "broken": "中断",
+    "pending": "待下发"
+  },
+  "search": "搜索链路、服务器、域名",
+  "view": {
+    "route": "路线",
+    "compact": "紧凑"
+  },
+  "empty": "没有符合条件的链",
+  "status": {
+    "healthy": "健康",
+    "degraded": "降级",
+    "broken": "中断",
+    "pending": "待下发"
+  },
+  "tag": {
+    "sticky": "连接保持",
+    "clientIp": "透传客户端 IP",
+    "landing": "中继到落地节点"
+  },
+  "row": {
+    "port": "端口 {{range}}",
+    "nodes": "{{count}} 个节点",
+    "conns": "连接 {{count}}",
+    "e2e": "端到端",
+    "loss": "丢包 {{value}}",
+    "avail": "可用率 24h",
+    "today": "今日",
+    "detail": "详情",
+    "memberLatency": "各台成员到下一组的延迟",
+    "lan": "内网",
+    "viaLan": "经内网",
+    "down": "不通",
+    "waiting": "等待探测",
+    "keepDown": "持续不通"
+  },
+  "role": {
+    "entry": "入口",
+    "relay": "中转",
+    "exit": "出口"
+  },
+  "strategy": {
+    "direct": "直连",
+    "round_robin": "轮询",
+    "lowest_latency": "最低延迟",
+    "least_conn": "最少连接",
+    "failover": "故障转移"
+  },
+  "members": {
+    "online": "{{online}}/{{total}} 在线"
+  },
+  "duration": {
+    "min": "{{count}} 分钟"
+  },
+  "compact": {
+    "status": "状态",
+    "chain": "链路",
+    "route": "路线",
+    "loss": "丢包",
+    "avail": "可用率",
+    "conns": "连接"
+  },
+  "legend": {
+    "title": "延迟颜色:",
+    "ok": "正常",
+    "warn": "超过组的告警阈值或丢包 ≥ 1%",
+    "bad": "不通",
+    "dots": "站点圆点 = 成员在线(空心为离线)",
+    "lan": "「经内网」= 这一跳按探测结果走了内网地址"
+  }
+}

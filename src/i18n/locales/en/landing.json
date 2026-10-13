@@ -232,6 +232,11 @@
       "drillNode": "Users on {{name}}",
       "drillNodeDesc": "Per-user breakdown on this node (descending)"
     },
+    "forwardDemo": {
+      "live": "Live demo",
+      "heading": "Forwarding chains, hop by hop",
+      "description": "The panel's forwarding page: which servers each chain passes through, the latency and loss of every hop, and where it broke — all on one map. The demo below runs on mock data: pick a chain in the topology, switch views, or try \"Push now\"."
+    },
     "screenshotsWall": {
       "heading": "Feature screenshots",
       "description": "From node management to the Telegram Mini App — every piece of UI gets the same polish.",
