@@ -38,7 +38,7 @@ export const Route = createFileRoute('/')({
 const featureDefs = [
   { icon: Globe, key: 'remoteServer' },
   { icon: Network, key: 'xrayInbound' },
-  { icon: Shield, key: 'reality' },
+  { icon: Waypoints, key: 'forward' },
   { icon: Lock, key: 'certificates' },
   { icon: Activity, key: 'trafficMonitor' },
   { icon: Users, key: 'userPackage' },
@@ -113,45 +113,6 @@ const protocolDefs: {
   { key: 'miu', name: 'Miu', href: '/docs/protocol-miu', icon: Cat, color: 'text-pink-500', badge: 'NEW', mark: MiuMark },
   { key: 'wireguard', name: 'WireGuard', href: '/docs/protocol-wireguard', icon: Waypoints, color: 'text-sky-500', badge: 'NEW' },
 ]
-
-function ScreenshotCard({ src, srcs, title, desc, srcAlts }: {
-  src?: string
-  srcs?: string[]      // 多张并排(MiniApp 管理员 + 用户视图一卡显示)
-  title: string
-  desc: string
-  srcAlts?: string[]
-}) {
-  return (
-    <div className="pixel-card overflow-hidden group flex flex-col">
-      <div className="bg-muted/40 border-b">
-        {srcs && srcs.length > 0 ? (
-          <div className={`grid gap-1 p-2`} style={{ gridTemplateColumns: `repeat(${srcs.length}, minmax(0, 1fr))` }}>
-            {srcs.map((s, i) => (
-              <img
-                key={s}
-                src={s}
-                alt={srcAlts?.[i] ?? title}
-                loading="lazy"
-                className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.01]"
-              />
-            ))}
-          </div>
-        ) : (
-          <img
-            src={src}
-            alt={title}
-            loading="lazy"
-            className="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
-          />
-        )}
-      </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-base mb-1">{title}</h3>
-        <p className="text-sm text-muted-foreground">{desc}</p>
-      </div>
-    </div>
-  )
-}
 
 function XHomePage() {
   const { t } = useTranslation('landing')
@@ -337,49 +298,6 @@ function XHomePage() {
 
       {/* 实时演示:转发链 mock(指标条 + 网络拓扑 + 待处理 + 链列表) */}
       <ForwardDemo />
-
-      {/* 功能截图墙:展示几个核心功能的实际 UI 截图 */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="pixel-text text-3xl sm:text-4xl font-bold text-primary mb-3">
-              {t('xHome.screenshotsWall.heading')}
-            </h2>
-            <p className="text-base text-muted-foreground max-w-2xl mx-auto">
-              {t('xHome.screenshotsWall.description')}
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-            <ScreenshotCard
-              src="/images/screenshots/tutorial-step8-nodes-list.webp"
-              title={t('xHome.screenshotsWall.nodes.title')}
-              desc={t('xHome.screenshotsWall.nodes.desc')}
-            />
-            <ScreenshotCard
-              src="/images/screenshots/doc-xray-servers-page.webp"
-              title={t('xHome.screenshotsWall.servers.title')}
-              desc={t('xHome.screenshotsWall.servers.desc')}
-            />
-            <ScreenshotCard
-              src="/images/screenshots/tutorial-step9-package-create-dialog.webp"
-              title={t('xHome.screenshotsWall.createPackage.title')}
-              desc={t('xHome.screenshotsWall.createPackage.desc')}
-            />
-            <ScreenshotCard
-              srcs={[
-                '/images/screenshots/tutorial-step12-miniapp-admin.webp',
-                '/images/screenshots/tutorial-step12-miniapp-user.webp',
-              ]}
-              srcAlts={[
-                t('xHome.screenshotsWall.miniappAdmin.title'),
-                t('xHome.screenshotsWall.miniappUser.title'),
-              ]}
-              title={t('xHome.screenshotsWall.miniapp.title')}
-              desc={t('xHome.screenshotsWall.miniapp.desc')}
-            />
-          </div>
-        </div>
-      </section>
 
       <section className="py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
