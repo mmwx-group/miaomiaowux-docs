@@ -123,13 +123,22 @@ async function changelog(request: Request, env: Env, ctx: Ctx, source: string) {
     const age = (Date.now() - Number(hit.headers.get(FETCHED_AT) ?? 0)) / 1000;
     if (age < FRESH_SECONDS) return reply(hit.body, "HIT");
     // 旧的先给出去,后台刷新;刷新失败(限流 / 不通)就接着用旧的
-    ctx.waitUntil(refresh().catch(() => undefined));
+    ctx.waitUntil(
+      refresh().catch((e) => {
+        // eslint-disable-next-line no-console -- 同上
+        console.error(`changelog ${source} p${page} refresh: ${e}`);
+      }),
+    );
     return reply(hit.body, "STALE");
   }
   try {
     return reply(await refresh(), "MISS");
-  } catch {
-    return reply('{"error":"upstream"}', "ERROR", 502);
+  } catch (e) {
+    // 把 GitHub 回的状态带出去(如 "github 403"),不然线上只看得到 502,分不清是限流还是别的
+    const reason = e instanceof Error ? e.message : "unknown";
+    // eslint-disable-next-line no-console -- Worker 里这就是日志,在 Cloudflare 后台能看到
+    console.error(`changelog ${source} p${page}: ${reason}`);
+    return reply(JSON.stringify({ error: "upstream", reason }), "ERROR", 502);
   }
 }
 
