@@ -26,6 +26,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `public/images/screenshots/` 里的老截图只剩落地页在用。
   - 落地页 hero 与文档首页 hero 的移动方格网格背景共用 `public/scripts/shape-grid.js`(移植自 ReactBits ShapeGrid 的 Canvas 实现:网格斜向平移 + 鼠标悬停格子点亮带尾迹;文档站经 astro 配置 `head` 注入,落地页由 `src/components/landing/shape-grid.tsx` 动态加载)。CSS 里的静态网格只是无 JS / 减少动效时的回退。
 
+只有 `/api/*` 进 Worker(`worker/index.ts`,`wrangler.jsonc` 的 `run_worker_first`),其余请求仍是纯静态资源。现在只有一个接口:`/api/changelog/{master|agent}`,在边缘缓存 GitHub 的 Release 列表给更新日志页用(10 分钟内直接给,过期先给旧的再后台刷新,GitHub 限流时一直给旧的)。可选密钥 `GITHUB_TOKEN`(在 Cloudflare 后台或 `wrangler secret put` 配,不进仓库)。本地 `vite` / `astro dev` 没有 Worker,页面会退回直接问 GitHub;要连 Worker 一起跑用 `npm run preview`。
+
 **i18n**: `src/i18n/`,命名空间 `common/layout/sidebar/landing/search/xdocs`,locales 在 `src/i18n/locales/{zh,en}`。`xdocs` 给 mdx 里的 React 演示用。
 
 **搜索**: `scripts/generate-search-index.mjs` 扫 `src/content/docs`(中英合并)生成 `src/generated/search-index.ts`;`src/lib/search-data.ts` + `src/components/search/` 提供落地页命令面板搜索,选中后整页跳转到文档。
