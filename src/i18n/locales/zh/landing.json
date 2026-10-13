@@ -293,7 +293,7 @@
         "miu": "自研协议,通道池 + 内层 TLS 1.3 原样转发",
         "wireguard": "UDP 隧道,密钥与地址由主控自动分配"
       },
-      "credits": "协议的名称与标志归各自的项目所有：Xray、V2Fly 的标志来自其官方文档站（CC BY-SA 4.0），Shadowsocks、Hysteria 的标志来自其官方项目。“WireGuard” 是 Jason A. Donenfeld 的注册商标。"
+      "credits": "协议的名称与标志归各自的项目所有：Xray、V2Fly 的标志来自其官方文档站（CC BY-SA 4.0），Shadowsocks、Hysteria 的标志来自其官方项目，Snell 的图标来自 Surge 知识库。“WireGuard” 是 Jason A. Donenfeld 的注册商标。"
     }
   }
 }
