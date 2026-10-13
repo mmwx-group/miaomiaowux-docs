@@ -13,8 +13,13 @@ import {
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  buildRenewals,
+  CNY_RATE,
+  currencySymbol,
   formatBytes,
   formatSpeed,
+  priceText,
+  renewalMonths,
   runOutDate,
   serverOf,
   serverSpeedAt,
@@ -23,6 +28,7 @@ import {
   type TimeRange,
 } from "./data";
 import { tooltipStyle, useChartColors } from "./chart-colors";
+import { RenewalSummary, RenewalTimeline } from "./renewal";
 import {
   Chip,
   FilterChips,
@@ -58,18 +64,7 @@ const SORTS: Record<
   conns: (a, b) => b.conns - a.conns,
   name: (a, b) => a.name.localeCompare(b.name),
 };
-const RENEW_WINDOW = 60;
 const HISTORY = 24;
-
-/** 把几笔带货币符号的价格按币种加总:「$12.9」+「$6.5」→「$19.4」。 */
-function sumPrices(prices: string[]): string {
-  const by = new Map<string, number>();
-  for (const p of prices)
-    by.set(p[0], (by.get(p[0]) ?? 0) + Number(p.slice(1)));
-  return [...by.entries()]
-    .map(([cur, v]) => `${cur}${Number(v.toFixed(2))}`)
-    .join(" + ");
-}
 
 export function ServersView({
   range,
@@ -107,14 +102,28 @@ export function ServersView({
     crit: colors.crit,
     unlimited: colors.muted,
   };
-  const renewals = servers
-    .filter((s) => s.expires != null && s.expires <= RENEW_WINDOW)
-    .sort((a, b) => (a.expires ?? 0) - (b.expires ?? 0));
-  const due30 = sumPrices(
-    renewals
-      .filter((s) => (s.expires ?? 99) <= 30 && s.price)
-      .map((s) => s.price!),
-  );
+  // 60 天内的每一次续费,以及本月 / 下月要付的
+  const renewals = useMemo(() => buildRenewals(servers), [servers]);
+  const months = useMemo(() => renewalMonths(servers), [servers]);
+  // 30 天内要续的合计:按币种分别加,有外币时再补一个折合人民币的总数
+  const due30 = useMemo(() => {
+    const due = renewals.filter((r) => r.days >= 0 && r.days <= 30 && r.price);
+    const by = new Map<string, number>();
+    for (const r of due)
+      by.set(
+        currencySymbol(r.currency),
+        (by.get(currencySymbol(r.currency)) ?? 0) + r.price,
+      );
+    const text = [...by.entries()]
+      .map(([sym, v]) => `${sym}${Math.round(v * 100) / 100}`)
+      .join(" + ");
+    const foreign = due.some((r) => r.currency === "USD");
+    const total = due.reduce(
+      (a, r) => a + r.price * CNY_RATE[r.currency ?? "CNY"],
+      0,
+    );
+    return foreign ? `${text} ≈ ¥${Math.round(total * 100) / 100}` : text;
+  }, [renewals]);
   const totalDown = servers.reduce((a, s) => a + s.download, 0);
   const totalUp = servers.reduce((a, s) => a + s.upload, 0);
   const axis = {
@@ -274,60 +283,21 @@ export function ServersView({
 
         <Section
           title={t("overview.servers.renewals")}
-          description={t("overview.servers.renewalsDesc")}
+          description={
+            due30
+              ? t("overview.servers.renewalsDescSum", { amount: due30 })
+              : t("overview.servers.renewalsDesc")
+          }
+          contentClassName="flex flex-col gap-3"
         >
-          {/* 时间轴:左端今天,右端 60 天后,每台服务器按到期日落一个点 */}
-          <div className="relative mx-2 mt-7 mb-8 h-px">
-            <div className="bg-border absolute inset-0" />
-            {[0, 15, 30, 45, 60].map((d) => (
-              <div
-                key={d}
-                className="absolute top-0 -translate-x-1/2"
-                style={{ left: `${(d / RENEW_WINDOW) * 100}%` }}
-              >
-                <div className="bg-border mx-auto h-1.5 w-px" />
-                <div className="text-muted-foreground mt-1 text-[10px] whitespace-nowrap tabular-nums">
-                  {d === 0
-                    ? t("overview.servers.renewToday")
-                    : t("overview.servers.renewDay", { count: d })}
-                </div>
-              </div>
-            ))}
-            {renewals.map((s) => (
-              <div
-                key={s.id}
-                title={s.name}
-                className={cn(
-                  "border-card absolute -top-[7px] size-3.5 -translate-x-1/2 rounded-full border-2",
-                  (s.expires ?? 0) <= 7 ? "bg-amber-500" : "bg-primary",
-                )}
-                style={{ left: `${((s.expires ?? 0) / RENEW_WINDOW) * 100}%` }}
-              />
-            ))}
-          </div>
-          <div className="divide-y">
-            {renewals.map((s) => (
-              <div key={s.id} className="flex items-center gap-2 py-2 text-sm">
-                <span className="min-w-0 flex-1 truncate font-medium">
-                  {s.name}
-                </span>
-                {s.autoRenew && (
-                  <Chip tone="ok">{t("overview.servers.renewAuto")}</Chip>
-                )}
-                <Chip tone={(s.expires ?? 0) <= 7 ? "warn" : "muted"}>
-                  {t("overview.servers.renewLeft", { count: s.expires ?? 0 })}
-                </Chip>
-                <span className="w-14 text-right text-sm font-semibold tabular-nums">
-                  {s.price ?? "—"}
-                </span>
-              </div>
-            ))}
-          </div>
-          {due30 && (
-            <div className="text-muted-foreground mt-3 border-t pt-3 text-xs">
-              {t("overview.servers.kpiRenewal", { amount: due30 })}
+          {renewals.length === 0 ? (
+            <div className="text-muted-foreground py-10 text-center text-sm">
+              {t("overview.servers.noRenewals")}
             </div>
+          ) : (
+            <RenewalTimeline items={renewals} />
           )}
+          <RenewalSummary {...months} />
         </Section>
       </div>
 
@@ -415,11 +385,16 @@ function ServerCard({
           <span className="min-w-0 flex-1 truncate text-sm font-semibold">
             {s.name}
           </span>
-          {s.expires != null && (
-            <Chip tone={s.expires <= 7 ? "warn" : "muted"}>
-              {t("overview.servers.expiresIn", { count: s.expires })}
-            </Chip>
-          )}
+          {s.expires != null &&
+            (s.expires < 0 ? (
+              <Chip tone="crit">
+                {t("overview.expiredDays", { count: -s.expires })}
+              </Chip>
+            ) : (
+              <Chip tone={s.expires <= 7 ? "warn" : "muted"}>
+                {t("overview.servers.expiresIn", { count: s.expires })}
+              </Chip>
+            ))}
         </div>
 
         <div>
@@ -478,7 +453,7 @@ function ServerCard({
             label={t("overview.servers.onlineUsers")}
             value={s.onlineUsers}
           />
-          <Stat label={t("overview.servers.renewal")} value={s.price ?? "—"} />
+          <Stat label={t("overview.servers.renewal")} value={priceText(s)} />
         </div>
       </CardContent>
     </Card>

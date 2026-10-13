@@ -173,7 +173,19 @@
       "renewToday": "Today",
       "renewDay": "{{count}}d",
       "renewLeft": "{{count}}d left",
-      "renewAuto": "Auto-renew"
+      "renewAuto": "Auto-renew",
+      "renewalsDescSum": "Servers expiring in the next 60 days · {{amount}} within 30 days",
+      "renewExpired": "Expired:",
+      "renewDueToday": "Due today",
+      "renewProjected": "Projected",
+      "renewThisMonth": "Due rest of this month",
+      "renewThisMonthHint": "Overdue and unrenewed, plus everything due from today to month end; converted to CNY",
+      "renewNextMonth": "Next month estimate",
+      "renewNextMonthHint": "Each server's billing cycle projected from its current due date; every renewal falling in next month counts (monthly servers renew again)",
+      "renewCount": "{{count}} renewals",
+      "renewOverdue": "Overdue",
+      "renewRateSource": "Rates from the license service, refreshed every 24 h",
+      "noRenewals": "No server expires in the next 60 days"
     }
   },
   "timeRange": {

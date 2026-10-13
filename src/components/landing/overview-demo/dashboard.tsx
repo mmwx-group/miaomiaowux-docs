@@ -155,7 +155,9 @@ export function DashboardView({
       action: t("overview.alerts.viewUsers"),
       view: "users",
     });
-  const expServers = servers.filter((s) => s.expires != null && s.expires <= 7);
+  const expServers = servers.filter(
+    (s) => s.expires != null && s.expires >= 0 && s.expires <= 7,
+  );
   if (expServers.length)
     alerts.push({
       level: "info",
