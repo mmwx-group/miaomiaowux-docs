@@ -9,7 +9,8 @@ import { AlertTriangle, ExternalLink, LoaderCircle } from "lucide-react";
 //
 // 用 GitHub 渲染好的 body_html(Accept: application/vnd.github.html+json),它已经过 GitHub 的
 // 清洗,不用再引入 markdown 解析器;只去掉每条 Release 开头重复的标题与群链接、末尾的升级说明。
-// 未登录的 GitHub API 每个 IP 每小时 60 次,结果在浏览器里缓存 10 分钟。
+// 数据经本站 Worker 的 /api/changelog 取(它在边缘缓存 GitHub 的结果,访客不直接消耗 GitHub 的额度),
+// 浏览器里再缓存 10 分钟;Worker 不可用时退回直接问 GitHub(未登录每个 IP 每小时 60 次)。
 
 const SOURCES = {
   master: { repo: "iluobei/miaomiaowuX" },
@@ -91,14 +92,30 @@ async function fetchReleases(
   const key = `mmwx-changelog:${repo}:${page}`;
   const cached = readCache(key);
   if (cached) return cached;
+  const data = await fromWorker(source, page).catch(() =>
+    fromGitHub(repo, page),
+  );
+  writeCache(key, data);
+  return data;
+}
+
+// 先问本站的 Worker(它替所有访客缓存 GitHub 的结果,见 worker/index.ts)。
+// 本地开发时没有 Worker,这个地址返回的是页面而不是 JSON,解析会失败,于是退回直接问 GitHub。
+async function fromWorker(source: SourceId, page: number): Promise<Release[]> {
+  const r = await fetch(`/api/changelog/${source}?page=${page}`);
+  if (!r.ok) throw new Error(String(r.status));
+  const data = (await r.json()) as Release[];
+  if (!Array.isArray(data)) throw new Error("not a list");
+  return data;
+}
+
+async function fromGitHub(repo: string, page: number): Promise<Release[]> {
   const r = await fetch(
     `https://api.github.com/repos/${repo}/releases?per_page=${PER_PAGE}&page=${page}`,
     { headers: { Accept: "application/vnd.github.html+json" } },
   );
   if (!r.ok) throw new Error(String(r.status));
-  const data = ((await r.json()) as Release[]).filter((x) => !x.draft);
-  writeCache(key, data);
-  return data;
+  return ((await r.json()) as Release[]).filter((x) => !x.draft);
 }
 
 // cleanBody 去掉 Release 正文里与卡片标题重复、或每版都一样的部分。
