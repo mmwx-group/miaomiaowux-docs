@@ -141,7 +141,7 @@
     "navChangelog": "日志",
     "navPricing": "购买",
     "advancedBadge": "妙妙屋的进阶版本",
-    "slogan": "多服务器 Xray 管理与订阅平台",
+    "slogan": "多服务器管理与订阅平台",
     "description": "Master-Agent 架构，集中管理远程服务器。可视化 Xray 入站配置，\n支持 10 种协议、27 种协议组合，证书自动管理，节点自动同步。",
     "quickStart": "快速开始",
     "viewDocs": "查看文档",
@@ -162,9 +162,9 @@
         "title": "Xray 入站管理",
         "desc": "可视化入站向导，支持 VLESS/VMess/Trojan/SS/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard，27 种协议组合一键配置"
       },
-      "reality": {
-        "title": "REALITY 支持",
-        "desc": "无需域名和证书，自动生成 X25519 密钥对，最强抗检测能力"
+      "forward": {
+        "title": "转发编排",
+        "desc": "在画布上把服务器编排成「入口 → 中转 → 出口」转发链,支持负载策略、故障转移、分支与选路段,内置延迟探测与 iperf3 测速"
       },
       "certificates": {
         "title": "证书管理",
@@ -222,7 +222,7 @@
         "desc": "查看所有文档"
       }
     },
-    "footerDesc": "妙妙屋X — 多服务器 Xray 管理与订阅平台",
+    "footerDesc": "妙妙屋X — 多服务器管理与订阅平台",
     "trafficDemo": {
       "live": "实时演示",
       "heading": "流量信息一目了然",
@@ -236,34 +236,6 @@
       "live": "实时演示",
       "heading": "转发链路一眼看清",
       "description": "面板的转发链页面:每条链经过哪些服务器、每一跳的延迟与丢包、哪里断了,都画在一张图上。下面是用模拟数据搭的演示,可以点一条链看拓扑、切换视图,或者试试「立即下发」。"
-    },
-    "screenshotsWall": {
-      "heading": "核心功能截图",
-      "description": "从节点管理到 TG Mini App,每个功能都打磨过细节。",
-      "nodes": {
-        "title": "节点管理",
-        "desc": "按服务器分组列出所有入站,支持批量编辑 / 启停 / 同步"
-      },
-      "servers": {
-        "title": "服务管理",
-        "desc": "服务器以卡片形式展示,含状态 / 实时网速 / 流量 / Xray 一键操作"
-      },
-      "createPackage": {
-        "title": "创建套餐",
-        "desc": "左侧参数 + 右侧关联节点选择,支持节点倍率 / 流量重置周期"
-      },
-      "miniappAdmin": {
-        "title": "TG Bot 管理员视图",
-        "desc": "兑换码 / 用户管理(手机)"
-      },
-      "miniappUser": {
-        "title": "TG Bot 用户视图",
-        "desc": "账号 / 流量 / 订阅(手机)"
-      },
-      "miniapp": {
-        "title": "TG Bot Mini App",
-        "desc": "管理员视图(左)与用户视图(右),完整手机分辨率展示"
-      }
     },
     "protocols": {
       "heading": "支持的协议",

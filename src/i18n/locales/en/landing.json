@@ -141,7 +141,7 @@
     "navChangelog": "Log",
     "navPricing": "Pricing",
     "advancedBadge": "The advanced version of MiaoMiaoWu",
-    "slogan": "Multi-Server Xray Management & Subscription Platform",
+    "slogan": "Multi-Server Management & Subscription Platform",
     "description": "Master-Agent architecture for centralized remote server management. Visual Xray inbound configuration,\n10 protocols and 27 protocol combinations, automated certificate management, and automatic node sync.",
     "quickStart": "Quick Start",
     "viewDocs": "View Docs",
@@ -162,9 +162,9 @@
         "title": "Xray Inbound Management",
         "desc": "Visual inbound wizard supporting VLESS/VMess/Trojan/SS/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard, 27 protocol combinations with one-click configuration"
       },
-      "reality": {
-        "title": "REALITY Support",
-        "desc": "No domain or certificate needed, auto-generates X25519 key pairs, strongest anti-detection capability"
+      "forward": {
+        "title": "Forwarding Orchestration",
+        "desc": "Arrange servers into entry → relay → exit chains on a canvas: load-balancing strategies, failover, branches and path selection, with built-in latency probing and iperf3 tests"
       },
       "certificates": {
         "title": "Certificate Management",
@@ -222,7 +222,7 @@
         "desc": "View all documentation"
       }
     },
-    "footerDesc": "MiaoMiaoWu X — Multi-Server Xray Management & Subscription Platform",
+    "footerDesc": "MiaoMiaoWu X — Multi-Server Management & Subscription Platform",
     "trafficDemo": {
       "live": "Live demo",
       "heading": "Traffic insights at a glance",
@@ -236,34 +236,6 @@
       "live": "Live demo",
       "heading": "Forwarding chains, hop by hop",
       "description": "The panel's forwarding page: which servers each chain passes through, the latency and loss of every hop, and where it broke — all on one map. The demo below runs on mock data: pick a chain in the topology, switch views, or try \"Push now\"."
-    },
-    "screenshotsWall": {
-      "heading": "Feature screenshots",
-      "description": "From node management to the Telegram Mini App — every piece of UI gets the same polish.",
-      "nodes": {
-        "title": "Node Management",
-        "desc": "Inbound nodes grouped by server; batch edit / toggle / sync"
-      },
-      "servers": {
-        "title": "Server Management",
-        "desc": "Servers as cards with status / live speed / traffic / Xray actions"
-      },
-      "createPackage": {
-        "title": "Create Package",
-        "desc": "Parameters on the left + node selection on the right; supports per-node multipliers and reset cycles"
-      },
-      "miniappAdmin": {
-        "title": "TG Bot admin view",
-        "desc": "Redeem codes & user management (mobile)"
-      },
-      "miniappUser": {
-        "title": "TG Bot user view",
-        "desc": "Account / traffic / subscription (mobile)"
-      },
-      "miniapp": {
-        "title": "TG Bot Mini App",
-        "desc": "Admin view (left) & user view (right), full phone resolution"
-      }
     },
     "protocols": {
       "heading": "Supported Protocols",
