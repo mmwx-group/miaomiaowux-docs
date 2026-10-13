@@ -71,6 +71,16 @@
     "clientIp": "Client IP passthrough",
     "landing": "Relays to a landing node"
   },
+  "path": {
+    "title": "Path selection",
+    "pick": "path",
+    "active": "active",
+    "item": "Path {{n}}",
+    "direct": "direct",
+    "via": "via {{names}}",
+    "summary": "{{count}} paths · path {{n}} active",
+    "hint": "Every 15 seconds the path with the lowest total latency to the exit wins; a new path must be clearly faster two rounds in a row before it takes over."
+  },
   "row": {
     "port": "Ports {{range}}",
     "nodes": "{{count}} nodes",
@@ -120,5 +130,184 @@
     "bad": "down",
     "dots": "Station dots = members online (hollow = offline)",
     "lan": "\"via LAN\" = this hop uses a private address, as chosen by probing"
+  },
+  "canvas": {
+    "a11yTitle": "Forwarding canvas",
+    "open": "Open canvas",
+    "crumb": "Forwarding / Canvas",
+    "newName": "New chain",
+    "newGroup": "Group {{n}}",
+    "saved": "Pushed to {{count}} servers",
+    "state": {
+      "draft": "Draft · not pushed",
+      "dirty": "Unsaved changes",
+      "saved": "Pushed",
+      "saving": "Pushing…"
+    },
+    "summary": "{{hops}} hops · {{branches}} branches · {{paths}} path sets",
+    "problems": "{{count}} problems",
+    "problem": {
+      "tooShort": "A chain needs an entry group and an exit group, connected by a line",
+      "multiEntry": "The trunk must be a single line: {{count}} groups have no previous hop",
+      "loose": "\"{{group}}\" is not connected to the chain",
+      "empty": "\"{{group}}\" has no servers yet",
+      "branchOpen": "The branch through \"{{group}}\" does not merge back into the trunk",
+      "pathOpen": "The paths leaving \"{{group}}\" do not meet in the same group"
+    },
+    "toolbar": {
+      "back": "Back",
+      "layout": "Auto layout",
+      "probe": "Probe latency",
+      "iperf": "iperf3 test",
+      "save": "Save & push"
+    },
+    "pool": {
+      "servers": "Servers {{used}}/{{total}}",
+      "nodes": "Nodes {{count}}",
+      "search": "Search name / IP",
+      "all": "All",
+      "unused": "Unused",
+      "onCanvas": "on canvas",
+      "hint": "Drag onto the canvas for a new group, or onto a group to join it — a click works too.",
+      "hintNodes": "Drag a landing node into the exit group: the last hop relays to that node."
+    },
+    "role": {
+      "entry": "Entry",
+      "relay": "Relay",
+      "exit": "Exit",
+      "pathRelay": "Path relay",
+      "branchRelay": "Branch relay",
+      "loose": "Unlinked"
+    },
+    "node": {
+      "empty": "Drag servers here",
+      "pathPick": "Path pick · lowest latency",
+      "remove": "Remove"
+    },
+    "edge": {
+      "path": "Path {{n}}",
+      "active": "active",
+      "down": "down"
+    },
+    "empty": {
+      "title": "The canvas is empty",
+      "desc": "Drag servers in from the pool (or click them), then pull a line from the dot on a group's right edge to the next group. Double-click a line to delete it.",
+      "sample": "Load an example"
+    },
+    "sample": {
+      "name": "example-paths-and-branch",
+      "entry": "Entry group",
+      "relay": "Relay group",
+      "exit": "Exit group",
+      "branch": "Branch relay"
+    },
+    "chain": {
+      "title": "Chain settings",
+      "hint": "Click a group on the canvas to edit it",
+      "name": "Chain name",
+      "ports": "Port range (entry ports of the chain's nodes come from here)",
+      "engine": "Default forwarding engine",
+      "engineHint": "Used by every group without its own engine. Kernel engines use less CPU; rules they cannot do (rate limits, IPv6, …) fall back to relay automatically.",
+      "clientIp": "Pass the real client IP",
+      "clientIpHint": "The entry prepends a PROXY header, so the exit node sees the client's real IP.",
+      "sticky": "Sticky connections",
+      "stickyHint": "Connections from one client land on the same server at every hop.",
+      "domain": "Entry domain (optional)",
+      "domainHint": "The master keeps the A / AAAA records in step with the entry group's health; a dead entry server is taken out of DNS."
+    },
+    "engine": {
+      "relay": "Userspace relay",
+      "iptables": "Kernel iptables",
+      "nftables": "Kernel nftables",
+      "inherit": "Follow the chain default"
+    },
+    "group": {
+      "title": "Group settings",
+      "back": "Back to chain settings",
+      "name": "Group name",
+      "strategy": "Load balancing",
+      "strategyHint": "Decides how traffic is spread over this group's members; the previous hop carries it out.",
+      "strategyEntry": "An entry group has no previous hop, so no strategy applies.",
+      "engine": "Forwarding engine",
+      "engineHint": "Applies only to the hop leaving this group.",
+      "failover": "Failover",
+      "threshold": "Unhealthy above (ms)",
+      "members": "Members",
+      "noMembers": "No members yet",
+      "up": "Move up",
+      "down": "Move down",
+      "removeMember": "Remove from group",
+      "branchHint": "On the canvas, pull a line from the purple dot beside a server to another group: that server takes its own detour and must join the trunk's next hop again.",
+      "pathTitle": "Path selection",
+      "pathPolicy": "Lowest latency first: every 15 seconds the path with the lowest total latency to the exit wins.",
+      "delete": "Delete this group"
+    },
+    "probe": {
+      "title": "Latency probe",
+      "done": "Done at {{at}} · {{proto}} × 5",
+      "running": "Probing…",
+      "idle": "Not probed yet",
+      "again": "Probe again",
+      "close": "Close",
+      "route": "Path {{n}}",
+      "trunk": "Trunk",
+      "link": "Link",
+      "latency": "Latency",
+      "loss": "Loss",
+      "jitter": "Jitter",
+      "e2e": "End-to-end paths (hops added up, {{count}} in total)",
+      "best": "Best",
+      "branch": "Branch",
+      "noPath": "No path gets through",
+      "handshake": "Through-chain handshake",
+      "handshakeRun": "Run once",
+      "handshakeHint": "The master does a TLS handshake against the entry of every node on the chain: packets really travel each hop to the landing and back. TLS / Reality nodes only.",
+      "handshakeRow": "handshake {{ms}} · in-chain round trip {{inner}}",
+      "handshakeNode": "Bound node {{n}}",
+      "needChain": "Build the chain first: it needs a connected entry group and exit group."
+    },
+    "iperf": {
+      "title": "iperf3 throughput test",
+      "subServers": "The receiver starts a one-off server in the chain's port range and closes it afterwards",
+      "subProxy": "The initiator temporarily uses the landing node as an outbound and downloads a large file through it",
+      "modeServers": "Between servers",
+      "modeProxy": "Via landing node",
+      "from": "Initiator (client)",
+      "to": "Receiver (iperf3 -s)",
+      "proxyFrom": "Initiator",
+      "proxyTo": "Landing node",
+      "direction": "Direction",
+      "up": "Upload",
+      "down": "Download -R",
+      "bidir": "Both",
+      "proto": "Protocol",
+      "parallel": "Streams -P",
+      "duration": "Seconds",
+      "bitrate": "UDP rate Mbps",
+      "start": "Start test",
+      "phase": {
+        "prepare": "Preparing",
+        "server": "Receiver starting iperf3",
+        "running": "Second {{t}} / {{total}}",
+        "done": "Done"
+      },
+      "avg": "Average",
+      "peak": "Peak",
+      "retrans": "Retransmits",
+      "sender": "Sender",
+      "lossPct": "Loss",
+      "jitter": "Jitter",
+      "bytes": "Downloaded",
+      "firstByte": "First byte",
+      "history": "History",
+      "noHistory": "Nothing tested yet.",
+      "viaNode": "via node",
+      "noteServers": "iperf3 is installed automatically when a server lacks it. Test traffic is not billed to any user, but it does use the servers' bandwidth and traffic quota.",
+      "noteProxy": "Tests through a node use system credentials and are not billed to any user, but they use the bandwidth and traffic of the initiator and of the landing node's server."
+    },
+    "mobile": {
+      "pool": "Servers",
+      "panel": "Panel"
+    }
   }
 }

@@ -25,6 +25,9 @@ export type Group = {
   members: Member[];
 };
 export type Link = { state: LinkState; rtt?: number; loss?: number };
+/** 选路段里的一条路:via 是路上的中转组(直连就是空的),rtts 是这条路上每一段的延迟 */
+export type PathOption = { via: Group[]; rtts: number[]; total: number };
+export type PathSet = { hop: number; active: number; paths: PathOption[] };
 export type Chain = {
   id: number;
   name: string;
@@ -40,6 +43,8 @@ export type Chain = {
   groups: Group[];
   /** 落地节点:链的最后一跳不是出口组,而是中继到一个已有节点 */
   terminus?: { name: string; addr: string };
+  /** 选路段:第 hop 站连出几条路,在下一站汇合;按到出口的总延迟挑一条在用 */
+  pathSet?: PathSet;
   /** 相邻两站之间的线路,按顺序;有落地节点时最后一条是到落地节点的 */
   links: Link[];
   nodes: number;
@@ -112,6 +117,14 @@ const LAX_EXIT: Group = {
   failover: false,
   members: [server(8, "lax-01"), server(9, "lax-02")],
 };
+const KR_RELAY: Group = {
+  id: 8,
+  name: "KR-Relay",
+  role: "relay",
+  strategy: "direct",
+  failover: false,
+  members: [server(12, "kr-sel-01")],
+};
 const SG_EXIT: Group = {
   id: 7,
   name: "SG-Exit",
@@ -152,6 +165,34 @@ const BASE: Chain[] = [
     todayBytes: 86.4 * GB,
     trend: trendOf(1, 10),
     availability: 100,
+    cells: cellsOf([["h", 48]]),
+  },
+  {
+    id: 6,
+    name: "jp-fastest",
+    engine: "nftables",
+    portStart: 25000,
+    portEnd: 25049,
+    domain: "jp.example.com",
+    status: "healthy",
+    groups: [SH_ENTRY, JP_EXIT],
+    pathSet: {
+      hop: 0,
+      active: 0,
+      paths: [
+        { via: [], rtts: [30], total: 30 },
+        { via: [HK_RELAY], rtts: [22, 44], total: 66 },
+        { via: [KR_RELAY], rtts: [18, 21], total: 39 },
+      ],
+    },
+    links: [{ state: "ok", rtt: 30, loss: 0 }],
+    nodes: 3,
+    conns: 58,
+    speedDown: 4.2 * MB,
+    speedUp: 0.5 * MB,
+    todayBytes: 18.6 * GB,
+    trend: trendOf(6, 2.2),
+    availability: 99.9,
     cells: cellsOf([["h", 48]]),
   },
   {
@@ -266,13 +307,32 @@ export function buildChains(tick: number, pushed: boolean): Chain[] {
     const c = base.id === 5 && pushed ? { ...base, ...PUSHED } : base;
     const wobble = (seed: number, spread: number) =>
       1 - spread / 2 + pseudoRandom(seed) * spread;
+    const links = c.links.map((l, i) =>
+      l.rtt == null
+        ? l
+        : { ...l, rtt: l.rtt * wobble(round * 13 + c.id * 7 + i, 0.1) },
+    );
+    let pathSet = c.pathSet;
+    if (pathSet) {
+      const paths = pathSet.paths.map((p, k) => {
+        // 直连那条路隔一阵会变慢两轮,这时选路会切到别的路上
+        const slow = p.via.length === 0 && [3, 4].includes(round % 7) ? 1.5 : 1;
+        const rtts = p.rtts.map(
+          (v, i) => v * slow * wobble(round * 11 + c.id * 5 + k * 3 + i, 0.06),
+        );
+        return { ...p, rtts, total: rtts.reduce((a, v) => a + v, 0) };
+      });
+      const active = paths.reduce(
+        (best, p, k) => (p.total < paths[best].total ? k : best),
+        0,
+      );
+      pathSet = { ...pathSet, paths, active };
+      links[pathSet.hop] = { state: "ok", rtt: paths[active].total, loss: 0 };
+    }
     return {
       ...c,
-      links: c.links.map((l, i) =>
-        l.rtt == null
-          ? l
-          : { ...l, rtt: l.rtt * wobble(round * 13 + c.id * 7 + i, 0.1) },
-      ),
+      links,
+      pathSet,
       conns:
         c.conns > 0
           ? Math.max(1, Math.round(c.conns * wobble(tick * 5 + c.id, 0.08)))

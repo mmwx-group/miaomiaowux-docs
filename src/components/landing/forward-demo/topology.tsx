@@ -9,6 +9,7 @@ import {
   onlineOf,
   stopsOf,
   type Chain,
+  type Group,
   type LinkState,
 } from "./data";
 import { STATUS_DOT } from "./styles";
@@ -39,6 +40,8 @@ type GEdge = {
   chain: number;
   state: LinkState;
   ms?: number;
+  /** 选路段里没在用的路 */
+  dim?: boolean;
 };
 
 function build(
@@ -48,7 +51,13 @@ function build(
   offlineText: string,
   landingText: string,
 ) {
-  const cols = Math.max(2, ...chains.map((c) => stopsOf(c).length));
+  // 选路段里路上的中转组,排在选路那一站和下一站之间
+  const viaCols = (c: Chain) =>
+    c.pathSet ? Math.max(0, ...c.pathSet.paths.map((p) => p.via.length)) : 0;
+  const cols = Math.max(
+    2,
+    ...chains.map((c) => stopsOf(c).length + viaCols(c)),
+  );
   const nodes = new Map<string, GNode>();
   const edges: GEdge[] = [];
   const touch = (n: GNode, chain: number) => {
@@ -56,71 +65,105 @@ function build(
     if (had) had.chains.add(chain);
     else nodes.set(n.key, { ...n, chains: new Set([chain]) });
   };
+  type Point = { key: string; online: boolean };
+  // 一个组在图上的点:按服务器看是每台一个,按组看是整组一个
+  const place = (g: Group, col: number, chain: number): Point[] => {
+    if (mode === "group") {
+      const online = onlineOf(g);
+      const key = `g${g.id}@${col}`;
+      touch(
+        {
+          key,
+          col,
+          label: g.name,
+          sub: onlineText(online, g.members.length),
+          chains: new Set(),
+          bad: online === 0,
+          warn: online > 0 && online < g.members.length,
+        },
+        chain,
+      );
+      return [{ key, online: online > 0 }];
+    }
+    return g.members.map((m) => {
+      const key = `s${m.id}@${col}`;
+      touch(
+        {
+          key,
+          col,
+          label: m.name,
+          sub: m.online ? g.name : offlineText,
+          chains: new Set(),
+          bad: !m.online,
+        },
+        chain,
+      );
+      return { key, online: m.online };
+    });
+  };
+  const connect = (
+    from: Point[],
+    to: Point[],
+    chain: number,
+    l: { state: LinkState; rtt?: number },
+    dim = false,
+  ) => {
+    for (const a of from)
+      for (const b of to)
+        edges.push({
+          from: a.key,
+          to: b.key,
+          chain,
+          state: a.online && b.online ? l.state : "down",
+          ms: a.online && b.online ? l.rtt : undefined,
+          dim,
+        });
+  };
   for (const c of chains) {
     const stops = stopsOf(c);
-    // 这一站在图上的点:[key, 是否在线]
+    const colOf = (i: number) =>
+      i === 0
+        ? 0
+        : i === stops.length - 1
+          ? cols - 1
+          : i + (c.pathSet && i > c.pathSet.hop ? viaCols(c) : 0);
     const points = stops.map((s, i) => {
-      const col = i === 0 ? 0 : i === stops.length - 1 ? cols - 1 : i;
-      if (s.kind === "terminus") {
-        const key = `t${c.id}`;
-        touch(
-          {
-            key,
-            col,
-            label: s.name,
-            sub: landingText,
-            chains: new Set(),
-            terminus: true,
-          },
-          c.id,
-        );
-        return [{ key, online: true }];
-      }
-      const g = s.group;
-      if (mode === "group") {
-        const online = onlineOf(g);
-        const key = `g${g.id}@${col}`;
-        touch(
-          {
-            key,
-            col,
-            label: g.name,
-            sub: onlineText(online, g.members.length),
-            chains: new Set(),
-            bad: online === 0,
-            warn: online > 0 && online < g.members.length,
-          },
-          c.id,
-        );
-        return [{ key, online: online > 0 }];
-      }
-      return g.members.map((m) => {
-        const key = `s${m.id}@${col}`;
-        touch(
-          {
-            key,
-            col,
-            label: m.name,
-            sub: m.online ? g.name : offlineText,
-            chains: new Set(),
-            bad: !m.online,
-          },
-          c.id,
-        );
-        return { key, online: m.online };
-      });
+      if (s.kind === "group") return place(s.group, colOf(i), c.id);
+      const key = `t${c.id}`;
+      touch(
+        {
+          key,
+          col: colOf(i),
+          label: s.name,
+          sub: landingText,
+          chains: new Set(),
+          terminus: true,
+        },
+        c.id,
+      );
+      return [{ key, online: true }];
     });
     for (let i = 0; i < points.length - 1; i++) {
-      const l = c.links[i];
-      for (const a of points[i])
-        for (const b of points[i + 1])
-          edges.push({
-            from: a.key,
-            to: b.key,
-            chain: c.id,
-            state: a.online && b.online ? l.state : "down",
-            ms: a.online && b.online ? l.rtt : undefined,
-          });
+      const ps = c.pathSet?.hop === i ? c.pathSet : undefined;
+      if (!ps) {
+        connect(points[i], points[i + 1], c.id, c.links[i]);
+        continue;
+      }
+      ps.paths.forEach((p, k) => {
+        const seq = [
+          points[i],
+          ...p.via.map((g, j) => place(g, colOf(i) + 1 + j, c.id)),
+          points[i + 1],
+        ];
+        for (let j = 0; j < seq.length - 1; j++)
+          connect(
+            seq[j],
+            seq[j + 1],
+            c.id,
+            { state: "ok", rtt: p.rtts[j] },
+            k !== ps.active,
+          );
+      });
     }
   }
   return { nodes: [...nodes.values()], edges, cols };
@@ -266,16 +309,24 @@ export function ForwardTopology({
                     key={i}
                     style={{
                       opacity:
-                        active !== null && active !== e.chain ? 0.1 : 0.9,
+                        active !== null && active !== e.chain
+                          ? 0.1
+                          : e.dim
+                            ? 0.5
+                            : 0.9,
                       transition: "opacity .2s",
                     }}
                   >
                     <path
                       d={`M ${x1} ${y1} C ${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`}
                       stroke={down ? "#c2452d" : chainColor(e.chain)}
-                      strokeWidth={w}
+                      strokeWidth={e.dim ? Math.min(w, 1.6) : w}
                       strokeDasharray={
-                        down || e.state === "unknown" ? "6 5" : undefined
+                        down || e.state === "unknown"
+                          ? "6 5"
+                          : e.dim
+                            ? "2 5"
+                            : undefined
                       }
                       strokeLinecap="round"
                       onMouseEnter={() => setHover(e.chain)}

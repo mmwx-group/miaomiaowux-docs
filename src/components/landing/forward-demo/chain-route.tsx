@@ -116,6 +116,23 @@ function LinkLine({ l }: { l: Link }) {
   );
 }
 
+/** 选路段那一跳:线上写在用那条路的总延迟,下面写一共几条路、哪条在用。 */
+function PathLine({ c }: { c: Chain }) {
+  const { t } = useTranslation("forward");
+  const ps = c.pathSet!;
+  return (
+    <div className="flex w-36 shrink-0 flex-col items-center gap-1 px-2">
+      <span className="text-xs text-teal-700 tabular-nums dark:text-teal-400">
+        {t("path.pick")} · {fmtMs(ps.paths[ps.active].total)}
+      </span>
+      <span className="h-1 w-full rounded bg-teal-600 dark:bg-teal-400" />
+      <span className="text-muted-foreground text-[11px]">
+        {t("path.summary", { count: ps.paths.length, n: ps.active + 1 })}
+      </span>
+    </div>
+  );
+}
+
 export function ChainRoute({ c }: { c: Chain }) {
   const stops = stopsOf(c);
   return (
@@ -130,7 +147,12 @@ export function ChainRoute({ c }: { c: Chain }) {
           ) : (
             <Terminus name={s.name} addr={s.addr} />
           )}
-          {i < stops.length - 1 && <LinkLine l={c.links[i]} />}
+          {i < stops.length - 1 &&
+            (c.pathSet?.hop === i ? (
+              <PathLine c={c} />
+            ) : (
+              <LinkLine l={c.links[i]} />
+            ))}
         </Fragment>
       ))}
     </div>
@@ -139,6 +161,7 @@ export function ChainRoute({ c }: { c: Chain }) {
 
 /** 一行文字的路线(紧凑视图 / 窄屏)。 */
 export function RouteText({ c, className }: { c: Chain; className?: string }) {
+  const { t } = useTranslation("forward");
   const stops = stopsOf(c);
   return (
     <span className={cn("text-xs tabular-nums", className)}>
@@ -150,7 +173,12 @@ export function RouteText({ c, className }: { c: Chain; className?: string }) {
             <span className={cn(bad && "text-red-700 dark:text-red-400")}>
               {s.kind === "group" ? s.group.name : s.name}
             </span>
-            {l && (
+            {l && c.pathSet?.hop === i && (
+              <span className="mx-1 text-teal-700 dark:text-teal-400">
+                ─{t("path.pick")} {Math.round(l.rtt ?? 0)}─
+              </span>
+            )}
+            {l && c.pathSet?.hop !== i && (
               <span className={cn("mx-1", LINK_TEXT[l.state])}>
                 {l.state === "down"
                   ? "┄✕┄"
