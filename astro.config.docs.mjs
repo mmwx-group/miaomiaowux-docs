@@ -73,6 +73,7 @@ export default defineConfig({
             "install-docker",
             "cloudflare-tunnel",
             "install-agent",
+            "install-agent-blocked-ports",
             "install-external-probe",
             "upgrade-from-mmw",
             "system-requirements",
