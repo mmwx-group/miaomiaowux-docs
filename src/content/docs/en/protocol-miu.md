@@ -1,6 +1,6 @@
 ---
 title: "Miu"
-description: "Miu protocol reference: lane pool, inner TLS 1.3 forwarded as is, PSK auth, TLS / REALITY outer layers, and the rule that sends Miu nodes to the official client only"
+description: "Miu protocol reference: lane pool, inner TLS 1.3 forwarded as is, PSK auth, TLS / REALITY outer layers, and the rule that sends Miu nodes to the officially recommended client only"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -25,7 +25,7 @@ MiaomiaowuX implements the Miu server inside its embedded (forked) xray core. Pe
 | UDP            | Supported (UDP-over-TCP)                                                                                             |
 | Core           | Only servers running [embedded xray](/docs/en/embedded-xray); the external (official) xray has no such protocol      |
 | Versions       | Master v0.5.6 or later, Agent v1.1.1 or later                                                                        |
-| Clients        | Sent to the official client MeowX only by default, see [Subscription rule](#subscription-rule)                       |
+| Clients        | Sent to the officially recommended client MeowX only by default, see [Subscription rule](#subscription-rule)         |
 
 ## Adding a node (wizard)
 
@@ -41,7 +41,7 @@ Miu has no protocol-level options: pick the security layer and submit. On server
 
 Miu is an in-house protocol that other clients do not know. The official mihomo **fails to load the whole config** when it meets a node type it does not recognise (no node works at all), so subscriptions treat clients differently by default:
 
-- **The official client MeowX** gets Miu nodes.
+- **The officially recommended client MeowX** gets Miu nodes.
 - **Other clients** have Miu nodes filtered out, together with the references to them in proxy groups; a group that ends up empty gets DIRECT. Regular subscriptions, package subscriptions and temporary subscriptions all follow this rule.
 - Nodes imported from one MiaomiaowuX panel into another are not filtered.
 
@@ -55,7 +55,7 @@ Before turning this on, make sure everyone using the subscription runs a client 
 
 | Client                                                                          | Support                                                       |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| MeowX (official client)                                                         | Supported; use the latest version                             |
+| MeowX (officially recommended client)                                           | Supported; use the latest version                             |
 | mihomo builds with the Miu outbound                                             | Supported; the node type is `type: miu`                       |
 | Official mihomo / Clash.Meta family (Clash Verge Rev, FlClash, Mihomo Party, …) | Not supported; a Miu node makes the whole config fail to load |
 | sing-box, Shadowrocket, Surge, Loon, Quantumult X, Stash                        | Not supported                                                 |

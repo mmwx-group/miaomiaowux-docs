@@ -10,13 +10,13 @@ tableOfContents:
 
 ## 放行的路径
 
-| 路径 | 用途 |
-| --- | --- |
-| `/x/*` | 短链接、套餐订阅链接 |
-| `/api/clash/subscribe` | Clash / Mihomo 订阅 |
-| `/api/user/package-subscribe` | 套餐订阅 |
-| `/api/subscribe` | 兼容旧版的订阅地址 |
-| `/api/fw/*` | 客户端 IP 白名单上报（官方客户端会自动上报，见 [客户端设置](/docs/client-settings)） |
+| 路径                          | 用途                                                                                            |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| `/x/*`                        | 短链接、套餐订阅链接                                                                            |
+| `/api/clash/subscribe`        | Clash / Mihomo 订阅                                                                             |
+| `/api/user/package-subscribe` | 套餐订阅                                                                                        |
+| `/api/subscribe`              | 兼容旧版的订阅地址                                                                              |
+| `/api/fw/*`                   | 客户端 IP 白名单上报（官方推荐客户端 MeowX 会自动上报，见 [客户端设置](/docs/client-settings)） |
 
 其余路径一律 404。
 
