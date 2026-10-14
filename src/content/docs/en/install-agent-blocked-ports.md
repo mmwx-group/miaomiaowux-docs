@@ -1,6 +1,6 @@
 ---
 title: "Servers that block outbound 80/443"
-description: "Connect servers whose provider blocks outbound ports 80/443: open an alternate HTTPS port on the master; install, upgrades and licensing all go through the master"
+description: "Connect servers whose provider blocks outbound ports 80/443: open an alternate port (HTTPS or HTTP) on the master; install, upgrades and licensing all go through the master"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -12,7 +12,7 @@ Some providers block **outbound ports 80 / 443**. On such a server:
 - If the master address is `https://panel-domain` (443), the Agent cannot reach the master even after it is installed;
 - External Xray cannot be installed (it is downloaded from GitHub).
 
-The block is **by port, not by protocol**: if the master also serves HTTPS on another port, these servers can connect.
+The block is **by port, not by protocol**: if the master also serves HTTPS (or HTTP) on another port, these servers can connect.
 
 ## Which case are you in?
 
@@ -25,22 +25,32 @@ If unsure, run `curl -m 5 -sI https://github.com` on the blocked server: a timeo
 
 ## Configure the Agent alternate address
 
-The alternate address is an HTTPS address **only for Agents**, for example `https://panel-domain:8443`. That port only allows Agent traffic (`/api/remote/`, including the WebSocket); opening the panel there returns 404.
+The alternate address is an address **only for Agents**, for example `https://panel-domain:8443`. That port only allows Agent traffic (`/api/remote/`, including the WebSocket); opening the panel there returns 404.
 
-### ① Pick a port
+### ① Pick the protocol and port
 
-- Domain **not behind a CDN** (DNS points straight at the master): any free port works; `8443` is common.
+| Form                        | Use it when                                     | What it needs                                                          |
+| --------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------- |
+| `https://domain:8443`       | **Recommended** whenever you have a certificate | A certificate covering the domain + an Nginx / Caddy reverse proxy     |
+| `http://domain-or-IP:8080`  | No certificate, or only an IP                   | An Nginx / Caddy reverse proxy, no certificate                         |
+| `http://domain-or-IP:12889` | You don't want a reverse proxy                  | Nothing: connects straight to the master's own port (12889 by default) |
+
+http is not encrypted: Agent traffic is protected by the encrypted channel, but the token in the install command and the install script itself travel in plain text, so prefer https. Connecting straight to the master's port also requires that the port is open on the master's host and that "Disable public access" is off (when on, the master only listens on localhost).
+
+Ports:
+
+- Domain **not behind a CDN** (DNS points straight at the master): any free port works; `8443` is common for https.
 - Domain **proxied by Cloudflare** (orange cloud): only Cloudflare's HTTPS ports `2053`, `2083`, `2087`, `2096`, `8443` work. You can also use a separate DNS-only subdomain (grey cloud) to use any port.
-- Ports 80, 443, the master's own port (12889 by default) and 8001 (used internally by the master's Nginx) are not allowed.
+- Ports 80, 443 and 8001 (used internally by the master's Nginx) are not allowed; the master's own port (12889 by default) only works with http (direct connection).
 
 Remember to allow this TCP port in the master's **firewall / cloud security group**.
 
 ### ② Check
 
-In **System settings → System → Agent alternate address**, enter the domain and port. Leave the domain empty to use the Agent address (the master address if none is set). Click **Check**. The panel checks:
+In **System settings → System → Agent alternate address**, choose the protocol and enter the domain (or IP) and port. Leave the domain empty to use the Agent address (the master address if none is set). Click **Check**. The panel checks:
 
 - whether the domain resolves to the master (or a recognised CDN);
-- whether Certificates has a certificate covering the domain (wildcards work);
+- for https, whether Certificates has a certificate covering the domain (wildcards work);
 - whether the master's Nginx is managed by the master and whether the port is already in use;
 - whether the port is allowed when the domain is proxied by Cloudflare.
 
@@ -48,9 +58,11 @@ In **System settings → System → Agent alternate address**, enter the domain 
 
 The check passed: the managed Nginx can be configured with one click, and Nginx / Caddy templates are shown below
 
-### ③ Set up the HTTPS port
+### ③ Set up the reverse proxy
 
-- **HTTPS enabled from the panel** (Certificates → "Deploy certificate to master" or "Enable HTTPS"): click **Configure**. The master writes a site listening only on this port into Nginx and reloads it; if `nginx -t` fails the change is rolled back.
+Skip this step when connecting straight to the master's port (`http://…:12889`).
+
+- **HTTPS enabled from the panel** (Certificates → "Deploy certificate to master" or "Enable HTTPS"): click **Configure Nginx**. The master writes a site listening only on this port into Nginx and reloads it; if `nginx -t` fails the change is rolled back.
 - **HTTPS you set up yourself** (your own Nginx, Caddy, control panels…): add the config shown in the panel (domain, port and certificate paths are filled in), then test and reload.
 
 If you write the config yourself, keep these two headers. The master uses them to recognise that a server connected through the alternate address:
@@ -104,11 +116,13 @@ Under **Servers connecting via the alternate address**, pick the server and clic
 
 A server that **connects through the alternate address is added to the list automatically**, including one whose install command you edited by hand or one that failed over to it as a backup master address.
 
+If 443 gets blocked on a server that is already running, nothing needs to be done by hand: after the main address has been unreachable for 2 minutes the Agent switches to the alternate address; the master sees it arrive through the alternate address and makes that its master address. From then on it no longer probes the unreachable main address, and connects straight to the alternate address after a restart.
+
 ## After installation
 
 For servers connecting through the alternate address:
 
-- **Their master address stays the alternate address**: reconnect resync, a new panel domain and switching the Agent address never change it to the 443 address;
+- **Their master address stays the alternate address**: reconnect resync, a new panel domain and switching the Agent address never change it to the 443 address, and the unreachable main address is not added to their backup master addresses;
 - **One-click upgrade from the panel**: downloads from the master when the official channels are unreachable, with the same signature check;
 - **License renewal**: if the license service cannot be reached directly, the request goes through the master (the master only relays the request the Agent signed);
 - **Geo data**: `geoip.dat` / `geosite.dat` needed by Embedded Xray are fetched from the master when they cannot be downloaded.
@@ -119,15 +133,15 @@ To move a server back, click **Switch back to main address** in the list (the ma
 
 ## FAQ
 
-### Can I just use the master's port 12889 without HTTPS?
+### Can I just use the master's port 12889 without a reverse proxy?
 
-You can, but it is not recommended:
+Yes: choose **http** and enter the master's own port (12889 by default) to connect straight to the master, no Nginx needed. Keep in mind:
 
-- 12889 is the master's **plain HTTP** port. Agent traffic is protected by the encrypted channel, but the token in the install command and the install script itself travel in plain text;
-- Many people close 12889 in the firewall after enabling HTTPS, or turn on "Disable public access", in which case it only opens temporarily during HTTPS self-recovery;
-- The master's existing "HTTPS recovery address" (`http://domain:12889`) is an emergency path for when HTTPS is down entirely, not a long-term channel for some servers.
+- This is **plain HTTP**. Agent traffic is protected by the encrypted channel, but the token in the install command and the install script itself travel in plain text;
+- The port must be open on the master's host, and "Disable public access" must be off (when on, the master only listens on localhost; the check warns about it);
+- It is not allowed while no master address is set: Agents then already connect straight to the master's port, blocked servers included, so nothing needs to be done.
 
-If your master is `http://IP:12889` without HTTPS anyway, blocked servers can already reach it and nothing needs to be done.
+The master's existing "HTTPS recovery address" (`http://domain:12889`) is an emergency path for when HTTPS is down entirely; it is separate from the alternate address.
 
 ### The test fails
 
