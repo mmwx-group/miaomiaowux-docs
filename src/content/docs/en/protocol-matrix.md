@@ -35,9 +35,9 @@ The three button rows at the top of the wizard: protocol → transport → secur
 | 17  | Shadowsocks | TCP       | None                  | SS2022: 2022-blake3-aes-128-gcm / aes-256-gcm / chacha20-poly1305                       |
 | 18  | Hysteria2   | UDP       | TLS                   | Requires TLS certificate                                                                |
 | 19  | AnyTLS      | TCP       | TLS                   | Requires TLS cert (recommended; mihomo / sing-box compatible)                           |
-| 20  | AnyTLS      | TCP       | REALITY               | Official client MeowX only; subscriptions drop it for other clients                     |
-| 21  | Miu         | TCP       | TLS                   | Requires TLS cert; sent to the official client MeowX only by default                    |
-| 22  | Miu         | TCP       | REALITY               | No certificate; sent to the official client MeowX only by default                       |
+| 20  | AnyTLS      | TCP       | REALITY               | Officially recommended client MeowX only; subscriptions drop it for other clients       |
+| 21  | Miu         | TCP       | TLS                   | Requires TLS cert; sent to the officially recommended client MeowX only by default      |
+| 22  | Miu         | TCP       | REALITY               | No certificate; sent to the officially recommended client MeowX only by default         |
 | 23  | Snell       | TCP       | None                  | Snell v4 / v5: per-user PSK, supports obfs                                              |
 | 24  | Snell       | TCP       | None                  | Snell v6: per-user PSK, hidden salt + shaping                                           |
 | 25  | Mieru       | TCP       | None                  | Username + password, self-encrypted                                                     |

@@ -1,6 +1,6 @@
 ---
 title: "Miu"
-description: "Miu 协议配置详解：通道池、内层 TLS 1.3 原样转发、PSK 鉴权、TLS / REALITY 两种外层、只发给官方客户端的订阅规则"
+description: "Miu 协议配置详解：通道池、内层 TLS 1.3 原样转发、PSK 鉴权、TLS / REALITY 两种外层、只发给官方推荐客户端的订阅规则"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -25,7 +25,7 @@ Miu 是妙妙屋X 自研的代理协议，跑在 TLS 1.3 或 REALITY 之上：�
 | UDP      | 支持（UDP-over-TCP）                                                                |
 | 内核要求 | 只有 [嵌入式 xray](/docs/embedded-xray) 的服务器支持，外置（官方）xray 没有这个协议 |
 | 版本要求 | 主控 v0.5.6 及以上，Agent v1.1.1 及以上                                             |
-| 客户端   | 默认只下发给官方客户端 MeowX，见下方[订阅下发规则](#订阅下发规则)                   |
+| 客户端   | 默认只下发给官方推荐客户端 MeowX，见下方[订阅下发规则](#订阅下发规则)               |
 
 ## 添加节点（向导）
 
@@ -41,7 +41,7 @@ Miu 没有协议级的可调参数，选完安全协议直接提交即可。外�
 
 Miu 是自研协议，别的客户端不认识它。官方 mihomo 遇到不认识的节点类型会**整份配置加载失败**（所有节点都用不了），所以订阅默认按客户端区分：
 
-- **官方客户端 MeowX**：正常拿到 Miu 节点。
+- **官方推荐客户端 MeowX**：正常拿到 Miu 节点。
 - **其它客户端**：Miu 节点被滤掉，连同代理组里对它的引用；被滤空的代理组会补上 DIRECT。普通订阅、套餐订阅、临时订阅都按这条规则处理。
 - 妙妙屋X 之间跨面板导入节点不过滤。
 
@@ -55,7 +55,7 @@ Miu 是自研协议，别的客户端不认识它。官方 mihomo 遇到不认�
 
 | 客户端                                                                   | 支持情况                              |
 | ------------------------------------------------------------------------ | ------------------------------------- |
-| MeowX（官方客户端）                                                      | 支持，请使用最新版本                  |
+| MeowX（官方推荐客户端）                                                  | 支持，请使用最新版本                  |
 | 带 Miu 出站的 mihomo                                                     | 支持，节点类型为 `type: miu`          |
 | 官方 mihomo / Clash.Meta 系（Clash Verge Rev、FlClash、Mihomo Party 等） | 不支持，遇到 Miu 节点整份配置加载失败 |
 | sing-box、Shadowrocket、Surge、Loon、Quantumult X、Stash                 | 不支持                                |

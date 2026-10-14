@@ -74,7 +74,7 @@ Dashboard 会提供包含 Tunnel Token 的安装命令。Token 等同凭证，�
 该规则只允许以下端点：
 
 - `/x/*`：短链接和套餐订阅。
-- `/api/fw/*`：客户端 IP 白名单上报（官方客户端会自动上报）。
+- `/api/fw/*`：客户端 IP 白名单上报（官方推荐客户端 MeowX 会自动上报）。
 - `/api/clash/subscribe`：Clash/Mihomo 订阅。
 - `/api/user/package-subscribe`：套餐订阅。
 - `/api/subscribe`：兼容订阅端点。

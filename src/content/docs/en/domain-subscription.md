@@ -10,13 +10,13 @@ The subscription domain is for proxy clients only: fetching subscriptions and re
 
 ## Allowed paths
 
-| Path | Purpose |
-| --- | --- |
-| `/x/*` | Short links and package subscription links |
-| `/api/clash/subscribe` | Clash / Mihomo subscriptions |
-| `/api/user/package-subscribe` | Package subscriptions |
-| `/api/subscribe` | Compatibility endpoint |
-| `/api/fw/*` | Client IP allowlist reports (the official client reports automatically, see [Client settings](/docs/en/client-settings)) |
+| Path                          | Purpose                                                                                                                                      |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/x/*`                        | Short links and package subscription links                                                                                                   |
+| `/api/clash/subscribe`        | Clash / Mihomo subscriptions                                                                                                                 |
+| `/api/user/package-subscribe` | Package subscriptions                                                                                                                        |
+| `/api/subscribe`              | Compatibility endpoint                                                                                                                       |
+| `/api/fw/*`                   | Client IP allowlist reports (the officially recommended client MeowX reports automatically, see [Client settings](/docs/en/client-settings)) |
 
 Everything else returns 404.
 

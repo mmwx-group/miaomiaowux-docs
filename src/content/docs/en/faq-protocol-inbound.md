@@ -20,7 +20,7 @@ Xray-core has removed flow (XTLS-Vision) support for Trojan. For Vision flow con
 
 ### Why are there no Miu nodes in my subscription?
 
-Miu is an in-house protocol and is sent to the official client MeowX only by default. When another client pulls the subscription, or a temporary subscription is used, Miu nodes are filtered out — a core that does not know Miu, such as the official mihomo, fails to load the whole config when it meets one. Once you are sure the people using the subscription run a client that supports Miu, turn on "Send Miu nodes to all clients" under Node Management → Utilities. See [Miu](/docs/en/protocol-miu#subscription-rule).
+Miu is an in-house protocol and is sent to the officially recommended client MeowX only by default. When another client pulls the subscription, or a temporary subscription is used, Miu nodes are filtered out — a core that does not know Miu, such as the official mihomo, fails to load the whole config when it meets one. Once you are sure the people using the subscription run a client that supports Miu, turn on "Send Miu nodes to all clients" under Node Management → Utilities. See [Miu](/docs/en/protocol-miu#subscription-rule).
 
 ### Why can't I pick AnyTLS / Snell / Mieru / Miu / WireGuard on some servers?
 

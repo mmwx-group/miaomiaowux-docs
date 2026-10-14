@@ -20,7 +20,7 @@ Xray-core 已移除 Trojan 的 flow（XTLS-Vision）支持。如需 Vision 流�
 
 ### 订阅里为什么没有 Miu 节点？
 
-Miu 是自研协议，默认只下发给官方客户端 MeowX。用其它客户端拉订阅、或者用临时订阅时，Miu 节点会被自动滤掉——官方 mihomo 等不认识 Miu 的内核遇到它会整份配置加载失败。确认订阅的使用者用的是支持 Miu 的客户端后，可以在「节点管理 → 辅助功能」里打开「向所有客户端下发 Miu 节点」。详见 [Miu](/docs/protocol-miu#订阅下发规则)。
+Miu 是自研协议，默认只下发给官方推荐客户端 MeowX。用其它客户端拉订阅、或者用临时订阅时，Miu 节点会被自动滤掉——官方 mihomo 等不认识 Miu 的内核遇到它会整份配置加载失败。确认订阅的使用者用的是支持 Miu 的客户端后，可以在「节点管理 → 辅助功能」里打开「向所有客户端下发 Miu 节点」。详见 [Miu](/docs/protocol-miu#订阅下发规则)。
 
 ### 为什么有的服务器上选不了 AnyTLS / Snell / Mieru / Miu / WireGuard？
 

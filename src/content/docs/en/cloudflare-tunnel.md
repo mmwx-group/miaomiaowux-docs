@@ -74,7 +74,7 @@ Path for the subscription hostname:
 This permits only:
 
 - `/x/*`: short links and package subscriptions.
-- `/api/fw/*`: client IP allowlist reports (the official client reports automatically).
+- `/api/fw/*`: client IP allowlist reports (the officially recommended client MeowX reports automatically).
 - `/api/clash/subscribe`: Clash/Mihomo subscriptions.
 - `/api/user/package-subscribe`: package subscriptions.
 - `/api/subscribe`: compatibility endpoint.

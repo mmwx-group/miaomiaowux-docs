@@ -35,9 +35,9 @@ tableOfContents:
 | 17  | Shadowsocks | TCP   | None                  | SS2022：2022-blake3-aes-128-gcm / aes-256-gcm / chacha20-poly1305 |
 | 18  | Hysteria2   | UDP   | TLS                   | 需要 TLS 证书                                                     |
 | 19  | AnyTLS      | TCP   | TLS                   | 需要 TLS 证书（推荐，mihomo / sing-box 通用）                     |
-| 20  | AnyTLS      | TCP   | REALITY               | 只有官方客户端 MeowX 支持，订阅对其它客户端自动滤掉               |
-| 21  | Miu         | TCP   | TLS                   | 需要 TLS 证书；默认只下发给官方客户端 MeowX                       |
-| 22  | Miu         | TCP   | REALITY               | 不需要证书；默认只下发给官方客户端 MeowX                          |
+| 20  | AnyTLS      | TCP   | REALITY               | 只有官方推荐客户端 MeowX 支持，订阅对其它客户端自动滤掉           |
+| 21  | Miu         | TCP   | TLS                   | 需要 TLS 证书；默认只下发给官方推荐客户端 MeowX                   |
+| 22  | Miu         | TCP   | REALITY               | 不需要证书；默认只下发给官方推荐客户端 MeowX                      |
 | 23  | Snell       | TCP   | None                  | Snell v4 / v5：每用户独立 PSK，支持 obfs 混淆                     |
 | 24  | Snell       | TCP   | None                  | Snell v6：每用户独立 PSK，隐藏 salt + 流量整形                    |
 | 25  | Mieru       | TCP   | None                  | 用户名 + 密码，协议自身加密                                       |
