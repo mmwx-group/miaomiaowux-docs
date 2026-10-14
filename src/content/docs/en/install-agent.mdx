@@ -88,9 +88,11 @@ SSH into the remote server and run the copied command with root privileges. The 
 | 1/6  | Stop old service       | Stop existing mmwx service if running                        |
 | 2/6  | Create config          | Generate /etc/mmw-agent/config.yaml                          |
 | 3/6  | Create systemd service | Register as system service with auto-start on boot           |
-| 4/6  | Download binary        | Auto-detect architecture (amd64/arm64), download from GitHub |
+| 4/6  | Download binary        | Auto-detect architecture (amd64/arm64), download from the official CDN or GitHub, or from the master if both are unreachable |
 | 5/6  | Start service          | Enable and start the mmwx service                            |
 | 6/6  | Verify installation    | Check service status and output result                       |
+
+If the server blocks outbound 80 / 443, see [Servers that block outbound 80/443](/docs/en/install-agent-blocked-ports).
 
 ## Docker Deployment
 
