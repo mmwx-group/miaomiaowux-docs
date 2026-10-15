@@ -1,6 +1,6 @@
 ---
 title: "Forwarding"
-description: "Chain servers into entry → relay → exit forward chains with Agent-native forwarding: canvas editor, load strategies, sticky connections, branches, path sets with lowest-latency selection, kernel forwarding engines, real client IP passthrough, latency probes and full-chain speed tests"
+description: "Chain servers into entry → relay → exit forward chains with Agent-native forwarding: canvas editor, load strategies, split-line DNS, sticky connections, branches, path sets with lowest-latency selection, kernel forwarding engines, real client IP passthrough, latency probes and full-chain speed tests"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -103,6 +103,9 @@ So to change how one hop distributes traffic, edit the **next-hop group**, not t
 | Most remaining traffic | More remaining traffic means a higher weight; recalculated every 5 minutes | Members with traffic quotas |
 | By period | The closer to the traffic reset day, the higher the weight | Different reset days |
 | Lowest latency | The previous hop uses only the member with the lowest total latency to the exit; the rest are standby and take over within seconds (needs a recent Agent) | Latency first |
+| Primary / backup | Always uses the first member in the list that is still reachable; later members only take over when the ones before them are down, and traffic moves back once they recover. Member order is the priority order (needs a recent Agent; older Agents only use the first member) | One primary, the rest standby |
+
+For relay and exit groups, the previous hop's Agent applies the strategy to every connection and switches within seconds when a member fails. The entry group works differently, see below.
 
 **The entry group is special**: it has no previous hop. Which entry server a client reaches is decided by the DNS records of the [entry domain](#chain-settings), so entry-group strategies are implemented through DNS:
 
@@ -110,10 +113,26 @@ So to change how one hop distributes traffic, edit the **next-hop group**, not t
 | --- | --- |
 | Round robin | Every healthy entry is published in the entry domain and DNS rotates between them; unreachable ones are withdrawn |
 | Lowest latency | Only the entry with the lowest total latency to the exit is published, the rest are standby; it is replaced when unreachable, or when another entry is more than 15% faster |
+| Primary / backup | Only the first healthy entry in the member list is published, the rest are standby; it is replaced when unreachable and comes back once it recovers |
+| Least connections | Every healthy entry is published, but entries with far more forwarded connections than the least busy one (more than twice as many plus 50) are withdrawn for now, and come back once they drop below 1.5 times plus 25; at most half of the entries are withdrawn, busiest first |
 | Most remaining traffic / By period | Entries that lag far behind (less than a quarter of the best one's remaining traffic, or quota used up) are withdrawn for now |
-| Weighted / Least connections | Not possible with DNS (plain records have no weight and cannot follow connection counts); greyed out and treated as round robin |
+| Weighted | Not possible with DNS (plain records have no weight); greyed out and treated as round robin |
 
-Entry-group strategies need an entry domain on the chain and take effect with a delay because of DNS caching. Withdrawn entries are marked "standby entry · not published" on the detail page.
+Entry-group strategies need an entry domain on the chain and take effect with a delay because of DNS caching (least connections is a coarse, minute-level adjustment, not per-connection balancing). Withdrawn entries are marked "standby entry · not published" on the detail page.
+
+### Split-line DNS
+
+Entry-group members can be tagged with a line: **Default / China Telecom / China Unicom / China Mobile / Overseas**. The entry domain then gets one record set per line: China Telecom users resolve to the entries tagged China Telecom, China Unicom users to those tagged China Unicom, and so on. On the canvas, select the entry group and pick a line next to each member; in the classic editor, pick it next to each server in the entry group card.
+
+- **Each line still follows the entry group's strategy**: with "primary / backup", for example, each line publishes only the first entry in its own list
+- **When every entry on a line is down**: that line's records are removed, and users on that network fall back to the default line
+- **The default line is never empty**: it serves every other network. Untagged entries belong to the default line; if there are none, or none of them is healthy, the default line publishes every healthy entry
+- **Only Alibaba Cloud and Tencent Cloud (DNSPod)**: Cloudflare, NameSilo and GoDaddy have no lines, so tags have no effect there and all entries go into one record set as before; the UI points this out
+- The master only manages records on the default line and these four carrier lines; records you added by hand on province or custom lines are left alone
+- The "Entry DNS" card on the chain detail page lists each entry's line and the records per line. The master can only resolve the line of its own network, so it no longer reports "not resolved yet" for split-line chains
+- MeowX clients receive the list of healthy entries directly (without waiting for DNS); that list is the union of all lines, not split by line
+
+Only the entry group has lines: connections to relay and exit groups come from the previous hop's servers, not from users, so there is no carrier to split by. To send different entries through different relays, use [Branches](#branches) or [path sets](#path-sets-and-lowest-latency-selection).
 
 ### Sticky connections
 
@@ -143,7 +162,7 @@ Click an empty spot on the canvas to see the chain settings:
 - **Default forwarding engine**: used by groups without their own setting
 - **Sticky connections**: the same client lands on the same server at every hop, see [Sticky connections](#sticky-connections)
 - **Pass through real client IP**: see [Real client IP passthrough](#real-client-ip-passthrough)
-- **Entry domain**: a domain (wildcard certificate required) whose A / AAAA records the master maintains every 17 seconds from entry server health and the entry group's load strategy — a failed entry server drops out of DNS automatically
+- **Entry domain**: a domain (wildcard certificate required) whose A / AAAA records the master maintains every 17 seconds from entry server health and the entry group's load strategy — a failed entry server drops out of DNS automatically; with Alibaba Cloud or Tencent Cloud DNS you can also use [split-line DNS](#split-line-dns)
 
 ### Ports per server
 
