@@ -14,6 +14,17 @@ Some providers block **outbound ports 80 / 443**. On such a server:
 
 The block is **by port, not by protocol**: if the master also serves HTTPS (or HTTP) on another port, these servers can connect.
 
+## Version requirements
+
+| Component | Version                                                | Used for                                                                                             |
+| --------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Master    | v0.5.8-beta.3 or later                                 | Agent alternate address, install script downloading the Agent from the master, license renewal relay |
+| Agent     | v1.1.5-beta.1 or later, **v1.1.5-beta.2+ recommended** | One-click upgrade downloading from the master, license renewal through the master                    |
+
+On v1.1.5-beta.1, Embedded Xray fails to start inside LXC / OpenVZ containers that have a WARP outbound (`CreateTUN("wg0") failed`); beta.2 fixes it. Many port-blocked machines are containers, so install beta.2 or later directly.
+
+A server installed with the install command always gets the latest Agent, so there is nothing else to check.
+
 ## Which case are you in?
 
 | Master address                                                        | What to do                                                                                                                                                           |
@@ -97,15 +108,20 @@ Run the install command on the blocked server. The script:
 1. spends a few seconds probing outbound HTTPS and, if it is blocked, **downloads the Agent from the master** (the master fetches the official release and forwards it; the script still verifies the release signature, so the master cannot alter it);
 2. writes the alternate address into the Agent config, so the Agent connects to the master through it.
 
-The install output contains something like:
+The install output contains something like this (actual output from a test machine with outbound 80 / 443 blocked; the address is replaced with an example):
 
 ```text
+Master Server: https://panel.example.com:8443
+...
 [4/6] Downloading MMWX binary...
 这台服务器连不上 https://dl.miaomiaowux.com/(出站 HTTPS 可能被封),改为先从主控下载 Agent。
 Downloading Agent from https://panel.example.com:8443/api/remote/agent-dist/<token>/mmw-agent-linux-amd64 ...
 Agent verified (.sig).
 Agent installed.
+[5/6] Starting service...
 ```
+
+Once installed, the server card shows it online, and it also appears in the **Servers connecting via the alternate address** list in System Settings.
 
 ## Servers you already added
 
@@ -116,15 +132,19 @@ Under **Servers connecting via the alternate address**, pick the server and clic
 
 A server that **connects through the alternate address is added to the list automatically**, including one whose install command you edited by hand or one that failed over to it as a backup master address.
 
-If 443 gets blocked on a server that is already running, nothing needs to be done by hand: after the main address has been unreachable for 2 minutes the Agent switches to the alternate address; the master sees it arrive through the alternate address and makes that its master address. From then on it no longer probes the unreachable main address, and connects straight to the alternate address after a restart.
+If 443 gets blocked on a server that is already running, nothing needs to be done by hand: after the main address has been unreachable for 2 minutes the Agent switches to the alternate address; the master sees it arrive through the alternate address and makes that its master address. From then on it no longer probes the unreachable main address, and connects straight to the alternate address after a restart. This requires the server to have received the alternate address before it got blocked (online Agents receive it automatically when you save the alternate address).
+
+### Older Agents
+
+On Agents older than v1.1.5-beta.1, the panel's one-click upgrade runs the **old upgrade script**, which only downloads from the official channels and therefore fails on a blocked machine. Copy the install command from the server card and run it again on the server once (the server keeps its identity and nodes are unaffected) to get the new version; after that, one-click upgrades download from the master automatically.
 
 ## After installation
 
 For servers connecting through the alternate address:
 
 - **Their master address stays the alternate address**: reconnect resync, a new panel domain and switching the Agent address never change it to the 443 address, and the unreachable main address is not added to their backup master addresses;
-- **One-click upgrade from the panel**: downloads from the master when the official channels are unreachable, with the same signature check;
-- **License renewal**: if the license service cannot be reached directly, the request goes through the master (the master only relays the request the Agent signed);
+- **One-click upgrade from the panel** (Agent v1.1.5-beta.1+): downloads from the master when the official channels are unreachable, with the same signature check;
+- **License renewal** (Agent v1.1.5-beta.1+): if the license service cannot be reached directly, the request goes through the master (the master only relays the request the Agent signed);
 - **Geo data**: `geoip.dat` / `geosite.dat` needed by Embedded Xray are fetched from the master when they cannot be downloaded.
 
 Other servers use the alternate address as a **backup master address** (an Agent tries backup master addresses after the main address has been unreachable for 2 minutes), so if their 443 gets blocked later they switch to it automatically.
