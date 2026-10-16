@@ -1,6 +1,6 @@
 ---
 title: "客户端下载"
-description: "官方推荐客户端 MeowX（macOS / Android / Windows）下载与安装说明"
+description: "官方推荐客户端 MeowX（macOS / Android / Windows / OpenWrt）下载与安装说明"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -37,7 +37,14 @@ MeowX 是一款独立的代理客户端，也是妙妙屋X 官方推荐的客户
 
     ![MeowX Windows 节点页截图](../../assets/screenshots/client-windows-nodes.webp)
   </TabItem>
+  <TabItem label="OpenWrt">
+    ![MeowX OpenWrt 版插件配置页截图：服务状态、主控账户与订阅](../../assets/screenshots/client-openwrt-home.webp)
+
+    ![MeowX OpenWrt 版辅助功能页截图：po0 加白](../../assets/screenshots/client-openwrt-extras.webp)
+  </TabItem>
 </Tabs>
+
+OpenWrt 版是路由器上的网页界面（LuCI「服务 → MeowX」），不是上面那套 App 界面：订阅、主控账户、po0 加白的用法与客户端一致。
 
 ## 安装说明
 
@@ -60,10 +67,35 @@ MeowX 是一款独立的代理客户端，也是妙妙屋X 官方推荐的客户
 2. 便携版解压即用，数据保存在程序目录。
 3. 系统代理模式开箱即用；TUN 模式需要管理员权限，首次启动核心会弹出 UAC 提示。
 
+### OpenWrt
+
+要求 OpenWrt 24.10 及以后（或同代的 ImmortalWrt）、使用 firewall4；内核约 40MB，小闪存机型先用 `df -h /overlay` 确认剩余空间。SSH 登录路由器后执行：
+
+```shell
+# 一键安装：自动识别系统版本与架构，装好内核、服务、界面与中文翻译
+wget -O - https://dl.miaomiaowux.com/meowx/openwrt/install.sh | ash
+```
+
+想以后像系统软件一样升级，可以改为添加软件源再安装：
+
+```shell
+# 添加软件源（只需一次）
+wget -O - https://dl.miaomiaowux.com/meowx/openwrt/feed.sh | ash
+# OpenWrt 24.10（opkg）
+opkg install meowx luci-app-meowx luci-i18n-meowx-zh-cn
+# OpenWrt 25.12 及以后（apk）
+apk add meowx luci-app-meowx luci-i18n-meowx-zh-cn
+```
+
+装好后打开 LuCI「服务 → MeowX」：在「插件配置」里登录主控账户或粘贴订阅链接，打开「启用」后「保存并应用」。缺省是「仅核心」（只运行内核、开放代理端口，不接管路由器流量），确认订阅可用后关掉它，再按「代理配置」设置透明代理。卸载：`wget -O - https://dl.miaomiaowux.com/meowx/openwrt/uninstall.sh | ash`（会删掉全部设置）。更多说明见 [GitHub 仓库](https://github.com/mmwx-group/meowx-openwrt)。
+
+OpenWrt 版基于开源项目 [OpenWrt-nikki](https://github.com/nikkinikki-org/OpenWrt-nikki) 改造，以 GPL-3.0 开源。
+
 ## 登录与导入订阅
 
 - **网页端登录客户端**（macOS / Windows）：在面板网页「个人菜单 → 扫码登录」里点「登录客户端」，MeowX 会自动打开并完成登录。
 - **手机扫码**（Android）：在桌面端「个人菜单 → 扫码登录」出示二维码，用 MeowX 扫一扫即可。
+- **复制登录链接**（OpenWrt）：路由器上没法扫码，在面板网页「个人菜单 → 扫码登录」里点「复制登录链接」，粘贴到 OpenWrt 版「插件配置」页的「主控账户」卡里登录；链接只能用一次、5 分钟内有效。
 - **订阅链接**：在「我的」页点「导入订阅」，粘贴订阅 URL 或妙妙屋X 短链；也支持 `clash://install-config` 深链。
 
 登录后「我的订阅」会列出账号下的全部订阅，点一下即下载并切换为当前配置；面板更新订阅后客户端会自动同步。退出登录时，从该面板导入的订阅会一并删除。
