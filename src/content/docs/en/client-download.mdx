@@ -1,6 +1,6 @@
 ---
 title: "Client Downloads"
-description: "Download and install MeowX, the officially recommended client, for macOS, Android and Windows"
+description: "Download and install MeowX, the officially recommended client, for macOS, Android, Windows and OpenWrt"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -37,7 +37,14 @@ All platforms share the same design: Home (connection and usage), Nodes (proxy g
 
     ![MeowX Nodes page on Windows](../../../assets/screenshots/client-windows-nodes.webp)
   </TabItem>
+  <TabItem label="OpenWrt">
+    ![MeowX for OpenWrt plugin settings page: service status, panel account and subscription](../../../assets/screenshots/client-openwrt-home.webp)
+
+    ![MeowX for OpenWrt Extras page: po0 whitelist](../../../assets/screenshots/client-openwrt-extras.webp)
+  </TabItem>
 </Tabs>
+
+The OpenWrt edition is a web interface on the router (LuCI “Services → MeowX”) rather than the app design above; subscriptions, the panel account and the po0 whitelist work the same way as in the apps.
 
 ## Installation
 
@@ -60,10 +67,35 @@ All platforms share the same design: Home (connection and usage), Nodes (proxy g
 2. The portable build runs from any folder and keeps its data next to the executable.
 3. System Proxy mode works out of the box; TUN mode needs administrator rights and triggers a UAC prompt when the core starts.
 
+### OpenWrt
+
+Requires OpenWrt 24.10 or later (or the matching ImmortalWrt) with firewall4. The core takes about 40 MB, so on small-flash routers check the free space first with `df -h /overlay`. SSH into the router and run:
+
+```shell
+# One-line install: detects the release and architecture, installs the core, service, web UI and translations
+wget -O - https://dl.miaomiaowux.com/meowx/openwrt/install.sh | ash
+```
+
+To upgrade it later like any system package, add the package feed and install from it instead:
+
+```shell
+# Add the feed (once)
+wget -O - https://dl.miaomiaowux.com/meowx/openwrt/feed.sh | ash
+# OpenWrt 24.10 (opkg)
+opkg install meowx luci-app-meowx
+# OpenWrt 25.12 or later (apk)
+apk add meowx luci-app-meowx
+```
+
+Then open LuCI “Services → MeowX”: sign in to your panel account or paste a subscription link under “App Config”, turn on “Enable” and click “Save & Apply”. “Core Only” is on by default (it only runs the core and opens the proxy port, without taking over router traffic); once the subscription works, turn it off and set up the transparent proxy under “Proxy Config”. Uninstall with `wget -O - https://dl.miaomiaowux.com/meowx/openwrt/uninstall.sh | ash` (this removes all settings). See the [GitHub repository](https://github.com/mmwx-group/meowx-openwrt) for more.
+
+The OpenWrt edition is built on the open-source project [OpenWrt-nikki](https://github.com/nikkinikki-org/OpenWrt-nikki) and is released under GPL-3.0.
+
 ## Sign in and import subscriptions
 
 - **Sign in from the web panel** (macOS / Windows): open "Account menu → QR login" in the panel and click "Sign in to client"; MeowX opens and signs in automatically.
 - **Scan with your phone** (Android): show the QR code under "Account menu → QR login" on a desktop browser and scan it with MeowX.
+- **Copy the login link** (OpenWrt): routers can't scan QR codes, so click "Copy login link" under "Account menu → QR login" in the panel and paste it into the "Panel Account" card on the OpenWrt "App Config" page. The link works once, within 5 minutes.
 - **Subscription link**: tap “Import subscription” on the Me page and paste a subscription URL or a MiaoMiaoWu X short link; `clash://install-config` deep links are supported too.
 
 After signing in, "My subscriptions" lists every subscription on the account; tap one to download it and make it active. Changes made in the panel are synced to the client automatically. Signing out removes the subscriptions imported from that panel.
