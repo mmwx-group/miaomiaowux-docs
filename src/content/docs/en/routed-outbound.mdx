@@ -199,6 +199,77 @@ Assign both child nodes in a package to users. Users see two routes in their sub
 - User-level traffic is still billed independently by sub-account email
 - Users seamlessly switch between landings, experiencing them as two independent routes
 
+## Advanced: Full Relay + AI Relay Sharing One Landing
+
+### Scenario
+
+One entry relay server "Line A" plus one landing server (with an SS node on it). You want to offer users two lines at the same time:
+
+- **Full relay**: all traffic exits through the landing SS;
+- **AI relay**: only AI services (OpenAI, Claude, Gemini, etc.) go through the landing; everything else exits directly from Line A — saving landing traffic and keeping everyday latency low.
+
+| Line       | Node users connect to       | AI domains | Everything else   |
+| ---------- | --------------------------- | ---------- | ----------------- |
+| Full relay | Routed child node on Line A | landing SS | landing SS        |
+| AI relay   | Line A's own node           | landing SS | Line A's own exit |
+
+Both lines use the **same** landing SS.
+
+### Key point: don't create another routed child node for the AI relay
+
+A routed child node comes with a rule that covers the whole node: **all** of that child node's traffic goes to its landing, so "everything else" can't fall back to Line A. Therefore:
+
+- "Full relay" is a routed child node;
+- "AI relay" is a **regular node** on Line A with an AI split rule whose outbound is the landing outbound created for "Full relay".
+
+### Steps
+
+**① Create "Full relay"**
+
+1. In Nodes, find Line A's node and click "Create chain proxy" in the row;
+2. In the "新增落地节点" (add landing node) dialog, set 作用范围 (scope) to **子节点(路由出站)** (child node / routed outbound) and give it a recognizable Label, e.g. `all`;
+3. Under 选择落地节点 (select landing node), pick the SS node on the landing server and create.
+
+![Add landing node dialog screenshot](../../../assets/screenshots/nodes-row-landing.webp)
+
+Scope set to 子节点(路由出站) (routed child node), then pick the landing node
+
+This adds the child node `LineA-all` to the node list and an outbound on Line A tagged like `routed:p<parent node id>:all`, which the next step uses.
+
+**② Add an AI split to Line A's own node**
+
+1. On Line A's **own node** (not the child you just created), click "Node Routing";
+2. At the bottom of the dialog click "Quick Add" → "AI Services (select outbound)"; the AI domains are filled in for you;
+3. Set "Outbound" to the `routed:p…:all` created in step ①, keep the scope as **This inbound only**, and add.
+
+![Node routing dialog screenshot](../../../assets/screenshots/nodes-row-routing.webp)
+
+The "Node Routing" dialog: "Quick Add" at the bottom contains "AI Services (select outbound)"
+
+The dialog's dedicated rules now include this AI split rule pointing to `routed:p…:all`; the default outbound stays `direct` (Line A's own exit) and doesn't need changing.
+
+**③ Rename and hand out (optional)**
+
+Rename Line A's own node to something like `LineA-AI-relay`, then add it to a package together with `LineA-all`.
+
+### Result
+
+| Node                      | AI domains | Everything else   |
+| ------------------------- | ---------- | ----------------- |
+| LineA-all (full relay)    | landing SS | landing SS        |
+| LineA-AI-relay (own node) | landing SS | Line A's own exit |
+
+The AI split rule is scoped to Line A's inbound, and the full-relay child node sits on the same inbound, so full-relay users' AI traffic also matches it — it goes to the same landing, so nothing changes for them. Inbound-scoped split rules like this are always placed before routed outbound rules, so the AI rule always matches first.
+
+### Line A's own node must stay fully direct?
+
+Node routing rules apply per inbound ("This inbound only" or "Global (all inbounds)"); nodes sharing one inbound can't be told apart. If Line A's own node must keep sending everything direct, **add another inbound** on Line A (another port) as the AI relay and do step ② on that new node instead; the original node is unaffected.
+
+### Notes
+
+- **Deleting the AI split rule**: in v0.5.8-beta.4 and earlier, deleting it from the "Node Routing" dialog also deletes the landing outbound it points to, taking the "Full relay" rules with it. On those versions delete it under "Servers → Xray Config → Routing tab" instead, which only removes the rule.
+- **Deleting the "Full relay" child node**: its landing outbound is removed, and the AI split rule pointing to it is cleared as well. To keep the AI relay, point the AI split rule at another outbound first.
+
 ## Implementation Details
 
 ### When Creating Routed Outbound
