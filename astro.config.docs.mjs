@@ -131,6 +131,7 @@ export default defineConfig({
           items: [
             "traffic-accounting",
             "routed-outbound",
+            "routing-scenarios",
             "forward",
             "reverse-tunnel",
             "system-settings",
