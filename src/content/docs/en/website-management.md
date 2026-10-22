@@ -51,6 +51,8 @@ Without Nginx the Agent can install it; an existing Nginx is reused with compati
 - Without a service manager, the nginx binary is used to start, reload and stop
 - The Docker image ships Nginx, no systemctl needed
 
+When the panel-installed nginx is affected by a published vulnerability, the nginx status section on this page shows the vulnerabilities and an upgrade button; see [Nginx Vulnerability Alerts and One-Click Upgrade](/docs/en/nginx-security).
+
 :::caution[Ports and master protection]
 Ports 80/443 are checked before adding. When the master already serves HTTPS, an Agent on the same machine may not enable "steal self" to avoid taking over 443 and losing the panel. Deleting a site only removes the config managed by MiaoMiaoWu X, never the static directory or the upstream app.
 :::

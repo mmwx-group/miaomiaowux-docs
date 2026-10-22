@@ -43,6 +43,7 @@ Nginx provides TLS camouflage and forwards port 443 traffic to Xray.
 - SSE streaming progress
 - Certificates deployed automatically afterwards
 - Sites are managed in "Agent → Websites", see [Nginx Websites](/docs/en/website-management)
+- When nginx has a security vulnerability the panel flags it and can upgrade it with one click, see [Nginx Vulnerability Alerts and One-Click Upgrade](/docs/en/nginx-security)
 
 ## Service control
 

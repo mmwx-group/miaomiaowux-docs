@@ -10,6 +10,8 @@ tableOfContents:
 
 The standalone probe hosts its static UI, read-only API proxy, and WebSocket proxy in one Cloudflare Worker. Visitors only access the probe hostname, while the master access token stays in a Worker Secret.
 
+The external probe's page is the same as the built-in probe's; see [The probe page](/docs/en/probe-api#the-probe-page). When the built-in probe is redesigned the external probe is updated to match, and forks with automatic updates (below) pick it up on their own.
+
 ## Before you begin
 
 1. The master must have a public HTTPS address reachable by Cloudflare.

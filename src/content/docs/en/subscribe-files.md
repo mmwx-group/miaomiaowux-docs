@@ -1,6 +1,6 @@
 ---
 title: "Subscription Files"
-description: "Manage generated subscription files and imported external subscriptions: bind V3 templates, set short links, view traffic; external subscriptions refresh on a schedule and merge with your own nodes in package subscriptions."
+description: "Manage generated subscription files and imported external subscriptions: bind V3 templates, set short links, view traffic; external subscriptions refresh on a schedule and merge with your own nodes in package subscriptions, or several can be combined into one aggregate subscription."
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -16,6 +16,8 @@ The "Subscriptions" page manages two kinds of things:
 
 - **Subscription list**: files saved from the [Generator](/docs/en/generator) (YAML files in the subscribes directory). Each file can get a custom short link, a bound V3 template and a traffic display.
 - **External subscriptions**: airport sources imported in [Nodes → Import external nodes → Subscription](/docs/en/nodes#import-external-nodes). View, sync or delete them here; imported nodes merge with nodes generated from local Xray inbounds and are distributed through the same subscription system.
+
+"Aggregate" at the top of the page combines several external subscriptions into one new subscription by tag; see [Aggregate subscriptions](#aggregate-subscriptions) below.
 
 ## Subscription list
 
@@ -54,6 +56,39 @@ External subscriptions can refresh on an interval. "System Settings → Subscrip
 | Hourly   | Frequently changing nodes        |
 | Daily    | General use                      |
 | Custom   | As needed                        |
+
+## Aggregate subscriptions
+
+An aggregate subscription combines several external subscriptions (or any node tags) into one new subscription. It only remembers which tags to include, not the nodes themselves: every time a client fetches it, the current nodes with those tags are taken live. If a source drops from 100 nodes to 20, the aggregate follows with 20, with no need to regenerate.
+
+Useful for merging several provider subscriptions into one for yourself, or putting external subscriptions and your own nodes into the same config.
+
+### Create one
+
+1. On the "Subscriptions" page, click "Aggregate" at the top.
+2. Enter a "Name"; "Description" and "File name" can be left empty to be generated.
+3. Under "Sources / tags", tick what to combine:
+   - **External subscription**: nodes synced from an external subscription are tagged with its name.
+   - **Node tag**: any other node tag, e.g. one entered when importing external nodes.
+4. "Template" is optional:
+   - No template: a minimal config with all nodes in one selector group `PROXY` (plus DIRECT), and all traffic goes through it.
+   - V3 template: generated from the template, with routing rules.
+   - My V2 templates / V2 presets: converted into a V3 template file first and then bound (an existing V3 template with the same name is used directly); you can keep editing it on the [Templates](/docs/en/templates) page.
+5. Click "Create aggregate".
+
+If there are no tags to choose from yet, import an external subscription in [Nodes](/docs/en/nodes#import-external-nodes) or tag some nodes first.
+
+### How it differs from a regular subscription
+
+- It has an "Aggregate" badge in the list; hover to see its source tags.
+- There's no "Edit config" or "Select nodes": the content is decided by the tags. "Edit info" lets you change the source tags.
+- Nodes come from the **creator's own** nodes (usually the external subscriptions they imported) and aren't limited by package scope.
+- It's generated the same way as a template-bound subscription: panel nodes still get the recipient's own credentials, and forward chains, WireGuard etc. are handled as usual.
+- If generation fails (e.g. no nodes at all under the selected tags), an error is returned instead of an empty config.
+
+### Make nodes removed at the source disappear too
+
+By default, syncing an external subscription only updates nodes that are already saved: new nodes at the source aren't added and removed ones aren't deleted. For an aggregate to follow its sources exactly, set the [sync scope](/docs/en/system-settings#sync-scope) under "System Settings → Subscription → External subscription sync" to "Sync All Nodes": new nodes are added automatically, and nodes no longer at the source are deleted on sync (not when an update fails).
 
 ## Traffic column
 
