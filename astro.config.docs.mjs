@@ -62,7 +62,7 @@ export default defineConfig({
         {
           label: "客户端",
           translations: { en: "Clients" },
-          items: ["client-download", "client-settings"],
+          items: ["client-download", "client-login", "client-settings"],
         },
         {
           label: "安装部署",
