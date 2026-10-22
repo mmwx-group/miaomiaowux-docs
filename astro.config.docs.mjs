@@ -96,6 +96,7 @@ export default defineConfig({
           items: [
             "remote-servers",
             "website-management",
+            "nginx-security",
             "xray-service",
             "xray-inbounds",
             "xray-outbounds",

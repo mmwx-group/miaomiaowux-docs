@@ -14,6 +14,40 @@ The probe is enabled in "System Settings → Probe": disguise the site as a publ
 
 System Settings → Probe: disguised probe switches
 
+## The probe page
+
+Every theme except "Premium Black Gold" uses the layout below for the probe page, including the [external probe](/docs/en/install-external-probe).
+
+### Top metrics
+
+| Metric | Meaning |
+| --- | --- |
+| Servers | Number of servers shown; click to show all |
+| Online | Number online |
+| Total down / up | Live speed summed across all servers |
+| Traffic today | Today's traffic summed across all servers |
+| Average load | Average CPU usage of online servers |
+| Renewals due | Servers expiring within 30 days and their total renewal cost (only servers with a renewal price) |
+
+When the globe is enabled under "System Settings → Probe", the six metrics form three columns by two rows on the left and the globe sits on the right. Each region with servers gets a flag and server count next to it on the globe; labels that are too close are shifted apart, and any that still don't fit are hidden.
+
+### Toolbar
+
+- **Search**: filter by server name.
+- **Region**: show one region only.
+- **Alerts N**: only servers whose CPU, memory, disk or billing usage is above 90%; **Renewals due N**: only those expiring within 30 days.
+- **Sort**: default order (as arranged by the admin), name, CPU, memory, speed, traffic, expiry date, latency. Servers without that data go last.
+- **By region**: group cards by region.
+- **Standard / Compact**: compact mode keeps only CPU / memory / disk usage, billing usage and speed, fitting more servers on screen.
+
+Sort, grouping and density choices are remembered in the visitor's own browser. On wide screens the toolbar sticks to the top while scrolling.
+
+### Server cards
+
+- Specs are written under the progress bars: CPU cores, and used / total memory and disk.
+- The health status is shown in the top-right corner; cards with alerts get a red outline.
+- Offline servers keep only specs, renewal info and "last seen xx minutes ago".
+
 ## Access and authentication
 
 The built-in probe uses same-origin browser requests. A protected standalone probe must send X-MMwx-Probe-Token. Disabled probe channels normally return 404.
@@ -40,6 +74,7 @@ The built-in probe uses same-origin browser requests. A protected standalone pro
 | ------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------- |
 | name                                                          | string           | Server name, controlled by the show-name switch                                          |
 | online                                                        | boolean          | Online according to Agent WebSocket or stored status                                     |
+| last_seen                                                     | string, ISO 8601 | Last heartbeat time; only returned for offline servers                                   |
 | region                                                        | string           | Region emoji                                                                             |
 | region_country / region_name / region_city                    | string           | Country, full region, and city                                                           |
 | provider_name / provider_url                                  | string           | Provider name and validated HTTP(S) URL                                                  |

@@ -43,6 +43,7 @@ Nginx 用于 TLS 伪装，将 443 端口的流量转发到 Xray。
 - 支持 SSE 流式安装进度
 - 安装完成后自动触发证书部署
 - 站点的增删在「Agent → 网站管理」，见 [Nginx 网站管理](/docs/website-management)
+- nginx 出了安全漏洞时面板会提示，并可一键升级，见 [Nginx 漏洞提示与一键升级](/docs/nginx-security)
 
 ## 服务控制
 

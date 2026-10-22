@@ -10,6 +10,8 @@ tableOfContents:
 
 外置探针将静态页面、只读 API 代理和 WebSocket 代理部署到同一个 Cloudflare Worker。访客只访问探针域名，主控访问密钥由 Worker Secret 保管，不会暴露在浏览器中。
 
+外置探针的页面与内置探针相同，见 [探针页面](/docs/probe-api#探针页面)。内置探针改版后外置探针会同步更新，启用了下文「fork 自动更新」的会自动跟上。
+
 ## 部署前准备
 
 1. 主控必须具有可由 Cloudflare 访问的公网 HTTPS 地址。

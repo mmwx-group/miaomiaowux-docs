@@ -221,6 +221,8 @@ Controls which nodes are updated during sync.
 | Sync Saved Nodes Only | Only update nodes already in the database (default), won't auto-add new nodes |
 | Sync All Nodes        | Sync all nodes from remote subscription, new nodes auto-added to database     |
 
+With "Sync All Nodes", nodes no longer present at the source are also deleted on sync (not when an update fails), so an [aggregate subscription](/docs/en/subscribe-files#aggregate-subscriptions) follows its sources exactly.
+
 #### Keep Current Node Names
 
 <table class="w-full text-sm">
