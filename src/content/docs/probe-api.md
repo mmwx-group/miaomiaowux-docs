@@ -18,6 +18,10 @@ tableOfContents:
 
 除「高级黑金」外，各主题的探针页（包括 [外置探针](/docs/install-external-probe)）都用下面这套布局。
 
+![探针页面截图](../../assets/screenshots/probe-page-overview.webp)
+
+探针页：顶部指标与地球、工具条、服务器卡片
+
 ### 顶部指标
 
 | 指标 | 说明 |

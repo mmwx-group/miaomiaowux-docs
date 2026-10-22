@@ -76,6 +76,14 @@ tableOfContents:
    - 我的 V2 模板 / V2 预设模板：先转换成 V3 模板文件再绑定（同名的 V3 模板已存在就直接用），之后可以在 [模板](/docs/templates) 页继续编辑。
 5. 点「创建聚合订阅」。
 
+![创建聚合订阅对话框截图](../../assets/screenshots/subscribe-aggregate-create.webp)
+
+创建聚合订阅：勾选「机场A」「机场B」两个外部订阅作为来源，绑定 V3 模板 default
+
+![绑定模板下拉列表截图](../../assets/screenshots/subscribe-aggregate-template.webp)
+
+「绑定模板」可选不绑定、V3 模板，或 V2 预设模板（选中后先转换成 V3 模板文件再绑定）
+
 还没有可选的标签时，先在 [节点管理](/docs/nodes#导入外部节点) 导入外部订阅，或给节点打上标签。
 
 ### 与普通订阅的区别
@@ -85,6 +93,14 @@ tableOfContents:
 - 节点取自**创建者自己**的节点（通常就是本人导入的外部订阅），不受套餐范围限制。
 - 生成方式与绑定模板的订阅相同：面板节点照常换成收件人自己的凭据，转发链、WireGuard 等照常处理。
 - 生成失败（例如所选标签下一个节点都没有）时直接返回错误，不会下发一份空配置。
+
+![订阅列表里的聚合订阅截图](../../assets/screenshots/subscribe-aggregate-list.webp)
+
+聚合订阅在列表里带「聚合」标记，鼠标悬停显示来源标签
+
+![编辑聚合订阅信息截图](../../assets/screenshots/subscribe-aggregate-edit.webp)
+
+「编辑信息」里可以改选来源标签；没有「编辑配置」和「选择节点」
 
 ### 让源订阅删掉的节点也跟着消失
 

@@ -76,6 +76,14 @@ Useful for merging several provider subscriptions into one for yourself, or putt
    - My V2 templates / V2 presets: converted into a V3 template file first and then bound (an existing V3 template with the same name is used directly); you can keep editing it on the [Templates](/docs/en/templates) page.
 5. Click "Create aggregate".
 
+![Create aggregate subscription dialog](../../../assets/screenshots/subscribe-aggregate-create.webp)
+
+Creating an aggregate: two external subscriptions ("机场A", "机场B") ticked as sources, bound to the V3 template default
+
+![Template dropdown](../../../assets/screenshots/subscribe-aggregate-template.webp)
+
+"Template" can be none, a V3 template, or a V2 preset (converted into a V3 template file first, then bound)
+
 If there are no tags to choose from yet, import an external subscription in [Nodes](/docs/en/nodes#import-external-nodes) or tag some nodes first.
 
 ### How it differs from a regular subscription
@@ -85,6 +93,14 @@ If there are no tags to choose from yet, import an external subscription in [Nod
 - Nodes come from the **creator's own** nodes (usually the external subscriptions they imported) and aren't limited by package scope.
 - It's generated the same way as a template-bound subscription: panel nodes still get the recipient's own credentials, and forward chains, WireGuard etc. are handled as usual.
 - If generation fails (e.g. no nodes at all under the selected tags), an error is returned instead of an empty config.
+
+![Aggregate subscription in the list](../../../assets/screenshots/subscribe-aggregate-list.webp)
+
+An aggregate subscription has an "Aggregate" badge in the list; hover to see its source tags
+
+![Edit aggregate subscription info](../../../assets/screenshots/subscribe-aggregate-edit.webp)
+
+"Edit info" lets you change the source tags; there's no "Edit config" or "Select nodes"
 
 ### Make nodes removed at the source disappear too
 
