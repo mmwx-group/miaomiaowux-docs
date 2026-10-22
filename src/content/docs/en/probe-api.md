@@ -18,6 +18,10 @@ System Settings → Probe: disguised probe switches
 
 Every theme except "Premium Black Gold" uses the layout below for the probe page, including the [external probe](/docs/en/install-external-probe).
 
+![Probe page](../../../assets/screenshots/probe-page-overview.webp)
+
+The probe page: top metrics and globe, toolbar, server cards
+
 ### Top metrics
 
 | Metric | Meaning |

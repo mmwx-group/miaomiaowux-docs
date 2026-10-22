@@ -26,6 +26,10 @@ Open the "Certificates" page; the master nginx status is shown at the top:
 | Master nginx X is older than the recommended version Y | No known vulnerability hit, but outdated; can be upgraded the same way |
 | Master nginx is already X | Shown after an upgrade completes |
 
+![Master nginx vulnerability card on the Certificates page](../../../assets/screenshots/nginx-master-card.webp)
+
+Top of the Certificates page: the CVEs the master nginx is affected by (first 6 by default) and the "Upgrade to X" button
+
 The card is hidden when there are no vulnerabilities and the version isn't below the recommended one, and also when the master has no nginx (HTTPS not enabled).
 
 After clicking "Upgrade to X":
@@ -37,6 +41,10 @@ After clicking "Upgrade to X":
 
 ### Banner on the Servers page
 
+![nginx vulnerability banner on the Servers page](../../../assets/screenshots/nginx-servers-banner.webp)
+
+The nginx vulnerability banner at the top of the Servers page
+
 When any server's nginx is affected, a banner appears at the top of the "Servers" page: "N servers have nginx with published security vulnerabilities; upgrading to X is recommended". Click "View & upgrade" to open the list:
 
 - One row per server, showing the current version, the number of vulnerabilities hit or "No known vulnerabilities", and the reason if it can't be upgraded.
@@ -44,12 +52,20 @@ When any server's nginx is affected, a banner appears at the top of the "Servers
 - Upgrade a single server with its "Upgrade" button, or tick several ("Select all upgradable") and click "Batch upgrade". Batch upgrades run **one server at a time**, each showing "Pending / Upgrading / Upgraded / Failed"; one failure doesn't stop the rest.
 - "Recheck" re-checks all online servers right away.
 
+![nginx security vulnerability list](../../../assets/screenshots/nginx-servers-dialog.webp)
+
+The "View & upgrade" list: upgradable servers can be upgraded one by one or ticked for a batch upgrade; the others show why they can't
+
 ### A single server
 
 You can also check and upgrade an individual server directly:
 
 - **Servers with external Xray**: the server card's "Agent" menu → "Service management", in the nginx section of the "Remote server management" dialog.
 - **Servers with embedded Xray** (no "Service management" menu): "Agent" → "Websites", in the nginx status section. See [Nginx Websites](/docs/en/website-management).
+
+![nginx vulnerability notice in Websites](../../../assets/screenshots/nginx-server-inline.webp)
+
+A server with embedded Xray: "Agent" → "Websites" lists the CVEs under the nginx status, with an upgrade button
 
 ## What the upgrade does
 

@@ -26,6 +26,10 @@ tableOfContents:
 | 主控 nginx X 低于建议版本 Y | 没有命中已知漏洞但版本偏旧，同样可以升级 |
 | 主控 nginx 已是 X | 升级完成后显示 |
 
+![证书管理页主控 nginx 漏洞卡片截图](../../assets/screenshots/nginx-master-card.webp)
+
+证书管理页顶部：主控 nginx 命中的漏洞（默认列前 6 条）和「升级到 X」按钮
+
 没有漏洞、版本也不低于建议版本时不显示这张卡片；主控没装 nginx（没开 HTTPS）时也不显示。
 
 点「升级到 X」后：
@@ -37,6 +41,10 @@ tableOfContents:
 
 ### 服务管理页顶部横幅
 
+![服务管理页 nginx 漏洞横幅截图](../../assets/screenshots/nginx-servers-banner.webp)
+
+服务管理页顶部的 nginx 漏洞横幅
+
 有服务器的 nginx 受漏洞影响时，「服务管理」页顶部会出现横幅：「N 台服务器的 nginx 有已公开的安全漏洞，建议升级到 X」。点「查看并升级」打开清单：
 
 - 每台服务器一行，显示当前版本、命中的漏洞数或「无已知漏洞」，以及不能升级的原因。
@@ -44,12 +52,20 @@ tableOfContents:
 - 可以对单台点「升级」，也可以勾选多台（「全选可升级」）后点「批量升级」。批量升级**逐台进行**，每台显示「等待中 / 升级中 / 已升级 / 失败」；某一台失败不影响后面的。
 - 「重新检测」立即重新检查所有在线服务器。
 
+![nginx 安全漏洞清单截图](../../assets/screenshots/nginx-servers-dialog.webp)
+
+「查看并升级」清单：可升级的服务器可单台升级，也可勾选后批量升级；不能升级的写明原因
+
 ### 单台服务器
 
 不想等横幅，也可以在单台服务器上直接看和升级：
 
 - **外置 Xray 的服务器**：服务器卡片「Agent」菜单 →「服务管理」，在「远程服务器管理」窗口的 nginx 一栏。
 - **内嵌 Xray 的服务器**（没有「服务管理」菜单）：「Agent」→「网站管理」，在 nginx 状态那一栏。见 [Nginx 网站管理](/docs/website-management)。
+
+![网站管理里的 nginx 漏洞提示截图](../../assets/screenshots/nginx-server-inline.webp)
+
+内嵌 Xray 的服务器：「Agent」→「网站管理」，nginx 状态下方列出漏洞并可直接升级
 
 ## 升级时会做什么
 
