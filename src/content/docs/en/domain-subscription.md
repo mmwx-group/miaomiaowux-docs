@@ -20,6 +20,10 @@ The subscription domain is for proxy clients only: fetching subscriptions and re
 
 Everything else returns 404.
 
+:::tip[Want users to sign in to the panel on this domain too?]
+With "Also use as the user portal" on, the subscription domain also gives regular users the panel (sign-in, subscriptions, traffic, personal settings), while admin pages and admin APIs still return 404 and admins can't sign in. See [User portal](/docs/en/domain-user-portal).
+:::
+
 ## Configuring it in the panel
 
 1. Point the subscription domain at the master server and prepare a certificate covering it in [Certificates](/docs/en/certificates) (a wildcard certificate works).
@@ -113,6 +117,10 @@ When publishing the subscription domain through a Tunnel, restrict paths on the 
 :::note
 When the subscription domain and the [report domain](/docs/en/domain-agent) are the same domain, one site must allow both sets of paths; see [Report domain · Sharing a domain with subscriptions](/docs/en/domain-agent#sharing-a-domain-with-subscriptions).
 :::
+
+## Also using it as the user portal
+
+Once the **Also use as the user portal** switch below the card is on, this domain forwards the whole site and serves the user panel, so the subscription-only config above no longer applies. For the switches, manual configuration and Cloudflare settings, see [User portal](/docs/en/domain-user-portal).
 
 ## With "Disable public access"
 

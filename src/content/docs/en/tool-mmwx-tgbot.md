@@ -90,6 +90,15 @@ Admins see the global overview plus user / traffic / redemption-code management 
 
 Regular users see their own plan, used traffic, subscription URL and available nodes in the Mini App.
 
+### Separate user and admin pages
+
+With the [user portal](/docs/en/domain-user-portal) on for the subscription domain, the Mini App is split by role into two pages:
+
+- **User page**: `subscription domain/tg-app`. The bot's default menu button opens it, and it contains nothing admin-only.
+- **Admin page**: `panel domain/tg-app/admin`, served only on the panel domain. Telegram accounts configured as admins get their own menu button pointing here.
+
+Opening the wrong page switches you to the right one for your role. The bot restarts automatically when the user-portal switch changes, so the menu buttons update. Without the user portal, both pages live under the master address.
+
 ## Security notes
 
 The Bot Token controls your Bot and must remain secret. Mini App development preview permits initData in a URL and is only for local debugging; keep it disabled in production to prevent replay risks.
