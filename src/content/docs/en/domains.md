@@ -11,7 +11,7 @@ miaomiaowuX can use up to three domains, one for each kind of visitor:
 | Domain | Who uses it | Paths allowed | Where to set it | Required |
 | --- | --- | --- | --- | --- |
 | [Master domain](/docs/en/domain-master) | Browsers of admins and users (the panel); also serves subscriptions and Agents when the others are not set | Everything | System Settings → "System" → Master Server URL | Yes |
-| [Subscription domain](/docs/en/domain-subscription) | Proxy clients fetching subscriptions and reporting allowlist IPs | Subscription paths (`/x/*`, subscription endpoints, `/api/fw/*`) | System Settings → "System" → Subscription URL | Optional |
+| [Subscription domain](/docs/en/domain-subscription) | Proxy clients fetching subscriptions and reporting allowlist IPs; with the [user portal](/docs/en/domain-user-portal) on, regular users' browsers too | Subscription paths (`/x/*`, subscription endpoints, `/api/fw/*`); with the user portal, the user panel as well, while admin pages and admin APIs still return 404 | System Settings → "System" → Subscription URL | Optional |
 | [Report domain (Agent connection address)](/docs/en/domain-agent) | The Agent on every server: long-lived connection, heartbeats, traffic reports, install script | `/api/remote/*` (including WebSocket) | System Settings → "System" → Agent connection address | Optional |
 
 The last two are optional: when they are not set, subscription links and Agents simply use the master domain.
@@ -28,6 +28,7 @@ The last two are optional: when they are not set, subscription links and Agents 
 | --- | --- |
 | Personal use, a few servers | Master domain only |
 | Several users, subscription links are handed out | Master + subscription domain |
+| Users sign in to the panel, but shouldn't learn where the admin backend is | Master + subscription domain, with the [user portal](/docs/en/domain-user-portal) on |
 | Many servers, you do not want every Agent to know the panel domain | All three |
 
 All three can be subdomains covered by one certificate (for example `panel.`, `sub.` and `agent.` under a wildcard `*.example.com`).

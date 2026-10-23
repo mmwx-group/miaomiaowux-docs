@@ -87,6 +87,7 @@ export default defineConfig({
             "domains",
             "domain-master",
             "domain-subscription",
+            "domain-user-portal",
             "domain-agent",
           ],
         },
