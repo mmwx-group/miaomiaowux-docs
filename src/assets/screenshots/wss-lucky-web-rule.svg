@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="820" viewBox="0 0 880 820" role="img" aria-labelledby="title desc">
+  <title id="title">Lucky Web服务规则与反向代理子规则(示意)</title>
+  <desc id="desc">Web服务规则监听高位端口并开启 TLS;子规则选反向代理,前端地址填域名,后端地址填 http://127.0.0.1 加 xray 本地端口。</desc>
+  <rect width="880" height="820" fill="#fafafa"/>
+  <g font-family="Arial, 'Noto Sans SC', sans-serif" fill="#1f2328">
+    <rect x="20" y="15" width="840" height="350" rx="18" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <text x="48" y="58" font-size="21" font-weight="600">Web服务 → 添加Web服务规则</text>
+    <g font-size="17">
+      <text x="48" y="108" fill="#555">名称</text>
+      <rect x="200" y="82" width="620" height="44" rx="8" fill="#fff" stroke="#dedede" stroke-width="2"/><text x="216" y="111">mmwx-wss</text>
+      <text x="48" y="168" fill="#555">监听类型</text>
+      <rect x="200" y="150" width="22" height="22" rx="4" fill="#3b82f6"/><path d="m205 161 5 5 8-10" fill="none" stroke="#fff" stroke-width="2.5"/><text x="232" y="168">IPv4</text>
+      <rect x="310" y="150" width="22" height="22" rx="4" fill="#3b82f6"/><path d="m315 161 5 5 8-10" fill="none" stroke="#fff" stroke-width="2.5"/><text x="342" y="168">IPv6</text>
+      <rect x="34" y="192" width="812" height="64" rx="4" fill="none" stroke="#ff565b" stroke-width="4"/>
+      <text x="48" y="230" fill="#555">监听端口</text>
+      <rect x="200" y="204" width="200" height="44" rx="8" fill="#fff" stroke="#dedede" stroke-width="2"/><text x="216" y="233" font-family="Menlo, monospace">8443</text>
+      <text x="420" y="233" font-size="14" fill="#777">家宽常封 80/443,用高位端口</text>
+      <text x="48" y="296" fill="#555">TLS</text>
+      <rect x="200" y="278" width="60" height="30" rx="15" fill="#3b82f6"/><circle cx="245" cy="293" r="12" fill="#fff"/>
+      <text x="48" y="342" fill="#555">HTTP3</text>
+      <rect x="200" y="324" width="60" height="30" rx="15" fill="#d0d4da"/><circle cx="215" cy="339" r="12" fill="#fff"/>
+    </g>
+
+    <rect x="20" y="385" width="840" height="410" rx="18" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <text x="48" y="428" font-size="21" font-weight="600">该规则 → 添加子规则</text>
+    <g font-size="17">
+      <text x="48" y="478" fill="#555">名称</text>
+      <rect x="200" y="452" width="620" height="44" rx="8" fill="#fff" stroke="#dedede" stroke-width="2"/><text x="216" y="481">vless-ws</text>
+      <text x="48" y="538" fill="#555">Web服务类型</text>
+      <rect x="200" y="512" width="620" height="44" rx="8" fill="#fff" stroke="#dedede" stroke-width="2"/><text x="216" y="541">反向代理</text>
+      <path d="m786 530 6 6 6-6" fill="none" stroke="#777" stroke-width="2"/>
+      <rect x="34" y="574" width="812" height="148" rx="4" fill="none" stroke="#ff565b" stroke-width="4"/>
+      <text x="48" y="616" fill="#555">前端地址</text>
+      <rect x="200" y="590" width="620" height="44" rx="8" fill="#fff" stroke="#dedede" stroke-width="2"/><text x="216" y="619" font-family="Menlo, monospace">ws.example.com</text>
+      <text x="48" y="682" fill="#555">后端地址</text>
+      <rect x="200" y="656" width="620" height="44" rx="8" fill="#fff" stroke="#dedede" stroke-width="2"/><text x="216" y="685" font-family="Menlo, monospace">http://127.0.0.1:11001</text>
+      <text x="48" y="760" font-size="15" fill="#777">前端地址只填域名(不带 https:// 与端口);后端地址不带路径。WebSocket 默认支持,不用另外设置。</text>
+    </g>
+  </g>
+</svg>

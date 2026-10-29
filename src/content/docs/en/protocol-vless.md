@@ -38,6 +38,7 @@ VLESS + TCP + XTLS-Vision-REALITY: the REALITY domain is probed for the lowest l
 - Simple mode: port, UUID and REALITY key pair are generated; just "Submit"
 - Expert mode: edit port, listen address, sniffing, relay address …
 - TLS / WSS combinations need a certificate on the server, otherwise step 1 shows the "SSL configuration" prompt first
+- WSS can also skip the master-managed nginx and go through Cloudflare Tunnel, Cloudflare CDN or Lucky; see [WSS nodes behind Cloudflare / Lucky](/docs/en/wss-reverse-proxy)
 
 ## Configuration Example
 

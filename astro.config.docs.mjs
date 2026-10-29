@@ -125,7 +125,13 @@ export default defineConfig({
         {
           label: "节点与订阅",
           translations: { en: "Nodes & subscriptions" },
-          items: ["nodes", "generator", "subscribe-files", "templates"],
+          items: [
+            "nodes",
+            "wss-reverse-proxy",
+            "generator",
+            "subscribe-files",
+            "templates",
+          ],
         },
         {
           label: "功能说明",

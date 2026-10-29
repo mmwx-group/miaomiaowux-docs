@@ -38,6 +38,7 @@ VLESS + TCP + XTLS-Vision-REALITY：REALITY 域名自动探测延迟最低的目
 - 简易模式：端口、UUID、REALITY 密钥对全部自动生成，直接「提交配置」
 - 专家模式：可改端口、监听地址、嗅探、中转地址等
 - 选 TLS / WSS 组合时服务器需要已配置证书，否则第一步会先弹出「SSL 配置」提示
+- WSS 也可以不用主控配的 nginx，改经 Cloudflare Tunnel、Cloudflare CDN 或 Lucky 接入，见 [WSS 节点接入 Cloudflare / Lucky](/docs/wss-reverse-proxy)
 
 ## 配置示例
 

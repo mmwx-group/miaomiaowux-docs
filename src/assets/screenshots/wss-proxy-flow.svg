@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="470" viewBox="0 0 880 470" role="img" aria-labelledby="title desc">
+  <title id="title">WSS 节点经反代接入的流量路径</title>
+  <desc id="desc">客户端经 Cloudflare Tunnel、Cloudflare CDN 加源站反代或 Lucky 终结 TLS,再以明文 WebSocket 转到本机 127.0.0.1 上的 xray。</desc>
+  <rect width="880" height="470" fill="#fafafa"/>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a8f98"/></marker>
+  </defs>
+  <g font-family="Arial, 'Noto Sans SC', sans-serif" fill="#1f2328">
+    <rect x="24" y="185" width="150" height="96" rx="14" fill="#fff" stroke="#dedede" stroke-width="2"/>
+    <text x="99" y="225" font-size="19" text-anchor="middle" font-weight="600">客户端</text>
+    <text x="99" y="252" font-size="14" fill="#777" text-anchor="middle">TLS + WebSocket</text>
+
+    <rect x="250" y="40" width="300" height="104" rx="14" fill="#fff7ef" stroke="#f38020" stroke-width="2"/>
+    <text x="270" y="74" font-size="18" font-weight="600">① Cloudflare Tunnel</text>
+    <text x="270" y="101" font-size="14" fill="#555">CF 边缘终结 TLS,经 cloudflared</text>
+    <text x="270" y="123" font-size="14" fill="#555">隧道回源,服务器不用开端口、不用证书</text>
+
+    <rect x="250" y="183" width="300" height="104" rx="14" fill="#fff7ef" stroke="#f38020" stroke-width="2"/>
+    <text x="270" y="217" font-size="18" font-weight="600">② Cloudflare CDN(小黄云)</text>
+    <text x="270" y="244" font-size="14" fill="#555">CF 边缘 → 源站 nginx / Caddy(带证书)</text>
+    <text x="270" y="266" font-size="14" fill="#555">可用优选 IP;端口限 443/2053/2083…</text>
+
+    <rect x="250" y="326" width="300" height="104" rx="14" fill="#eef6ff" stroke="#3b82f6" stroke-width="2"/>
+    <text x="270" y="360" font-size="18" font-weight="600">③ Lucky / nginx / Caddy</text>
+    <text x="270" y="387" font-size="14" fill="#555">在本机终结 TLS(ACME 证书)</text>
+    <text x="270" y="409" font-size="14" fill="#555">家宽可用高位端口,如 8443</text>
+
+    <rect x="636" y="170" width="220" height="126" rx="14" fill="#fff" stroke="#2e7d4f" stroke-width="2"/>
+    <text x="746" y="206" font-size="18" text-anchor="middle" font-weight="600">xray(WSS 入站)</text>
+    <text x="746" y="236" font-size="15" text-anchor="middle" fill="#2e7d4f">127.0.0.1:&lt;本地端口&gt;</text>
+    <text x="746" y="262" font-size="14" text-anchor="middle" fill="#777">明文 ws,路径 /ws/&lt;随机&gt;</text>
+    <text x="746" y="284" font-size="13" text-anchor="middle" fill="#777">端口与路径由妙妙屋X 生成</text>
+
+    <g stroke="#8a8f98" stroke-width="2" fill="none" marker-end="url(#a)">
+      <path d="M174 220 C210 180 220 100 248 92"/>
+      <path d="M174 233 L248 235"/>
+      <path d="M174 246 C210 290 220 370 248 378"/>
+      <path d="M550 92 C600 100 610 190 634 205"/>
+      <path d="M550 235 L634 233"/>
+      <path d="M550 378 C600 370 610 280 634 262"/>
+    </g>
+    <text x="440" y="458" font-size="13" fill="#999" text-anchor="middle">SNI 与 ws Host 始终填你的域名;客户端连的地址 / 端口按所选方式填写</text>
+  </g>
+</svg>
