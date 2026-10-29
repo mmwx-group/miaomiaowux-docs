@@ -188,12 +188,16 @@ server {
 ```caddy
 ws.example.com {
     @ws path /ws/abcd1234
-    reverse_proxy @ws 127.0.0.1:11001
-    respond 404
+    handle @ws {
+        reverse_proxy 127.0.0.1:11001
+    }
+    handle {
+        respond 404
+    }
 }
 ```
 
-Caddy 会自动申请证书并处理 WebSocket。
+Caddy 会自动申请证书并处理 WebSocket。两个 `handle` 块不能省：Caddy 按内置顺序执行指令，`respond` 排在 `reverse_proxy` 前面，直接并列写会让所有请求（包括 ws 路径）都返回 404。
 
 把示例里的域名、`/ws/abcd1234` 和 `11001` 换成节点详情里的实际值。
 
