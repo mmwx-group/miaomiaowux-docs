@@ -188,12 +188,16 @@ server {
 ```caddy
 ws.example.com {
     @ws path /ws/abcd1234
-    reverse_proxy @ws 127.0.0.1:11001
-    respond 404
+    handle @ws {
+        reverse_proxy 127.0.0.1:11001
+    }
+    handle {
+        respond 404
+    }
 }
 ```
 
-Caddy obtains the certificate and handles WebSocket automatically.
+Caddy obtains the certificate and handles WebSocket automatically. Keep the two `handle` blocks: Caddy runs directives in its own fixed order where `respond` comes before `reverse_proxy`, so writing them side by side makes every request, including the ws path, return 404.
 
 Replace the domain, `/ws/abcd1234` and `11001` with the values from node details.
 
