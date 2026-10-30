@@ -10,13 +10,13 @@ import { DocDemo } from "@/components/docs/islands/routed-outbound";
 
 ## Try it: nodes + routed outbound
 
-Below is a local mock of the Node Management table — every action (enable/disable, copy link, routed outbound, edit, delete) is clickable. Click the purple Route icon (the «routed outbound» button) on any row to open the «Create Routed Node» dialog, identical to what's in the master.
+Below is a local mock of the Node Management list (new layout); every button is clickable. Click the ⇄ «Landing Node» button (two-arrow icon) next to a node name to open the «Add Landing Node» dialog. With scope «Whole node», all users of the source node exit through that landing and a cyan «⇢ target» appears under the protocol; with scope «Child node (routed outbound)», a new routed child row is added with an indigo «↳ target» under the protocol and the tag «路由出站».
 
 <DocDemo lang="en" client:load />
 
 ## Two Outbound Configuration Methods
 
-On the node management page, the "Create chained outbound" button (double-arrow icon) on each node row opens the Add Landing Node dialog. The Scope selector at the top provides two distinct capabilities:
+On the node management page, the "Landing Node" button (⇄ two-arrow icon) next to each node name opens the Add Landing Node dialog. The Scope selector at the top provides two distinct capabilities:
 
 ![Add landing node dialog screenshot](../../../assets/screenshots/nodes-row-landing.webp)
 
