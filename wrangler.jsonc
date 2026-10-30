@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mmwx-docs",
+  "name": "miaomiaowux-docs",
   "compatibility_date": "2026-05-22",
   // 只有 /api/* 进 Worker(更新日志的 GitHub Release 缓存,见 worker/index.ts),其余仍是纯静态资源
   "main": "worker/index.ts",
