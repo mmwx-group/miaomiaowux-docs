@@ -259,7 +259,7 @@ systemctl status mmw-agent
 # Live logs (the agent's own rotated log file)
 tail -f /var/log/mmw-agent/mmw-agent.log
 
-# If it fails to start or crashes, check the systemd journal (newer agents no longer duplicate routine logs there)
+# If it fails to start or crashes, check the systemd journal
 journalctl -u mmw-agent -n 50 --no-pager
 
 # 重启服务
