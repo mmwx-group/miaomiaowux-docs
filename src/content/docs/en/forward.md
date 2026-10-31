@@ -8,6 +8,8 @@ tableOfContents:
 
 Forwarding (转发管理) links several servers into a forward chain: clients connect to an entry server, traffic is forwarded hop by hop to the exit, and the exit lands on a proxy node. Forwarding is implemented natively by the Agent (not through Xray). Each hop is an independent port forward, and the master orchestrates, pushes and monitors the whole chain.
 
+New to this and want step-by-step instructions? Start with the [Forwarding tutorial](/docs/en/forward-tutorial).
+
 Typical uses:
 
 - Route optimisation: a client-friendly machine as entry (e.g. a domestic relay), a landing machine as exit, extra relay hops as needed
@@ -59,7 +61,7 @@ Canvas: entry group (2 servers) → exit group, with two parallel routes — rou
 ### Building a chain
 
 1. Drag servers from the server pool onto the canvas. Hold Shift to multi-select, then click "group the N selected" to make a group at once
-2. Drag a line from the dot on a group's right side (the group output) to the next group to form the main line
+2. Drag a line from the dot at a group's top-right corner (the group output) to the next group to form the main line
 3. Attach the exit: drag servers with self-built nodes into the exit group, or drag a landing node from the node pool into it
 4. Click "Auto layout" to tidy up, then "Save and push"
 
@@ -69,7 +71,7 @@ Three kinds of lines:
 | --- | --- |
 | Solid (rust) | Main line |
 | Dashed (purple) | Branch: one server detouring on its own |
-| Teal | Path set: multiple routes leaving the same group |
+| Teal | Path set: multiple routes leaving the same group. The route in use is a thick solid line, the others thin dashed lines, each labelled "路N · Xms · 在用" (route N · latency · in use) |
 
 Double-click a line to delete it. Badges on the canvas show the state: "Draft · not pushed", "Unsaved changes", "Pushed"; when something is wrong, an issue badge lists each problem.
 
@@ -80,9 +82,10 @@ Saving validates the chain: the main line must be straight, a server may appear 
 Select a group to edit:
 
 - **Name**
-- **Load strategy**: how connections are spread across **this group's** members (see [Load strategies](#load-strategies))
+- **Load strategy**: how connections are spread across **this group's** members (see [Load strategies](#load-strategies)). With "weighted", the member list heading becomes "members and weights" and each row gets a weight box
+- **Member order**: move members up / down; "primary / backup" follows this order
 - **Forwarding engine**: overrides the chain default (see [Forwarding engines](#forwarding-engines))
-- **Failover**: temporarily removes a member that is unreachable or slower than a threshold (ms), and adds it back once it recovers
+- **Failover**: temporarily removes a member that is unreachable or slower than a threshold (ms), and adds it back once it recovers; 0 = only react to outages. The same threshold decides "degraded" on the overview: a hop slower than it, or with loss ≥1%, shows as degraded
 
 ### Load strategies
 
@@ -105,14 +108,14 @@ So to change how one hop distributes traffic, edit the **next-hop group**, not t
 | Lowest latency | The previous hop uses only the member with the lowest total latency to the exit; the rest are standby and take over within seconds (needs a recent Agent) | Latency first |
 | Primary / backup | Always uses the first member in the list that is still reachable; later members only take over when the ones before them are down, and traffic moves back once they recover. Member order is the priority order (needs a recent Agent; older Agents only use the first member) | One primary, the rest standby |
 
-For relay and exit groups, the previous hop's Agent applies the strategy to every connection and switches within seconds when a member fails. The entry group works differently, see below.
+For relay and exit groups, the previous hop's Agent applies the strategy to every connection and switches within seconds when a member fails. When the next group uses "lowest latency", each member row of the previous group on the canvas shows the server it currently picks ("· → server name Xms"). The entry group works differently, see below.
 
 **The entry group is special**: it has no previous hop. Which entry server a client reaches is decided by the DNS records of the [entry domain](#chain-settings), so entry-group strategies are implemented through DNS:
 
 | Entry-group strategy | Actual effect |
 | --- | --- |
 | Round robin | Every healthy entry is published in the entry domain and DNS rotates between them; unreachable ones are withdrawn |
-| Lowest latency | Only the entry with the lowest total latency to the exit is published, the rest are standby; it is replaced when unreachable, or when another entry is more than 15% faster |
+| Lowest latency | Only the entry with the lowest total latency to the exit is published, the rest are standby; it is replaced when unreachable, or when another entry is faster by more than 15% plus 5ms |
 | Primary / backup | Only the first healthy entry in the member list is published, the rest are standby; it is replaced when unreachable and comes back once it recovers |
 | Least connections | Every healthy entry is published, but entries with far more forwarded connections than the least busy one (more than twice as many plus 50) are withdrawn for now, and come back once they drop below 1.5 times plus 25; at most half of the entries are withdrawn, busiest first |
 | Most remaining traffic / By period | Entries that lag far behind (less than a quarter of the best one's remaining traffic, or quota used up) are withdrawn for now |
@@ -162,7 +165,7 @@ Click an empty spot on the canvas to see the chain settings:
 - **Default forwarding engine**: used by groups without their own setting
 - **Sticky connections**: the same client lands on the same server at every hop, see [Sticky connections](#sticky-connections)
 - **Pass through real client IP**: see [Real client IP passthrough](#real-client-ip-passthrough)
-- **Entry domain**: a domain (wildcard certificate required) whose A / AAAA records the master maintains every 17 seconds from entry server health and the entry group's load strategy — a failed entry server drops out of DNS automatically; with Alibaba Cloud or Tencent Cloud DNS you can also use [split-line DNS](#split-line-dns)
+- **Entry domain**: pick a certificate under "select wildcard certificate" (only `*.` certificates are listed), then fill in a v4 prefix and an optional v6 prefix; the DNS provider bound to the certificate is used automatically. The master maintains the A / AAAA records every 17 seconds from entry server health and the entry group's load strategy — a failed entry server drops out of DNS automatically; with Alibaba Cloud or Tencent Cloud DNS you can also use [split-line DNS](#split-line-dns)
 
 ### Ports per server
 
@@ -171,11 +174,11 @@ A binding has a single **entry port** — the one clients connect to; every serv
 - If the entry port falls inside the range a server allows, the server reuses it (a chain with no port-restricted servers still uses one port end to end)
 - Otherwise the server picks a free port from its own range; the previous hop forwards to that port, and a self-built exit inbound is created on it
 
-The range a server allows defaults to the server's own port range (set in Servers — fill it in for NAT machines that only map a block of ports); unset means unrestricted. On the canvas, click "Port" on a member row to set a range for **this chain** only (use the same number twice for a single port).
+The range a server allows defaults to the server's own port range ("Random port range (optional)" in Servers — fill it in for NAT machines that only map a block of ports); unset means unrestricted. On the canvas, click "Port" on a member row to set a range for **this chain** only (use the same number twice for a single port).
 
 - A range on an **entry server** limits which entry ports can be chosen: the entry port comes from the intersection of the entry servers' ranges, or from the entry range itself when it does not overlap the chain's port range
 - Entry servers whose ranges do not intersect cannot share one entry port — adjust the ranges or enable "separate entries"
-- When binding or adding a node, the port field lists the servers that will use a different port; "Random" always returns a port the entry servers allow
+- When binding an existing node or adding a node, the port field lists the servers that will use a different port. "Nodes → Add node → Forward chain" has a "Random" button that always returns a port the entry servers allow; a new node created from a chain card has no port field (assigned automatically), and when binding an existing node you can leave the port empty to auto-pick or type one
 - Temporary ports for latency probes and the full-chain speed test follow each server's own range as well
 
 ## Branches
@@ -229,7 +232,9 @@ Limitations:
 
 Set a default on the chain and override it per group. If an Agent lacks the iptables / nftables command, it installs it through the system package manager and uses relay in the meantime.
 
-Rules the kernel engines cannot handle **fall back to relay automatically**: rate limits, PROXY headers, IPv6, ports with a client IP whitelist, private upstream addresses and so on. The engine each server actually uses is shown in the forwarding status.
+Rules the kernel engines cannot handle **fall back to relay automatically**: rate or connection limits, writing or reading PROXY headers (client IP passthrough, sticky connections), shared bandwidth groups, sticky connections under iptables, a configured outbound address, ports with a client IP whitelist, upstreams resolving to private / reserved or local addresses, IPv6-only upstreams, and primary / backup upstreams that include an address the kernel can't forward to. Under a kernel engine, "least connections" is treated as round robin. The engine each server actually uses is shown in the forwarding status.
+
+A group-level engine applies to **the hop leaving that group**.
 
 ## Real client IP passthrough
 
@@ -245,20 +250,29 @@ The last hop is attached in one of two ways:
 
 **A. Self-built exit**: the exit group contains your servers and the node lives on them.
 
-- On a chain card, "Bind nodes → New node", choosing "entry split" (subscriptions use the entry server's address) or "exit split"
+- "Bind nodes" opens the bind dialog; choose "New node", with "entry split" (subscriptions use the entry server's address) or "exit split". Cards of chains with no node yet show this button directly; otherwise it is in the card's "…" menu or at the top right of "Bound nodes" on the detail page
+- The dialog's third tab, "Complete entries", creates nodes only for entry servers added later when you don't use an entry domain, reusing the existing port and exit
 - Or from "Nodes → Add node", picking "Forward chain" as the node entry in step one
 
 **B. Landing node**: the exit group points at an existing proxy node (which may be someone else's landing machine).
 
 - Drag the landing node from the node pool into the exit group on the canvas, or use "Bind existing node" on the card
-- Forwarded protocols: TCP / UDP / TCP+UDP
+- The forwarded protocol (TCP / UDP / TCP+UDP) can only be chosen in the canvas side panel (for a newly dropped landing node) and in "Nodes → Add node → Forward chain"; "Bind existing node" on a card and classic mode pick it automatically from the landing protocol (Hysteria2 / TUIC etc. use UDP)
 - If the node has **related nodes** (its parent node and routed-outbound children of the same parent — they share one IP and port), a dialog lists them when you bind; the ones you tick are pointed at this chain's entry address too and show the entry address in node management. Deleting the entry node later puts them back on their original address
 
 Exit-group servers and landing nodes are mutually exclusive; WireGuard nodes can't go through a forward chain.
 
+**Changing the entry port**: in node management, click the forward-chain badge under the node address to open the "Switch forward chain" dialog, change "Entry port" and click "Change port". Forwarding rules, sibling nodes on the same port, related nodes following the chain and the exit inbound (for self-built exits) all change together, with no need to recreate the node; the master creates the new port first and removes the old one only after the push succeeds, rolling everything back if any step fails.
+
+**Unbinding**:
+
+- Delete the entry node the chain created (related nodes go back to their original address)
+- Remove the landing node from the chain on the canvas or in the classic editor and save (this deletes the entry node created for it)
+- Rebind to another chain in the "Switch forward chain" dialog
+
 ## Latency probes
 
-"Latency probe" in the canvas toolbar opens temporary listeners in the chain's port range and measures every hop:
+The "探测延迟" (probe latency) button in the canvas toolbar opens the "Latency probe" panel, which opens temporary listeners in the chain's port range and measures every hop:
 
 ![Latency probe panel screenshot](../../../assets/screenshots/forward-canvas-probe.webp)
 
@@ -294,12 +308,19 @@ Mobile canvas: with the entry group selected, the bottom bar shows "Group settin
 
 ## Alerts and monitoring
 
-- **Forward chain node down alert**: under "System settings → Notifications", on by default. Sends a Telegram notification when a node on a chain has been unreachable for 2 minutes
+- **Forward chain node down / entry DNS alert**: under "System settings → Notifications", on by default. Sends a Telegram notification when a hop of a chain stays unreachable longer than the configured minutes (1–1440, default 2), and another when it recovers; it also notifies when entry DNS sync fails, an entry server's address is not IPv4 and so is missing from the A records, or public resolution has differed from the expected records for over 15 minutes
 - Latency and active routes on the overview, detail pages and the canvas refresh continuously; the overview's "To do" list shows every current problem
 
 ## Member forwarding address
 
-Which address the previous hop uses to reach each member can be chosen per member: auto / fixed entry IP / public / domain / private network / manual. Servers in the same data centre can use the private network to save traffic and latency.
+Which address the previous hop uses to reach each member can be chosen per member, from the address button on the member row on the canvas; classic mode only lets you set it when creating a chain.
+
+- **Auto (from probe results)**: IPv4 between dual-stack servers, IPv6 when either side is IPv6-only; private addresses are tried only after you click "probe latency", and used if reachable and faster
+- **Prefer IPv6**: previous hops that also have IPv6 connect to this server's IPv6
+- **A specific address**: fixed entry IP / public IPv4 / public IPv6 / domain / private network. Private addresses come from the Agent's live NIC list (RFC1918, IPv6 ULA, 100.64/10). A hand-picked address applies to **all** previous hops and is not checked for reachability on save (the panel flags previous hops that can't reach it)
+- **Outbound address**: servers with a next hop can also choose which local NIC address they use to connect to it
+
+Each choice is saved immediately and the chain is pushed again. Servers in the same data centre can use the private network to save traffic and latency.
 
 ## Shared servers
 
@@ -309,7 +330,7 @@ Which address the previous hop uses to reach each member can be chosen per membe
 
 Regular users create forwarding rules for their own nodes under "My forwards". The admin configures a forwarding quota in the package:
 
-- Number of rules, rate limit, connection count
+- Number of rules, number of entry ports (0 = unlimited), rate limit, connection count
 - Which forward chains are allowed
 
 Only traffic on the entry hop of a user's bindings is billed; relay and exit hops are not billed again.
@@ -321,5 +342,7 @@ Classic mode suits straight entry → relay → exit chains and is quick to lear
 - Branches
 - Path sets and lowest-latency selection
 - Per-group forwarding engines
+- The weighted and lowest-latency load strategies (classic mode's "forwarding strategy" offers only round robin, least connections, primary / backup, most remaining traffic and by period, and appears only for groups with 2+ servers), and member weights
+- Failover and sticky connections
 
-Both create the same kind of chain, and a chain made in classic mode can be opened and extended on the canvas at any time.
+Both create the same kind of chain, and a chain made in classic mode can be opened and extended on the canvas at any time. Note: saving in the classic editor resets every member weight to 1, so re-enter weights on the canvas afterwards if you had set them.
