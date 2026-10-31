@@ -1,0 +1,245 @@
+---
+// 转发教程用的拓扑示意图:按网格坐标摆节点、画连线,输出内联 SVG,颜色走 CSS 变量(跟随亮 / 暗主题)。
+// x / y 是网格坐标(列 / 行,可用小数),宽高也按网格单位;连线从源节点右侧连到目标节点左侧。
+type Kind = "client" | "entry" | "relay" | "exit" | "landing" | "dns" | "plain";
+type Style = "main" | "branch" | "path" | "lan" | "dim" | "dns";
+
+interface DNode {
+  id: string;
+  x: number;
+  y: number;
+  label: string;
+  sub?: string;
+  kind?: Kind;
+  w?: number;
+}
+interface DGroup {
+  label: string;
+  kind?: Kind;
+  members: string[];
+}
+interface DEdge {
+  from: string;
+  to: string;
+  style?: Style;
+  label?: string;
+  // 连线从源节点底部 / 顶部出发(画「经 DNS」这类竖向关系时用)
+  fromSide?: "right" | "bottom" | "top";
+  toSide?: "left" | "top" | "bottom";
+  dx?: number; // 标签水平偏移(像素)
+  dy?: number; // 标签竖直偏移(像素)
+}
+interface Props {
+  nodes: DNode[];
+  groups?: DGroup[];
+  edges?: DEdge[];
+  caption?: string;
+}
+
+const { nodes, groups = [], edges = [], caption } = Astro.props;
+const CW = 170; // 列宽
+const RH = 58; // 行高
+const NW = 132; // 默认节点宽
+const NH = 40; // 节点高
+const PAD = 18;
+const GP = 12; // 组框内边距
+const GH = 20; // 组标题高度
+
+const pos = new Map<string, { x: number; y: number; w: number; n: DNode }>();
+for (const n of nodes) {
+  const w = (n.w ?? 1) * NW;
+  pos.set(n.id, { x: PAD + n.x * CW, y: PAD + GH + n.y * RH, w, n });
+}
+
+const groupRects = groups.map((g) => {
+  const ps = g.members.map((id) => pos.get(id)!).filter(Boolean);
+  const x1 = Math.min(...ps.map((p) => p.x)) - GP;
+  const y1 = Math.min(...ps.map((p) => p.y)) - GP - GH;
+  const x2 = Math.max(...ps.map((p) => p.x + p.w)) + GP;
+  const y2 = Math.max(...ps.map((p) => p.y + NH)) + GP;
+  return { g, x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+});
+
+const allX = [...pos.values()].map((p) => p.x + p.w).concat(groupRects.map((r) => r.x + r.w));
+const allY = [...pos.values()].map((p) => p.y + NH).concat(groupRects.map((r) => r.y + r.h));
+const W = Math.ceil(Math.max(...allX) + PAD);
+const H = Math.ceil(Math.max(...allY) + PAD);
+
+function anchor(id: string, side: string) {
+  const p = pos.get(id)!;
+  switch (side) {
+    case "left":
+      return { x: p.x, y: p.y + NH / 2 };
+    case "top":
+      return { x: p.x + p.w / 2, y: p.y };
+    case "bottom":
+      return { x: p.x + p.w / 2, y: p.y + NH };
+    default:
+      return { x: p.x + p.w, y: p.y + NH / 2 };
+  }
+}
+
+const paths = edges.map((e) => {
+  const a = anchor(e.from, e.fromSide ?? "right");
+  const b = anchor(e.to, e.toSide ?? "left");
+  const vertical = (e.fromSide ?? "right") !== "right" || (e.toSide ?? "left") !== "left";
+  let d: string;
+  if (vertical) {
+    const my = (a.y + b.y) / 2;
+    d = `M${a.x},${a.y} C${a.x},${my} ${b.x},${my} ${b.x},${b.y}`;
+  } else {
+    const mx = (a.x + b.x) / 2;
+    d = `M${a.x},${a.y} C${mx},${a.y} ${mx},${b.y} ${b.x},${b.y}`;
+  }
+  return { e, d, lx: (a.x + b.x) / 2 + (e.dx ?? 0), ly: (a.y + b.y) / 2 - 6 + (e.dy ?? 0) };
+});
+
+const uid = "fd" + Math.random().toString(36).slice(2, 8);
+---
+
+<figure class="fwd-diagram">
+  <svg viewBox={`0 0 ${W} ${H}`} width={W} role="img" aria-label={caption ?? "转发拓扑示意图"}>
+    <defs>
+      <marker id={`${uid}-arrow`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" class="fd-arrowhead"></path>
+      </marker>
+    </defs>
+    {
+      groupRects.map((r) => (
+        <g class={`fd-group fd-k-${r.g.kind ?? "plain"}`}>
+          <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="10"></rect>
+          <text x={r.x + 10} y={r.y + 15} class="fd-group-label">
+            {r.g.label}
+          </text>
+        </g>
+      ))
+    }
+    {
+      paths.map((p) => (
+        <g class={`fd-edge fd-s-${p.e.style ?? "main"}`}>
+          <path d={p.d} marker-end={`url(#${uid}-arrow)`}></path>
+          {p.e.label && (
+            <text x={p.lx} y={p.ly} text-anchor="middle" class="fd-edge-label">
+              {p.e.label}
+            </text>
+          )}
+        </g>
+      ))
+    }
+    {
+      [...pos.values()].map((p) => (
+        <g class={`fd-node fd-k-${p.n.kind ?? "plain"}`}>
+          <rect x={p.x} y={p.y} width={p.w} height={NH} rx="7"></rect>
+          <text x={p.x + p.w / 2} y={p.n.sub ? p.y + 17 : p.y + 25} text-anchor="middle" class="fd-node-label">
+            {p.n.label}
+          </text>
+          {p.n.sub && (
+            <text x={p.x + p.w / 2} y={p.y + 32} text-anchor="middle" class="fd-node-sub">
+              {p.n.sub}
+            </text>
+          )}
+        </g>
+      ))
+    }
+  </svg>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style is:global>
+  .fwd-diagram {
+    --fd-entry: #b4532a;
+    --fd-relay: #3f6f68;
+    --fd-exit: #2c4a86;
+    --fd-landing: #7a4fb0;
+    --fd-dns: #8a6d1d;
+    --fd-line: #8a5a44;
+    --fd-branch: #7c4dbd;
+    --fd-path: #1f8a80;
+    --fd-lan: #2f8f3a;
+    --fd-bg: var(--sl-color-bg, #fff);
+    --fd-fg: var(--sl-color-white, #111);
+    --fd-muted: var(--sl-color-gray-3, #777);
+    margin: 1.25rem 0;
+    overflow-x: auto;
+  }
+  :root[data-theme="dark"] .fwd-diagram {
+    --fd-entry: #e0845a;
+    --fd-relay: #6fb3a9;
+    --fd-exit: #7ea2e6;
+    --fd-landing: #b08ae0;
+    --fd-dns: #d4b257;
+    --fd-line: #c99780;
+    --fd-branch: #a987e6;
+    --fd-path: #4cc3b7;
+    --fd-lan: #6cc777;
+  }
+  .fwd-diagram svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    font-family: var(--sl-font, system-ui, sans-serif);
+  }
+  .fwd-diagram figcaption {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--sl-color-gray-3);
+    margin-top: 0.4rem;
+  }
+  .fwd-diagram .fd-group rect {
+    fill: none;
+    stroke: var(--fd-muted);
+    stroke-width: 1.2;
+    stroke-dasharray: 5 4;
+  }
+  .fwd-diagram .fd-group-label {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--fd-fg);
+  }
+  .fwd-diagram .fd-group.fd-k-entry .fd-group-label { fill: var(--fd-entry); }
+  .fwd-diagram .fd-group.fd-k-relay .fd-group-label { fill: var(--fd-relay); }
+  .fwd-diagram .fd-group.fd-k-exit .fd-group-label { fill: var(--fd-exit); }
+  .fwd-diagram .fd-group.fd-k-landing .fd-group-label { fill: var(--fd-landing); }
+  .fwd-diagram .fd-node rect {
+    fill: var(--fd-bg);
+    stroke: var(--fd-muted);
+    stroke-width: 1.4;
+  }
+  .fwd-diagram .fd-node.fd-k-entry rect { stroke: var(--fd-entry); stroke-width: 2; }
+  .fwd-diagram .fd-node.fd-k-relay rect { stroke: var(--fd-relay); stroke-width: 2; }
+  .fwd-diagram .fd-node.fd-k-exit rect { stroke: var(--fd-exit); stroke-width: 2; }
+  .fwd-diagram .fd-node.fd-k-landing rect { stroke: var(--fd-landing); stroke-width: 2; stroke-dasharray: 4 3; }
+  .fwd-diagram .fd-node.fd-k-dns rect { stroke: var(--fd-dns); stroke-width: 2; }
+  .fwd-diagram .fd-node.fd-k-client rect { stroke: var(--fd-fg); stroke-width: 1.6; }
+  .fwd-diagram .fd-node-label {
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--fd-fg);
+  }
+  .fwd-diagram .fd-node-sub {
+    font-size: 10.5px;
+    fill: var(--fd-muted);
+    font-family: var(--sl-font-mono, ui-monospace, monospace);
+  }
+  .fwd-diagram .fd-edge path {
+    fill: none;
+    stroke: var(--fd-line);
+    stroke-width: 2.2;
+  }
+  .fwd-diagram .fd-arrowhead { fill: var(--fd-muted); }
+  .fwd-diagram .fd-s-branch path { stroke: var(--fd-branch); stroke-dasharray: 6 4; }
+  .fwd-diagram .fd-s-path path { stroke: var(--fd-path); }
+  .fwd-diagram .fd-s-lan path { stroke: var(--fd-lan); stroke-dasharray: 2 4; stroke-width: 2.6; stroke-linecap: round; }
+  .fwd-diagram .fd-s-dim path { stroke: var(--fd-muted); stroke-dasharray: 3 4; stroke-width: 1.4; opacity: 0.7; }
+  .fwd-diagram .fd-s-dns path { stroke: var(--fd-dns); stroke-dasharray: 5 3; stroke-width: 1.6; }
+  .fwd-diagram .fd-edge-label {
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--fd-fg);
+    paint-order: stroke;
+    stroke: var(--fd-bg);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+</style>

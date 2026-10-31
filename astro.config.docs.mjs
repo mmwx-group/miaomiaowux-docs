@@ -141,6 +141,7 @@ export default defineConfig({
             "routed-outbound",
             "routing-scenarios",
             "forward",
+            "forward-tutorial",
             "reverse-tunnel",
             "system-settings",
           ],
