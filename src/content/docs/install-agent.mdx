@@ -254,8 +254,11 @@ WantedBy=multi-user.target
 # 查看服务状态
 systemctl status mmw-agent
 
-# 查看实时日志
-journalctl -u mmw-agent -f
+# 查看实时日志(agent 自己写的轮转日志)
+tail -f /var/log/mmw-agent/mmw-agent.log
+
+# 启动失败 / 崩溃时看 systemd 日志(新版 agent 不再往这里重复写日常日志)
+journalctl -u mmw-agent -n 50 --no-pager
 
 # 重启服务
 systemctl restart mmw-agent

@@ -256,8 +256,11 @@ The one-click installation uses WebSocket connection mode by default. To change 
 # 查看服务状态
 systemctl status mmw-agent
 
-# 查看实时日志
-journalctl -u mmw-agent -f
+# Live logs (the agent's own rotated log file)
+tail -f /var/log/mmw-agent/mmw-agent.log
+
+# If it fails to start or crashes, check the systemd journal (newer agents no longer duplicate routine logs there)
+journalctl -u mmw-agent -n 50 --no-pager
 
 # 重启服务
 systemctl restart mmw-agent
