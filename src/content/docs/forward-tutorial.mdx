@@ -22,6 +22,7 @@ import shotPortPicker from "../../assets/screenshots/ft-port-picker.webp";
 import shotServerPortrange from "../../assets/screenshots/ft-server-portrange.webp";
 import shotDetailDns from "../../assets/screenshots/ft-detail-dns.webp";
 import shotDetailActual from "../../assets/screenshots/ft-detail-actual.webp";
+import shotEntryAddr from "../../assets/screenshots/ft-entry-addr.webp";
 
 这篇教程按「要做什么」来组织,每一步都配了界面截图和示意图。每个功能的完整说明与参数见[转发管理](/docs/forward),这里只讲怎么用。
 
@@ -195,9 +196,30 @@ import shotDetailActual from "../../assets/screenshots/ft-detail-actual.webp";
 
 ### 订阅里的地址是什么
 
-- **地址**:链设了入口域名就用入口域名;没设就用入口组第一台的地址
+- **地址**:链设了入口域名就用入口域名;没设就用入口组第一台的「入口地址」(见下)
 - **端口**:入口端口
 - **协议和凭据**:来自出口上的入站,或落地节点本身
+
+### 入口地址写 IP 还是域名
+
+入口组每台服务器可以单独设「订阅里写哪个地址」。打开画布,点入口组成员行上的「入口 …」按钮(悬停提示「订阅里写的入口地址,点击切换」),弹层顶部就是「入口地址(写进订阅 / 入口节点,客户端连这个地址)」:
+
+<DocShot src={shotEntryAddr} alt="入口地址" />
+
+入口地址弹层:这条链在功能上线前就有,所以多了「旧规则」一行;下半部分是这台连下一跳用的出站地址
+
+| 选项 | 订阅里写的地址 |
+| --- | --- |
+| 自动(跟随服务器地址) | 和普通节点一样:服务器有域名用域名,没有用 IP;服务器地址变了跟着变。新建的链、新加进入口组的服务器默认是它 |
+| IPv4 / IPv6 | 这台的公网 IPv4 / IPv6(开了「锁定节点入口 IP」时取手填的地址);这台没有对应地址时选项是灰的 |
+| 手填 / 登记的域名 | 「指定」一个域名或 IP,比如套了 CDN 的域名;这台在服务管理里登记过的域名会直接列出来 |
+| 旧规则(IP 优先) | 只在功能上线前就有的链上出现:有 IP 用 IP,没有才用域名。没改过就一直照旧 |
+
+- 点一项就立即保存;已经停在这台旧地址上的入口节点会挪到新地址,客户端更新订阅后生效
+- 链设了入口域名时,不分离的那个入口节点照旧用入口域名,这里的设定只用于[入口分离](#入口分离每台入口一个节点)和「补全入口」生成的、按台分开的节点
+- 没设入口域名、也没开入口分离时,整条链只有一个入口节点,用的是入口组**第一台**的设定
+- 按设定取不到地址(比如选了 IPv6,后来服务器没了 IPv6)时退回旧规则,不会写出空地址
+- 新建链时(经典模式)入口组成员行上的「入口 自动」按钮也能改这一项
 
 ### 怎么解绑
 
