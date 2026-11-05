@@ -9,6 +9,11 @@ export default defineConfig({
   outDir: "./dist/docs",
   publicDir: "./public",
   trailingSlash: "never",
+  // 「转发管理图文教程」已并进「转发管理」,旧链接跳过去
+  redirects: {
+    "/forward-tutorial": "/docs/forward",
+    "/en/forward-tutorial": "/docs/en/forward",
+  },
   integrations: [
     react(),
     starlight({
@@ -147,7 +152,6 @@ export default defineConfig({
             "routed-outbound",
             "routing-scenarios",
             "forward",
-            "forward-tutorial",
             "reverse-tunnel",
             "meownest",
             "system-settings",
