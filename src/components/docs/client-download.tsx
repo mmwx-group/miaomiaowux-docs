@@ -12,18 +12,27 @@ import {
   Monitor,
   Router,
   Smartphone,
+  Terminal,
   AlertTriangle,
   LoaderCircle,
 } from "lucide-react";
 
 // ClientDownload — 「客户端下载」页的下载卡片。版本与链接不写死在文档里，而是读 R2 桶根目录的
 // latest.json（由 MeowX 仓库 scripts/publish-r2.sh 在发版时上传），发版不用改文档、不用重新部署。
+// Android / Windows / Linux 的条目由 meowC 仓库的 CI（scripts/publish_cdn.py）写；
 // OpenWrt 版的条目由 meowx-openwrt 仓库的发布工作流写（没有安装包列表，给的是软件源与一键安装命令）。
 
 const MANIFEST_URL = "https://dl.miaomiaowux.com/meowx/latest.json";
 
-type Platform = "macos" | "android" | "windows";
-type FileKind = "dmg" | "zip" | "apk" | "setup" | "portable";
+type Platform = "macos" | "android" | "windows" | "linux";
+type FileKind =
+  | "dmg"
+  | "zip"
+  | "apk"
+  | "setup"
+  | "portable"
+  | "deb"
+  | "appimage";
 
 interface ManifestFile {
   kind: FileKind;
@@ -62,11 +71,17 @@ const STRINGS = {
     version: "版本",
     released: "发布于",
     checksum: "SHA-256",
-    platform: { macos: "macOS", android: "Android", windows: "Windows" },
+    platform: {
+      macos: "macOS",
+      android: "Android",
+      windows: "Windows",
+      linux: "Linux",
+    },
     requirement: {
       macos: "macOS 14 及以上 · Apple Silicon",
       android: "Android 8.0 及以上 · arm64",
       windows: "Windows 10 及以上 · x64",
+      linux: "Ubuntu 22.04 / Debian 12 及以上 · x64 / arm64",
     },
     kind: {
       dmg: "DMG 安装镜像",
@@ -74,8 +89,13 @@ const STRINGS = {
       apk: "APK 安装包",
       setup: "安装包",
       portable: "便携版",
+      deb: "DEB 安装包",
+      appimage: "AppImage",
     },
-    arch: { "arm64-v8a": "arm64", universal: "通用" } as Record<string, string>,
+    arch: { "arm64-v8a": "arm64", universal: "通用", amd64: "x64" } as Record<
+      string,
+      string
+    >,
     ios: {
       badge: "TestFlight 内测",
       requirement: "iOS 17 及以上 · iPhone / iPad",
@@ -100,11 +120,17 @@ const STRINGS = {
     version: "Version",
     released: "Released",
     checksum: "SHA-256",
-    platform: { macos: "macOS", android: "Android", windows: "Windows" },
+    platform: {
+      macos: "macOS",
+      android: "Android",
+      windows: "Windows",
+      linux: "Linux",
+    },
     requirement: {
       macos: "macOS 14 or later · Apple Silicon",
       android: "Android 8.0 or later · arm64",
       windows: "Windows 10 or later · x64",
+      linux: "Ubuntu 22.04 / Debian 12 or later · x64 / arm64",
     },
     kind: {
       dmg: "DMG disk image",
@@ -112,11 +138,14 @@ const STRINGS = {
       apk: "APK package",
       setup: "Installer",
       portable: "Portable",
+      deb: "DEB package",
+      appimage: "AppImage",
     },
-    arch: { "arm64-v8a": "arm64", universal: "universal" } as Record<
-      string,
-      string
-    >,
+    arch: {
+      "arm64-v8a": "arm64",
+      universal: "universal",
+      amd64: "x64",
+    } as Record<string, string>,
     ios: {
       badge: "TestFlight beta",
       requirement: "iOS 17 or later · iPhone / iPad",
@@ -142,6 +171,7 @@ const PLATFORMS: { id: Platform; Icon: typeof Laptop }[] = [
   { id: "macos", Icon: Laptop },
   { id: "android", Icon: Smartphone },
   { id: "windows", Icon: Monitor },
+  { id: "linux", Icon: Terminal },
 ];
 
 function formatSize(bytes: number) {
@@ -316,6 +346,7 @@ export function ClientDownload({ lang = "zh" }: { lang?: "zh" | "en" }) {
                           variant={
                             f.kind === "zip" ||
                             f.kind === "portable" ||
+                            f.kind === "appimage" ||
                             f.arch === "universal"
                               ? "outline"
                               : "default"
@@ -325,7 +356,7 @@ export function ClientDownload({ lang = "zh" }: { lang?: "zh" | "en" }) {
                             <Download className="size-4" />
                             <span className="truncate">
                               {t.kind[f.kind] ?? f.kind}
-                              {/* 同一平台有多个同类包（Android 的 arm64 / 通用）时标出架构，否则几个按钮一模一样 */}
+                              {/* 同一平台有多个同类包（Android 的 arm64 / 通用、Linux 的 x64 / arm64）时标出架构，否则几个按钮一模一样 */}
                               {p.files.filter((o) => o.kind === f.kind).length >
                                 1 && ` · ${t.arch[f.arch] ?? f.arch}`}
                             </span>

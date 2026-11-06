@@ -1,6 +1,6 @@
 ---
 title: "Client Downloads"
-description: "Download and install MeowX, the officially recommended client, for macOS, Android, Windows and OpenWrt"
+description: "Download and install MeowX, the officially recommended client, for macOS, Android, Windows, Linux and OpenWrt"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -44,7 +44,7 @@ All platforms share the same design: Home (connection and usage), Nodes (proxy g
   </TabItem>
 </Tabs>
 
-The OpenWrt edition is a web interface on the router (LuCI “Services → MeowX”) rather than the app design above; subscriptions, the panel account and the po0 whitelist work the same way as in the apps.
+The Linux edition uses the same desktop interface as Windows. The OpenWrt edition is a web interface on the router (LuCI “Services → MeowX”) rather than the app design above; subscriptions, the panel account and the po0 whitelist work the same way as in the apps.
 
 ## Installation
 
@@ -66,6 +66,21 @@ The OpenWrt edition is a web interface on the router (LuCI “Services → MeowX
 1. The installer is not code-signed, so SmartScreen may show "Windows protected your PC": click "More info → Run anyway".
 2. The portable build runs from any folder and keeps its data next to the executable.
 3. System Proxy mode works out of the box; TUN mode needs administrator rights and triggers a UAC prompt when the core starts.
+
+### Linux
+
+Supports Ubuntu 22.04 / Debian 12 or later (x64 and arm64), as a deb package or an AppImage:
+
+- **deb package (recommended)**: after downloading, run in a terminal (use the arm64 file name on arm64):
+
+  ```shell
+  sudo apt install ./MeowX-*-linux-amd64.deb
+  ```
+
+  apt installs the dependencies automatically. Open MeowX from the application menu, or run `meowx` in a terminal. The bundled core already has the permissions it needs, so the virtual network adapter (TUN) under "Takeover" on the home page can be turned on right away. To uninstall: `sudo apt remove meowx`.
+- **AppImage**: no installation needed. Run it after `chmod +x MeowX-*.AppImage` (requires FUSE 2: `libfuse2` on Ubuntu 22.04, `libfuse2t64` on 24.04). The AppImage only supports System Proxy mode; TUN is not available.
+
+System Proxy mode sets the proxy for GNOME-based desktops or KDE; for programs that ignore the system proxy, use TUN.
 
 ### OpenWrt
 
@@ -95,6 +110,7 @@ The OpenWrt edition is built on the open-source project [OpenWrt-nikki](https://
 
 - **Sign in from the web panel** (macOS / Windows): open "Account menu → QR login" in the panel and click "Sign in to client"; MeowX opens and signs in automatically.
 - **Scan with your phone** (Android / iOS): show the QR code under "Account menu → QR login" on a desktop browser and scan it with MeowX.
+- **Account sign-in** (Linux, also available in the other clients): on the "Me" page click "Account login" and enter the panel address, username and password (plus the verification code if two-step verification is on). The Linux edition does not yet support "Sign in to client" from the web panel.
 - **Copy the login link** (OpenWrt): routers can't scan QR codes, so click "Copy login link" under "Account menu → QR login" in the panel and paste it into the "Panel Account" card on the OpenWrt "App Config" page. The link works once, within 5 minutes.
 - **Subscription link**: tap “Import subscription” on the Me page and paste a subscription URL or a MiaoMiaoWu X short link; `clash://install-config` deep links are supported too.
 
