@@ -143,6 +143,7 @@ export default defineConfig({
             "forward",
             "forward-tutorial",
             "reverse-tunnel",
+            "meownest",
             "system-settings",
           ],
         },
@@ -165,7 +166,7 @@ export default defineConfig({
         {
           label: "用户与套餐",
           translations: { en: "Users & packages" },
-          items: ["users", "packages", "carpool-multi-package"],
+          items: ["users", "packages", "user-exit", "carpool-multi-package"],
         },
         {
           label: "系统配置",
