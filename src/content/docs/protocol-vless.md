@@ -12,16 +12,20 @@ VLESS 是 Xray 的主力协议，轻量无加密开销（依赖传输层加密�
 
 ## 支持的组合
 
-| 传输      | 安全层                | 说明                                                                  |
-| --------- | --------------------- | --------------------------------------------------------------------- |
-| TCP       | REALITY               | 推荐，无需域名和证书                                                  |
-| TCP       | REALITY + XTLS-Vision | 推荐，最佳性能                                                        |
-| TCP       | TLS                   | 需要域名和证书                                                        |
-| TCP       | TLS + XTLS-Vision     | 需要域名和证书                                                        |
-| TCP       | Encryption（ENC）     | VLESS 自带加密，不需要域名和证书；sing-box、Quantumult X、Loon 不支持 |
-| WebSocket | TLS                   | WSS，适合 CDN 中转                                                    |
-| gRPC      | REALITY               | 适合高并发场景                                                        |
-| XHTTP     | REALITY               | 新一代传输，替代 H2                                                   |
+| 传输       | 安全层                | 说明                                                                  |
+| ---------- | --------------------- | --------------------------------------------------------------------- |
+| TCP        | REALITY               | 推荐，无需域名和证书                                                  |
+| TCP        | REALITY + XTLS-Vision | 推荐，最佳性能                                                        |
+| TCP        | TLS                   | 需要域名和证书                                                        |
+| TCP        | TLS + XTLS-Vision     | 需要域名和证书                                                        |
+| TCP        | Encryption（ENC）     | VLESS 自带加密，不需要域名和证书；sing-box、Quantumult X、Loon 不支持 |
+| WebSocket  | TLS                   | WSS，适合 CDN 中转                                                    |
+| gRPC       | REALITY               | 适合高并发场景                                                        |
+| XHTTP      | REALITY               | 新一代传输，替代 H2；见 [XHTTP 节点与上下行分离](/docs/xhttp)         |
+| XHTTP      | TLS                   | 需要域名和证书                                                        |
+| XHTTP      | 无                    | 放在 CDN / nginx 后面、TLS 由前面终结                                 |
+| XHTTP      | Encryption（ENC）     | VLESS 自带加密，不需要域名和证书                                      |
+| XHTTP 分离 | REALITY + CDN         | 上行走 CDN、下行走 REALITY 直连                                       |
 
 ## XTLS-Vision
 
@@ -29,7 +33,7 @@ XTLS-Vision 是 VLESS 独有的流控模式，通过 flow: xtls-rprx-vision 启�
 
 ## 在向导中创建
 
-「节点管理 → 添加节点」选择 VLESS 后，传输协议可选 GRPC / TCP / WSS / XHTTP，安全协议可选 REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC。默认组合就是推荐的 TCP + XTLS-Vision-REALITY：
+「节点管理 → 添加节点」选择 VLESS 后，传输协议可选 GRPC / TCP / WSS / XHTTP / XHTTP 分离（REALITY + CDN），安全协议随传输变化（TCP 下可选 REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC，XHTTP 下可选 REALITY / TLS / 无 / ENC）。XHTTP 的模式、进阶选项与上下行分离见 [XHTTP 节点与上下行分离](/docs/xhttp)。默认组合就是推荐的 TCP + XTLS-Vision-REALITY：
 
 ![VLESS 添加节点向导截图](../../assets/screenshots/nodes-add-vless-reality.webp)
 

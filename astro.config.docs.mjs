@@ -128,6 +128,7 @@ export default defineConfig({
           items: [
             "nodes",
             "wss-reverse-proxy",
+            "xhttp",
             "generator",
             "subscribe-files",
             "templates",

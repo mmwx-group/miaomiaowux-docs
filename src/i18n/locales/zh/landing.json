@@ -142,7 +142,7 @@
     "navPricing": "购买",
     "advancedBadge": "妙妙屋的进阶版本",
     "slogan": "多服务器管理与订阅平台",
-    "description": "Master-Agent 架构，集中管理远程服务器。可视化 Xray 入站配置，\n支持 10 种协议、27 种协议组合，证书自动管理，节点自动同步。",
+    "description": "Master-Agent 架构，集中管理远程服务器。可视化 Xray 入站配置，\n支持 10 种协议、31 种协议组合，证书自动管理，节点自动同步。",
     "quickStart": "快速开始",
     "viewDocs": "查看文档",
     "stats": {
@@ -160,7 +160,7 @@
       },
       "xrayInbound": {
         "title": "Xray 入站管理",
-        "desc": "可视化入站向导，支持 VLESS/VMess/Trojan/SS/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard，27 种协议组合一键配置"
+        "desc": "可视化入站向导，支持 VLESS/VMess/Trojan/SS/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard，31 种协议组合一键配置"
       },
       "forward": {
         "title": "转发编排",
@@ -215,7 +215,7 @@
       },
       "protocols": {
         "title": "协议参考",
-        "desc": "27 种协议组合详解"
+        "desc": "31 种协议组合详解"
       },
       "fullDocs": {
         "title": "完整文档",

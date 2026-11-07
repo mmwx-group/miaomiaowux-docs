@@ -12,16 +12,20 @@ VLESS is Xray's primary protocol. It is lightweight with no encryption overhead 
 
 ## Supported Combinations
 
-| Transport | Security              | Description                                                                                       |
-| --------- | --------------------- | ------------------------------------------------------------------------------------------------- |
-| TCP       | REALITY               | Recommended, no domain or certificate required                                                    |
-| TCP       | REALITY + XTLS-Vision | Recommended, best performance                                                                     |
-| TCP       | TLS                   | Requires domain and certificate                                                                   |
-| TCP       | TLS + XTLS-Vision     | Requires domain and certificate                                                                   |
-| TCP       | Encryption (ENC)      | VLESS's own encryption, no domain or certificate; not supported by sing-box, Quantumult X or Loon |
-| WebSocket | TLS                   | WSS, suitable for CDN relay                                                                       |
-| gRPC      | REALITY               | Suitable for high concurrency                                                                     |
-| XHTTP     | REALITY               | Next-gen transport, replaces H2                                                                   |
+| Transport   | Security              | Description                                                                                       |
+| ----------- | --------------------- | ------------------------------------------------------------------------------------------------- |
+| TCP         | REALITY               | Recommended, no domain or certificate required                                                    |
+| TCP         | REALITY + XTLS-Vision | Recommended, best performance                                                                     |
+| TCP         | TLS                   | Requires domain and certificate                                                                   |
+| TCP         | TLS + XTLS-Vision     | Requires domain and certificate                                                                   |
+| TCP         | Encryption (ENC)      | VLESS's own encryption, no domain or certificate; not supported by sing-box, Quantumult X or Loon |
+| WebSocket   | TLS                   | WSS, suitable for CDN relay                                                                       |
+| gRPC        | REALITY               | Suitable for high concurrency                                                                     |
+| XHTTP       | REALITY               | Next-gen transport, replaces H2; see [XHTTP nodes and upload / download split](/docs/en/xhttp)    |
+| XHTTP       | TLS                   | Requires domain and certificate                                                                   |
+| XHTTP       | None                  | Behind a CDN / nginx that terminates TLS                                                          |
+| XHTTP       | Encryption (ENC)      | VLESS's own encryption, no domain or certificate                                                  |
+| XHTTP Split | REALITY + CDN         | Upload via CDN, download over direct REALITY                                                      |
 
 ## XTLS-Vision
 
@@ -29,7 +33,7 @@ XTLS-Vision is a flow control mode exclusive to VLESS, enabled via flow: xtls-rp
 
 ## Creating it in the wizard
 
-In "Nodes → Add Node" with VLESS selected, the transport can be GRPC / TCP / WSS / XHTTP and the security REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC. The default is the recommended TCP + XTLS-Vision-REALITY:
+In "Nodes → Add Node" with VLESS selected, the transport can be GRPC / TCP / WSS / XHTTP / XHTTP Split (REALITY + CDN), and the security options depend on the transport (REALITY / TLS / XTLS-Vision / XTLS-Vision-REALITY / ENC for TCP; REALITY / TLS / None / ENC for XHTTP). For XHTTP modes, advanced options and the download split, see [XHTTP nodes and upload / download split](/docs/en/xhttp). The default is the recommended TCP + XTLS-Vision-REALITY:
 
 ![VLESS add node wizard screenshot](../../../assets/screenshots/nodes-add-vless-reality.webp)
 

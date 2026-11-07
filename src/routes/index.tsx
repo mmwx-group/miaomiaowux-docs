@@ -66,7 +66,7 @@ const quickLinkDefs = [
 
 // 协议矩阵(docs 的 protocol-matrix 页)里的组合数。加减协议或组合时,这个数、下面的 protocolDefs
 // 和 landing.json 里写着数字的几处文案要一起改。
-const PROTOCOL_COMBOS = 27
+const PROTOCOL_COMBOS = 31
 
 // Miu 的标志(μ 加一对猫耳),与面板里的 miu-mark.svg 同一份路径;跟随文字颜色,明暗主题都能用。
 function MiuMark({ className }: { className?: string }) {

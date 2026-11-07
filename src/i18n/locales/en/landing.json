@@ -142,7 +142,7 @@
     "navPricing": "Pricing",
     "advancedBadge": "The advanced version of MiaoMiaoWu",
     "slogan": "Multi-Server Management & Subscription Platform",
-    "description": "Master-Agent architecture for centralized remote server management. Visual Xray inbound configuration,\n10 protocols and 27 protocol combinations, automated certificate management, and automatic node sync.",
+    "description": "Master-Agent architecture for centralized remote server management. Visual Xray inbound configuration,\n10 protocols and 31 protocol combinations, automated certificate management, and automatic node sync.",
     "quickStart": "Quick Start",
     "viewDocs": "View Docs",
     "stats": {
@@ -160,7 +160,7 @@
       },
       "xrayInbound": {
         "title": "Xray Inbound Management",
-        "desc": "Visual inbound wizard supporting VLESS/VMess/Trojan/SS/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard, 27 protocol combinations with one-click configuration"
+        "desc": "Visual inbound wizard supporting VLESS/VMess/Trojan/SS/Hysteria2/AnyTLS/Snell/Mieru/Miu/WireGuard, 31 protocol combinations with one-click configuration"
       },
       "forward": {
         "title": "Forwarding Orchestration",
@@ -215,7 +215,7 @@
       },
       "protocols": {
         "title": "Protocol Reference",
-        "desc": "27 protocol combinations explained"
+        "desc": "31 protocol combinations explained"
       },
       "fullDocs": {
         "title": "Full Documentation",
