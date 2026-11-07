@@ -9,7 +9,7 @@ tableOfContents:
 MeowNest is a private network built into the panel. Once enabled, the panel becomes the control center of a private network:
 
 - Phones and computers under the same admin account can reach each other, wherever they are
-- An OpenWrt router can expose your home LAN, so you can reach your NAS, cameras or PCs from outside
+- An OpenWrt router or an fnOS NAS can expose your home LAN, so you can reach your NAS, cameras or PCs from outside
 - When two devices can't connect directly, traffic is relayed through one of your own servers
 
 It uses the Tailscale protocol: the panel runs Headscale (an open-source Tailscale control server) locally, and the relay runs on a server with the agent. Traffic between devices is end-to-end encrypted; neither the panel nor the relay can read it.
@@ -17,7 +17,7 @@ It uses the Tailscale protocol: the panel runs Headscale (an open-source Tailsca
 :::note[Scope]
 - **Admin accounts only.** Regular / subscription users can't see or join MeowNest. When an admin account is disabled or demoted, its devices are removed automatically.
 - No PRO license required.
-- Requires a panel release **after v0.6.2-beta.8**, and an agent release **after v1.3.0** on the relay server. The MeowX client and OpenWrt plugin are coming soon.
+- Requires a panel release **after v0.6.2-beta.8**, and an agent release **after v1.3.0** on the relay server. The MeowX client and OpenWrt plugin are coming soon; the fnOS NAS edition is available now.
 :::
 
 ## Parts
@@ -27,7 +27,7 @@ It uses the Tailscale protocol: the panel runs Headscale (an open-source Tailsca
 | Panel | Runs Headscale, manages devices, issues join credentials, distributes the network policy |
 | Relay server | A server in the panel with the agent, running the relay (DERP) and STUN. Used when devices can't connect directly |
 | Device | A MeowX client logged in with an admin account; gets an address in `100.64.0.0/10` |
-| Site | An OpenWrt router with the MeowX plugin, exposing LAN subnets to the account's devices |
+| Site | An OpenWrt router with the MeowX plugin, or a NAS running MeowX for fnOS, exposing LAN subnets to the account's devices |
 
 Each admin account is its own isolated network: it can only reach its own devices and the subnets it exposed.
 
@@ -139,6 +139,16 @@ Exposed subnets are approved by the panel automatically and are reachable from t
 - IPv4 private ranges only (within `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), sized /16 to /30, at most 16 per router
 - Must not overlap the mapping pool
 - If another account already exposes the same subnet, yours is mapped into the mapping pool (e.g. `10.233.1.0/24`), keeping host numbers: `192.168.1.10` becomes `10.233.1.10`
+
+## fnOS NAS
+
+The [fnOS NAS edition](/docs/en/client-download#fnos-nas) of MeowX ships the official tailscaled, so nothing else needs installing. In its web UI (`http://<NAS address>:7899`), first sign in to the panel with an admin account on the “Subscriptions” page, then open the “MeowNest” page:
+
+1. Turn on “MeowNest”; the NAS joins within a minute or two.
+2. Optional: tick the “LAN subnets to share” (the subnets of the NAS's network interfaces); “MeowNest devices can access the NAS itself” is on by default; “Always map” and the device name work as on OpenWrt.
+3. “Leave MeowNest” deletes the device from the panel and withdraws the subnets it shared.
+
+Subnet limits and mapping are the same as for OpenWrt above. If your home router already shares the NAS's subnet, the NAS doesn't need to share it again: the account's devices reach the NAS's LAN address through the router, and the NAS's own MeowNest address works directly too.
 
 ## Managing devices and sites
 

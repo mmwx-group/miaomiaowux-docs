@@ -1,6 +1,6 @@
 ---
 title: "Client Downloads"
-description: "Download and install MeowX, the officially recommended client, for macOS, Android, Windows, Linux and OpenWrt"
+description: "Download and install MeowX, the officially recommended client, for macOS, Android, Windows, Linux, OpenWrt and fnOS NAS"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -106,12 +106,30 @@ Then open LuCI “Services → MeowX”: sign in to your panel account or paste 
 
 The OpenWrt edition is built on the open-source project [OpenWrt-nikki](https://github.com/nikkinikki-org/OpenWrt-nikki) and is released under GPL-3.0.
 
+### fnOS NAS
+
+Requires fnOS (飞牛) with Docker. There is one package for x86 machines and one for ARM.
+
+1. Download the fpk for your architecture above.
+2. In fnOS, open “App Center → Manual install” (at the bottom of the sidebar) and upload the fpk. The app runs as a Docker project whose image is built on the NAS itself, so no image registry is needed.
+3. Open MeowX from the fnOS desktop, or browse to `http://<NAS address>:7899`. Sign in to your panel account or paste a subscription link on the “Subscriptions” page, then start it on “Overview”.
+
+What you can do with it:
+
+- **Proxy port**: devices on your LAN can set their HTTP / SOCKS5 proxy to `<NAS address>:7890` (one port for both). The LAN and the NAS itself need no password; connections from the internet (through a router port forward) do — the account is under “Mixin”.
+- **Transparent proxy**: on the “Transparent proxy” page, turn it on separately for the NAS itself, other containers on the NAS, and LAN devices (side router: set the device's gateway **and** DNS to the NAS address; IPv4 only). After turning it on or changing it there is a trial of a few minutes with a countdown banner at the top: click “Keep settings” once the network works. If you don't, it turns itself off and removes all of its rules, so a mistake can't cut off the NAS (SSH and the web UI included).
+- **MeowNest**: after signing in with an admin account you can join the mesh and share the NAS's LAN, see [MeowNest](/docs/en/meownest#fnos-nas).
+
+To upgrade, download the new fpk and install it the same way. If fnOS says it is already installed, uninstall it in App Center first — settings, subscriptions and the MeowNest device identity are kept in `/vol1/@appdata/meowx` and survive uninstalling (delete that folder to remove everything). The web UI has no password by default; if port 7899 of the NAS is reachable from the internet, set one under “Settings”. See the [GitHub repository](https://github.com/mmwx-group/meowx-fnos) for more.
+
+The fnOS edition uses the same core as the OpenWrt edition and is released under GPL-3.0.
+
 ## Sign in and import subscriptions
 
 - **Sign in from the web panel** (macOS / Windows): open "Account menu → QR login" in the panel and click "Sign in to client"; MeowX opens and signs in automatically.
 - **Scan with your phone** (Android / iOS): show the QR code under "Account menu → QR login" on a desktop browser and scan it with MeowX.
 - **Account sign-in** (Linux, also available in the other clients): on the "Me" page click "Account login" and enter the panel address, username and password (plus the verification code if two-step verification is on). The Linux edition does not yet support "Sign in to client" from the web panel.
-- **Copy the login link** (OpenWrt): routers can't scan QR codes, so click "Copy login link" under "Account menu → QR login" in the panel and paste it into the "Panel Account" card on the OpenWrt "App Config" page. The link works once, within 5 minutes.
+- **Copy the login link** (OpenWrt / fnOS NAS): routers and NAS boxes can't scan QR codes, so click "Copy login link" under "Account menu → QR login" in the panel and paste it into the "Panel Account" card on the OpenWrt "App Config" page or the fnOS "Subscriptions" page. The link works once, within 5 minutes. On fnOS, if no subscription is in use yet and the account has exactly one, it is imported and switched to automatically.
 - **Subscription link**: tap “Import subscription” on the Me page and paste a subscription URL or a MiaoMiaoWu X short link; `clash://install-config` deep links are supported too.
 
 After signing in, "My subscriptions" lists every subscription on the account; tap one to download it and make it active. Changes made in the panel are synced to the client automatically. Signing out removes the subscriptions imported from that panel.

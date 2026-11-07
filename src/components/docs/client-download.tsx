@@ -8,6 +8,7 @@ import {
   Copy,
   Download,
   ExternalLink,
+  HardDrive,
   Laptop,
   Monitor,
   Router,
@@ -20,11 +21,12 @@ import {
 // ClientDownload — 「客户端下载」页的下载卡片。版本与链接不写死在文档里，而是读 R2 桶根目录的
 // latest.json（由 MeowX 仓库 scripts/publish-r2.sh 在发版时上传），发版不用改文档、不用重新部署。
 // Android / Windows / Linux 的条目由 meowC 仓库的 CI（scripts/publish_cdn.py）写；
-// OpenWrt 版的条目由 meowx-openwrt 仓库的发布工作流写（没有安装包列表，给的是软件源与一键安装命令）。
+// OpenWrt 版的条目由 meowx-openwrt 仓库的发布工作流写（没有安装包列表，给的是软件源与一键安装命令）；
+// 飞牛 NAS 版（fnos）的条目由 meowx-fnos 仓库的发布工作流写（x86_64 / arm64 两个 fpk）。
 
 const MANIFEST_URL = "https://dl.miaomiaowux.com/meowx/latest.json";
 
-type Platform = "macos" | "android" | "windows" | "linux";
+type Platform = "macos" | "android" | "windows" | "linux" | "fnos";
 type FileKind =
   | "dmg"
   | "zip"
@@ -32,7 +34,8 @@ type FileKind =
   | "setup"
   | "portable"
   | "deb"
-  | "appimage";
+  | "appimage"
+  | "fpk";
 
 interface ManifestFile {
   kind: FileKind;
@@ -76,12 +79,14 @@ const STRINGS = {
       android: "Android",
       windows: "Windows",
       linux: "Linux",
+      fnos: "飞牛 NAS",
     },
     requirement: {
       macos: "macOS 14 及以上 · Apple Silicon",
       android: "Android 8.0 及以上 · arm64",
       windows: "Windows 10 及以上 · x64",
       linux: "Ubuntu 22.04 / Debian 12 及以上 · x64 / arm64",
+      fnos: "飞牛 fnOS（带 Docker）· x86_64 / arm64 · 应用中心「手动安装」",
     },
     kind: {
       dmg: "DMG 安装镜像",
@@ -91,6 +96,7 @@ const STRINGS = {
       portable: "便携版",
       deb: "DEB 安装包",
       appimage: "AppImage",
+      fpk: "FPK 安装包",
     },
     arch: { "arm64-v8a": "arm64", universal: "通用", amd64: "x64" } as Record<
       string,
@@ -111,6 +117,7 @@ const STRINGS = {
       copied: "已复制",
       source: "源码（GitHub）",
     },
+    source: "源码（GitHub）",
   },
   en: {
     loading: "Fetching the latest release…",
@@ -125,12 +132,14 @@ const STRINGS = {
       android: "Android",
       windows: "Windows",
       linux: "Linux",
+      fnos: "fnOS NAS",
     },
     requirement: {
       macos: "macOS 14 or later · Apple Silicon",
       android: "Android 8.0 or later · arm64",
       windows: "Windows 10 or later · x64",
       linux: "Ubuntu 22.04 / Debian 12 or later · x64 / arm64",
+      fnos: "fnOS with Docker · x86_64 / arm64 · App Center “Manual install”",
     },
     kind: {
       dmg: "DMG disk image",
@@ -140,6 +149,7 @@ const STRINGS = {
       portable: "Portable",
       deb: "DEB package",
       appimage: "AppImage",
+      fpk: "FPK package",
     },
     arch: {
       "arm64-v8a": "arm64",
@@ -161,17 +171,23 @@ const STRINGS = {
       copied: "Copied",
       source: "Source (GitHub)",
     },
+    source: "Source (GitHub)",
   },
 } as const;
 
 const BETA_SIGNUP_URL = "https://license.miaomiaowux.com/beta";
 const OPENWRT_REPO_URL = "https://github.com/mmwx-group/meowx-openwrt";
+// 有源码仓库的平台在卡片底部给源码链接（同 OpenWrt 卡）
+const SOURCE_URL: Partial<Record<Platform, string>> = {
+  fnos: "https://github.com/mmwx-group/meowx-fnos",
+};
 
 const PLATFORMS: { id: Platform; Icon: typeof Laptop }[] = [
   { id: "macos", Icon: Laptop },
   { id: "android", Icon: Smartphone },
   { id: "windows", Icon: Monitor },
   { id: "linux", Icon: Terminal },
+  { id: "fnos", Icon: HardDrive },
 ];
 
 function formatSize(bytes: number) {
@@ -382,6 +398,14 @@ export function ClientDownload({ lang = "zh" }: { lang?: "zh" | "en" }) {
                       </ul>
                     </details>
                   </>
+                )}
+                {SOURCE_URL[id] && (
+                  <Button asChild variant="outline">
+                    <a href={SOURCE_URL[id]} target="_blank" rel="noreferrer">
+                      <ExternalLink className="size-4" />
+                      <span>{t.source}</span>
+                    </a>
+                  </Button>
                 )}
               </CardContent>
             </Card>
