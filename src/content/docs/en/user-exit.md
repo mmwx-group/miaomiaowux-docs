@@ -100,7 +100,6 @@ User management → package dialog: the Exit field applies immediately and lists
 
   - Usernames must match exactly (case-insensitive). Users with several packages get it on their **primary package** only.
   - Node names match an exact name first; otherwise the single node whose name contains the text. Several matches give "Name matches several nodes; use the full name".
-  - When separating with a comma, don't put a space after it.
   - Click **Preview** first; nothing is set until you confirm:
 
   ![Paste list preview](../../../assets/screenshots/user-exit-paste-preview.webp)
