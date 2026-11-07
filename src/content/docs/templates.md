@@ -358,6 +358,47 @@ proxy-groups:
 内置的起步模板和社区预置按 **sing-box 1.14** 的写法(显式的 `http_clients` 下载规则集),1.13 及更早的内核不认识这些字段。自己上传的模板写成什么版本的格式,就需要对应版本的客户端。
 :::
 
+## Quantumult X 模板(.qx)
+
+Quantumult X 模板是**一份完整的 Quantumult X 配置**(文本,扩展名 `.qx`;`.conf` 已经代表 Surge 模板)。主控生成订阅时把节点写进 `[server_local]` 段,分组和规则完全由模板决定。
+
+#### 模板里怎么写
+
+- 节点由主控注入 `[server_local]`:段内手写的节点会被替换掉,注释会保留。
+- 地区分组用 `server-tag-regex` 按节点名筛选:
+
+```ini
+[policy]
+url-latency-benchmark = 🇭🇰 香港, server-tag-regex=(?i)(🇭🇰|香港|\bHK\b), check-interval=600, tolerance=100
+```
+
+- Quantumult X 要求下面 12 个模块**一个都不能少**(空着可以),缺了导入时会报「配置文件缺少模块」:
+
+  `[general]` `[dns]` `[policy]` `[server_remote]` `[filter_remote]` `[rewrite_remote]` `[server_local]` `[filter_local]` `[rewrite_local]` `[task_local]` `[http_backend]` `[mitm]`
+
+  模板里没写的段,主控生成订阅时会自动补成空段。
+
+#### 怎么让订阅用上它
+
+- **订阅文件绑定**:在 [订阅管理](/docs/subscribe-files) 里给订阅文件选一个 `.qx` 模板。
+- **套餐模板**:在套餐编辑器的 Quantumult X 模板位选一个,用这个套餐的用户拉 QX 订阅时套用。
+- **设为系统默认**:在模板列表里点 QX 模板的星标。客户端用 QX 格式拉取**没有绑定模板**的订阅时,会套上这份模板。
+
+#### 在 Quantumult X 里导入
+
+套了 QX 模板的订阅返回的是整份配置,而 Quantumult X 的导入链接只能添加节点等资源,**不能一键导入完整配置**。在订阅页或用户首页点「导入 → QuantumultX」,会弹窗二选一:
+
+| 方式 | 得到什么 | 怎么做 |
+| --- | --- | --- |
+| 导入完整配置 | 模板里的分组、规则和节点 | 点「复制配置链接」,在 Quantumult X「设置 → 配置文件 → 下载」里粘贴 |
+| 只添加节点 | 只有节点,分组和规则沿用 Quantumult X 里现有的配置 | 点「一键添加节点」 |
+
+:::caution[别把整份配置加成节点资源]
+套了模板的订阅地址直接加成 Quantumult X 的节点资源(`[server_remote]`),会报 `Response invalid`。要手动添加节点资源时,在订阅地址后面加上 `&qx=nodes`(地址里还没有 `?` 就加 `?qx=nodes`),主控就只返回节点。
+
+导入弹窗和 `qx=nodes` 需要 v0.6.2-beta.8 之后的版本。
+:::
+
 ## 支持的节点类型
 
 include-type 和 exclude-type 支持以下节点类型（不区分大小写）：

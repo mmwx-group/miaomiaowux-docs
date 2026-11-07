@@ -358,6 +358,47 @@ With neither set, sing-box subscriptions keep returning nodes only, exactly as b
 The built-in starter template and the community preset use the **sing-box 1.14** format (explicit `http_clients` for rule-set downloads); 1.13 and older do not understand those fields. A template you upload needs a client matching the format you wrote it in.
 :::
 
+## Quantumult X templates (.qx)
+
+A Quantumult X template is **a complete Quantumult X configuration** (plain text, extension `.qx`; `.conf` already means a Surge template). When generating a subscription, the master writes the nodes into the `[server_local]` section. Groups and rules come entirely from the template.
+
+#### Writing the template
+
+- The master injects nodes into `[server_local]`. Nodes written by hand in that section are replaced; comments are kept.
+- Region groups filter nodes by name with `server-tag-regex`:
+
+```ini
+[policy]
+url-latency-benchmark = 🇭🇰 Hong Kong, server-tag-regex=(?i)(🇭🇰|香港|\bHK\b), check-interval=600, tolerance=100
+```
+
+- Quantumult X requires **all 12 of these modules** (they may be empty). If one is missing, the import fails with a "missing module" error:
+
+  `[general]` `[dns]` `[policy]` `[server_remote]` `[filter_remote]` `[rewrite_remote]` `[server_local]` `[filter_local]` `[rewrite_local]` `[task_local]` `[http_backend]` `[mitm]`
+
+  Sections the template leaves out are added back as empty sections when the subscription is generated.
+
+#### Using it in a subscription
+
+- **Bind it to a subscription file**: pick a `.qx` template for the file in [Subscription management](/docs/en/subscribe-files).
+- **Package template**: choose one in the Quantumult X template slot of the package editor. It applies when users of that package fetch a QX subscription.
+- **Set as system default**: click the star on a QX template in the template list. When a client fetches a subscription **without a bound template** in QX format, this template is applied.
+
+#### Importing in Quantumult X
+
+A subscription that uses a QX template returns a whole configuration, but Quantumult X import links can only add resources such as nodes. **A full configuration can't be imported in one tap.** Choosing "Import → QuantumultX" on the subscription page or the user home page opens a dialog with two options:
+
+| Option | What you get | How |
+| --- | --- | --- |
+| Import the full configuration | The template's groups, rules and nodes | Click "Copy configuration link" and paste it in Quantumult X under Settings → Configuration → Download |
+| Add nodes only | Nodes only; your existing Quantumult X groups and rules stay | Click "Add nodes" |
+
+:::caution[Don't add the full configuration as a server resource]
+Adding the subscription URL of a templated subscription as a Quantumult X server resource (`[server_remote]`) fails with `Response invalid`. If you add a server resource by hand, append `&qx=nodes` to the subscription URL (or `?qx=nodes` if the URL has no `?` yet), and the master returns the nodes only.
+
+The import dialog and `qx=nodes` need a version later than v0.6.2-beta.8.
+:::
+
 ## Supported node types
 
 include-type and exclude-type accept (case-insensitive):
