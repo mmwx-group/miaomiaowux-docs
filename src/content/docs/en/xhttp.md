@@ -51,15 +51,16 @@ With auto, MeowX and Xray clients use stream-one over REALITY (stream-up when th
 
 In simple mode you only fill in what you have to decide; everything else is generated:
 
-| Generated       | How                                                                                                               |
-| --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Port            | A port that is actually free on the server (skipping ports the agent itself uses), inside the server's port range |
-| UUID            | Random                                                                                                            |
-| Path            | Random, e.g. `/3xo4tg7u`                                                                                          |
-| Mode            | auto                                                                                                              |
-| REALITY         | Probes target domains (lowest latency that completes a handshake), generates the key pair and a random shortId    |
-| TLS certificate | Matches the server's domain against certificates issued in Certificates                                           |
-| ENC keys        | Generates an ML-KEM-768 key                                                                                       |
+| Generated        | How                                                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Port             | A port that is actually free on the server (skipping ports the agent itself uses), inside the server's port range |
+| UUID             | Random                                                                                                            |
+| Path             | Random, e.g. `/3xo4tg7u`                                                                                          |
+| Mode             | auto                                                                                                              |
+| Connection reuse | Recommended                                                                                                       |
+| REALITY          | Probes target domains (lowest latency that completes a handshake), generates the key pair and a random shortId    |
+| TLS certificate  | Matches the server's domain against certificates issued in Certificates                                           |
+| ENC keys         | Generates an ML-KEM-768 key                                                                                       |
 
 Switching to **Expert mode** keeps all of these values so you can review and change them:
 
@@ -105,8 +106,8 @@ Connection reuse levels:
 
 | Level       | Behavior                                                                                                                                      |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Off         | Default. Every proxy connection does its own handshake                                                                                        |
-| Recommended | At most 3 underlying connections, each replaced after 600–900 requests or 30–50 minutes (Xray client defaults)                                |
+| Off         | Every proxy connection does its own handshake                                                                                                 |
+| Recommended | Default for new nodes. At most 3 underlying connections, each replaced after 600–900 requests or 30–50 minutes (Xray client defaults)         |
 | Custom      | Limit by either max connections or max concurrency per connection, plus max requests and max lifetime per connection (empty = client default) |
 
 Ranges take a single number or "from-to"; the client picks a random value in the range each time. In our tests, time to first byte for back-to-back requests roughly halved with reuse on.
