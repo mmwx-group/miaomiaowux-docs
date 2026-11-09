@@ -12,9 +12,9 @@ Where to find Settings:
 
 | Platform | Location |
 | --- | --- |
-| iOS | The "Settings" tab at the bottom |
+| iOS | The "Me" tab at the bottom, in the settings list below your account and subscriptions |
 | macOS | Menu bar icon → drop-down panel → "Settings" page (MeowX has no main window) |
-| Android / Windows | "Settings" in the bottom bar / sidebar |
+| Android / Windows / Linux | The "Me" page (bottom bar on phones, sidebar on wide screens), in the settings list below your account and subscriptions |
 
 Unless noted otherwise, changes **take effect immediately while connected**; no reconnect needed.
 

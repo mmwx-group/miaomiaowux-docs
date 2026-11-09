@@ -1,6 +1,6 @@
 ---
 title: "MeowNest"
-description: "The panel's built-in private network (Tailscale protocol): admin phones and computers reach each other, OpenWrt routers expose home LANs, and your own relay server forwards traffic when direct connections fail. How it works, requirements, setup, control entry and CDNs, joining devices, troubleshooting"
+description: "The panel's built-in private network (Tailscale protocol): phones and computers of admins (and accounts they open it to) reach each other, OpenWrt routers expose home LANs, and your own relay server forwards traffic when direct connections fail. How it works, requirements, setup, control entry and CDNs, joining devices, troubleshooting"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -8,14 +8,14 @@ tableOfContents:
 
 MeowNest is a private network built into the panel. Once enabled, the panel becomes the control center of a private network:
 
-- Phones and computers under the same admin account can reach each other, wherever they are
+- Phones and computers under the same account can reach each other, wherever they are
 - An OpenWrt router or an fnOS NAS can expose your home LAN, so you can reach your NAS, cameras or PCs from outside
 - When two devices can't connect directly, traffic is relayed through one of your own servers
 
 It uses the Tailscale protocol: the panel runs Headscale (an open-source Tailscale control server) locally, and the relay runs on a server with the agent. Traffic between devices is end-to-end encrypted; neither the panel nor the relay can read it.
 
 :::note[Scope]
-- **Admin accounts only.** Regular / subscription users can't see or join MeowNest. When an admin account is disabled or demoted, its devices are removed automatically.
+- **Admins and accounts they open it to.** Admins can always use it; other accounts need an admin to tick them under "Accounts that can use MeowNest" in the panel's System settings › MeowNest, otherwise they can't see or join MeowNest. When an account is disabled, demoted or removed from the list, its devices are removed within about half a minute.
 - No PRO license required.
 - Requires a panel release **after v0.6.2-beta.8**, and an agent release **after v1.3.0** on the relay server. Supported by the MeowX client from iOS / macOS 0.8.0 and Android / Windows / Linux 0.5.0, by the OpenWrt plugin from 0.3.0, and by the fnOS NAS edition.
 :::
@@ -26,10 +26,10 @@ It uses the Tailscale protocol: the panel runs Headscale (an open-source Tailsca
 | --- | --- |
 | Panel | Runs Headscale, manages devices, issues join credentials, distributes the network policy |
 | Relay server | A server in the panel with the agent, running the relay (DERP) and STUN. Used when devices can't connect directly |
-| Device | A MeowX client logged in with an admin account; gets an address in `100.64.0.0/10` |
+| Device | A MeowX client logged in with an account that can use MeowNest; gets an address in `100.64.0.0/10` |
 | Site | An OpenWrt router with the MeowX plugin, or a NAS running MeowX for fnOS, exposing LAN subnets to the account's devices |
 
-Each admin account is its own isolated network: it can only reach its own devices and the subnets it exposed.
+Each account is its own isolated network: it can only reach its own devices and the subnets it exposed.
 
 Devices are named `device-name.MagicDNS-suffix`, e.g. `macbook.meowx.internal`, and can be reached by name.
 
@@ -111,7 +111,7 @@ When the panel address is the control entry, the panel adds a long read timeout 
 
 No config files, QR codes or keys to copy:
 
-1. In the MeowX client, log in to the panel with an **admin account** (QR code or username/password).
+1. In the MeowX client, log in to the panel with an **admin account or an account MeowNest is open to** (QR code or username/password).
 2. Open the network settings (iOS, Android, Windows, Linux: Me › Network; macOS: menu-bar panel › Settings › Network) and choose **MeowNest**.
 3. The client requests a one-time join credential from the panel (valid 10 minutes) and joins automatically.
 
@@ -138,7 +138,7 @@ The client UI is authoritative.
 
 ## Exposing a LAN from OpenWrt
 
-Install the MeowX OpenWrt plugin (LuCI), log in to the panel with an admin account in the plugin settings, then open the plugin's **MeowNest** page:
+Install the MeowX OpenWrt plugin (LuCI), log in to the panel with an admin account (or one MeowNest is open to) in the plugin settings, then open the plugin's **MeowNest** page:
 
 1. Click **Install tailscale** (from the system package feed, about 24 MB of space).
 2. Tick the LAN subnets to expose (subnets of interfaces in the lan zone are listed; you can add others), then turn the switch on.
@@ -152,7 +152,7 @@ Exposed subnets are approved by the panel automatically and are reachable from t
 
 ## fnOS NAS
 
-The [fnOS NAS edition](/docs/en/client-download#fnos-nas) of MeowX ships the official tailscaled, so nothing else needs installing. In its web UI (`http://<NAS address>:7899`), first sign in to the panel with an admin account on the “Subscriptions” page, then open the “MeowNest” page:
+The [fnOS NAS edition](/docs/en/client-download#fnos-nas) of MeowX ships the official tailscaled, so nothing else needs installing. In its web UI (`http://<NAS address>:7899`), first sign in to the panel with an admin account (or one MeowNest is open to) on the “Subscriptions” page, then open the “MeowNest” page:
 
 1. Turn on “MeowNest”; the NAS joins within a minute or two.
 2. Optional: tick the “LAN subnets to share” (the subnets of the NAS's network interfaces); “MeowNest devices can access the NAS itself” is on by default; “Always map” and the device name work as on OpenWrt.
@@ -162,7 +162,7 @@ Subnet limits and mapping are the same as for OpenWrt above. If your home router
 
 ## Managing devices and sites
 
-Below the settings, **Devices and sites** lists every admin device and exposed subnet:
+Below the settings, **Devices and sites** lists every device and exposed subnet of accounts that can use MeowNest:
 
 ![Devices and sites](../../../assets/screenshots/meownest-devices.webp)
 
