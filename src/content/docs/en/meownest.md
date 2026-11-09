@@ -17,7 +17,7 @@ It uses the Tailscale protocol: the panel runs Headscale (an open-source Tailsca
 :::note[Scope]
 - **Admin accounts only.** Regular / subscription users can't see or join MeowNest. When an admin account is disabled or demoted, its devices are removed automatically.
 - No PRO license required.
-- Requires a panel release **after v0.6.2-beta.8**, and an agent release **after v1.3.0** on the relay server. The MeowX client and OpenWrt plugin are coming soon; the fnOS NAS edition is available now.
+- Requires a panel release **after v0.6.2-beta.8**, and an agent release **after v1.3.0** on the relay server. Supported by the MeowX client from iOS / macOS 0.8.0 and Android / Windows / Linux 0.5.0, by the OpenWrt plugin from 0.3.0, and by the fnOS NAS edition.
 :::
 
 ## Parts
@@ -112,7 +112,7 @@ When the panel address is the control entry, the panel adds a long read timeout 
 No config files, QR codes or keys to copy:
 
 1. In the MeowX client, log in to the panel with an **admin account** (QR code or username/password).
-2. Open the network settings (iOS: Me › Network; macOS: menu-bar panel › Settings › Network) and choose **MeowNest**.
+2. Open the network settings (iOS, Android, Windows, Linux: Me › Network; macOS: menu-bar panel › Settings › Network) and choose **MeowNest**.
 3. The client requests a one-time join credential from the panel (valid 10 minutes) and joins automatically.
 
 Notes:
@@ -122,8 +122,18 @@ Notes:
 - The network page lists your devices (direct or relayed, last seen) and sites; **Leave MeowNest** at the bottom removes the device from the panel. Logging out also turns MeowNest off.
 - An account can join at most 5 times per minute.
 
+### Device name
+
+The **Device name** on the network page can be changed. In MeowNest the device shows up as `<device name>.meowx.internal` (the suffix is the MagicDNS suffix set in the panel), and the account's other devices can reach it by that name.
+
+- Leave it empty to use the device's own name. On iOS the system gives every app the device name "iPhone", so several iPhones end up as `iphone`, `iphone-1`, `iphone-2`; give each one its own name.
+- Only letters, digits and hyphens are allowed, and capitals become lowercase. Other characters (Chinese, spaces and so on) are turned into hyphens or dropped; a name made only of such characters can't be saved.
+- Names are unique across the whole panel (all accounts). If the name is taken, the panel appends `-1`, `-2` and so on; the device list shows the actual name.
+- Changing the name while MeowNest is on and connected reconnects once, and the new name takes effect.
+- Requires iOS / macOS 0.8.1 or Android / Windows / Linux 0.5.1 or later. The OpenWrt and fnOS editions set their device name on their own MeowNest page.
+
 :::note
-The iOS / macOS clients are coming soon; Android / Windows are in development. The client UI is authoritative.
+The client UI is authoritative.
 :::
 
 ## Exposing a LAN from OpenWrt
