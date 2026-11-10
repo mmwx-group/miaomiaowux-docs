@@ -409,9 +409,9 @@ Endpoints for the master's built-in mesh network ([MeowNest](/docs/meownest)) li
 
 | Path | Method | Notes |
 | --- | --- | --- |
-| `/user/mesh/status` | GET | Availability: `{"available":true,"control_url":"…","magic_dns":"…","device_cidr":"100.64.0.0/10","device_limit":10,"account_id":"…"}` |
+| `/user/mesh/status` | GET | Availability: `{"available":true,"control_url":"…","magic_dns":"…","device_cidr":"100.64.0.0/10","device_limit":10,"account_id":"…","joined_admin":"root"}`. See below for `joined_admin` |
 | `/user/mesh/enroll` | POST | Request `hostname`, `os`, `client`, `version`, `previous_node_id`; returns a one-time join key: `{"control_url","auth_key","expires_at","magic_dns","device_cidr","sites":[…]}`. The key is valid for 10 minutes, at most 5 calls per account per minute |
-| `/user/mesh/devices` | GET | The account's devices: `{"devices":[{"id","name","dns_name","ipv4","online","last_seen","routes","pending_routes"}],"sites":[…]}` |
+| `/user/mesh/devices` | GET | The account's devices: `{"devices":[{"id","name","dns_name","ipv4","online","last_seen","routes","pending_routes"}],"sites":[…],"shared_devices":[…]}`. See below for `shared_devices` |
 | `/user/mesh/devices/{id}` | PATCH / DELETE | Rename (`name`) / remove a device |
 | `/user/mesh/sites` | POST | A router declares the subnets it serves: `networks`, `force_map`, `router` |
 
@@ -424,6 +424,15 @@ When MeowNest is unavailable `status` still returns 200 with `available: false` 
 | `starting` | MeowNest is starting on the master | Retry later |
 
 The other MeowNest endpoints return 403 when unavailable.
+
+### Joining an admin's MeowNest
+
+In System settings › MeowNest, an admin can set an allowed account to join a given admin's MeowNest: the account then shares one network with that admin and the other accounts that joined, and their devices and site subnets can reach each other both ways; devices still belong to each account and can only be managed by their owner. In that case:
+
+- `/user/mesh/status` includes `joined_admin`: the username of the admin it joined. Missing or empty means its own MeowNest.
+- `/user/mesh/devices` adds `shared_devices`: other members' devices in the same network, with the same fields as `devices` plus `username` (the owner). They are read-only; renaming or deleting them returns 404. The field is absent for an account with its own MeowNest.
+
+Clients can show "Joined xx's MeowNest" on the MeowNest page and list `shared_devices` separately as "Devices in this network" without delete or rename. Older masters do not return these fields; treat that as an account with its own MeowNest.
 
 ## Realtime push
 

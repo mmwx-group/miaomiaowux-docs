@@ -407,9 +407,9 @@ miaomiaowu://login?host=https%3A%2F%2Fpanel.example.com&code=一次性码
 
 | 路径 | 方法 | 说明 |
 | --- | --- | --- |
-| `/user/mesh/status` | GET | 能不能用：`{"available":true,"control_url":"…","magic_dns":"…","device_cidr":"100.64.0.0/10","device_limit":10,"account_id":"…"}` |
+| `/user/mesh/status` | GET | 能不能用：`{"available":true,"control_url":"…","magic_dns":"…","device_cidr":"100.64.0.0/10","device_limit":10,"account_id":"…","joined_admin":"root"}`。`joined_admin` 见下文 |
 | `/user/mesh/enroll` | POST | 请求 `hostname`、`os`、`client`、`version`、`previous_node_id`；返回一次性入网 key：`{"control_url","auth_key","expires_at","magic_dns","device_cidr","sites":[…]}`。key 10 分钟有效，每账号每分钟最多 5 次 |
-| `/user/mesh/devices` | GET | 本账号的设备：`{"devices":[{"id","name","dns_name","ipv4","online","last_seen","routes","pending_routes"}],"sites":[…]}` |
+| `/user/mesh/devices` | GET | 本账号的设备：`{"devices":[{"id","name","dns_name","ipv4","online","last_seen","routes","pending_routes"}],"sites":[…],"shared_devices":[…]}`。`shared_devices` 见下文 |
 | `/user/mesh/devices/{id}` | PATCH / DELETE | 改名（`name`）/ 删除设备 |
 | `/user/mesh/sites` | POST | 路由器申报自己负责的网段：`networks`、`force_map`、`router` |
 
@@ -422,6 +422,15 @@ miaomiaowu://login?host=https%3A%2F%2Fpanel.example.com&code=一次性码
 | `starting` | 主控的喵窝正在启动 | 稍后重试 |
 
 其它喵窝接口在不能用时返回 403。
+
+### 加入管理员的喵窝
+
+管理员可以在「系统设置 › 喵窝」把名单里的账号设成「加入某位管理员的喵窝」：这个账号与那位管理员、以及加入他的其他账号在同一个网络里，彼此的设备和站点网段双向互通；设备仍记在各自名下，只能管理自己的。这时：
+
+- `/user/mesh/status` 带 `joined_admin`：加入了哪位管理员（用户名）。没有这个字段或为空 = 独立喵窝。
+- `/user/mesh/devices` 多一个 `shared_devices`：同一网络里别人的设备，字段与 `devices` 相同，另带 `username`（设备主人）。它们是只读的，对它们改名或删除会返回 404。独立喵窝时没有这个字段。
+
+客户端可以在喵窝页显示「已加入 xx 的喵窝」，并把 `shared_devices` 单独列成「同网络的设备」，不提供删除和改名。较早版本的主控不返回这两个字段，按独立喵窝处理即可。
 
 ## 实时推送
 
