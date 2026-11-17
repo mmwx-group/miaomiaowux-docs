@@ -56,7 +56,7 @@ Sort, grouping and density choices are remembered in the visitor's own browser. 
 
 The built-in probe uses same-origin browser requests. A protected standalone probe must send X-MMwx-Probe-Token. Disabled probe channels normally return 404.
 
-<table class="w-full min-w-[620px] text-sm"><tbody><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-servers</td><td class="px-4 py-3">Current state and one-hour latency summary</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">WS /api/public/probe-ws</td><td class="px-4 py-3">Pushes the same snapshot every five seconds</td></tr><tr><td class="px-4 py-3 font-mono">GET /api/public/probe-series</td><td class="px-4 py-3">Latency or system metric history</td></tr></tbody></table>
+<table class="w-full min-w-[620px] text-sm"><tbody><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-servers</td><td class="px-4 py-3">Current state and one-hour latency summary</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">WS /api/public/probe-ws</td><td class="px-4 py-3">Pushes the same snapshot at the data refresh interval (3 seconds by default, on the same beat as server reports)</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-series</td><td class="px-4 py-3">Latency or system metric history</td></tr><tr><td class="px-4 py-3 font-mono">GET /api/public/probe-forward</td><td class="px-4 py-3">Forward chain structure, per-hop latency, trend, and traffic (same as forward in the snapshot)</td></tr></tbody></table>
 
 ## Snapshot fields
 
@@ -71,6 +71,8 @@ The built-in probe uses same-origin browser requests. A protected standalone pro
 | show_globe    | boolean     | Whether the 3D globe is displayed                                      |
 | license_badge | object      | Optional badge with name and display_name                              |
 | servers       | array       | Servers selected by the administrator                                  |
+| show_forward  | boolean     | Whether forward chains are shown                                       |
+| forward       | array       | Forward chains, see "Forward chains" below; omitted when there are none or display is off |
 
 ## servers\[\] fields
 
@@ -125,6 +127,84 @@ Without a valid reset day, cycle directions and `period_*` are omitted so the la
 `ping[]`: `key`, `label`, `isp`, `current_ms`, `loss_pct`, `buckets`. The list contains twelve five-minute buckets. ms is average latency, loss is 0–100, and -1 means no data.
 
 `return_routes[]`: `carrier` (telecom/unicom/mobile), `region`, `route_type`, `tested_at` (RFC 3339).
+
+## Forward chains
+
+Forward chain data comes from two places with the same structure: `forward` in the snapshot (HTTP and WebSocket), and the separate `GET /api/public/probe-forward`, which returns `{ enabled, chains, generated_at }`. Under "System settings → Probe":
+
+- **Forward chain topology and latency**: when off, no forward chain data is returned (on by default).
+- **Forward chain full-server latency matrix (each server → every server in the next group)**: when on, every server gets a `ups` array (off by default, since v0.6.2).
+
+Only display names of servers and groups are returned, never IPs, ports, or rules.
+
+### chains\[\] fields
+
+| Field | Type / unit | Description |
+| --- | --- | --- |
+| name | string | Chain name |
+| end_to_end_ms | integer, ms | Current end-to-end latency |
+| loss_pct | number, % | Current end-to-end packet loss |
+| groups | array | Groups in order (entry, relay, exit) |
+| bucket_sec / trend | integer / array | Last hour of end-to-end trend in 5-minute buckets: `{ ts, e2e_ms, loss }` |
+| availability_24h | number \| null | Availability over the last 24 hours (0–1); null without data |
+| jitter_ms | number \| null | Jitter of the latest sample |
+| cells | string | 24-hour status strip, 72 characters of 20 minutes each: o ok, d degraded, b broken, n no data |
+| speed_up / speed_down | integer \| null, B/s | Current entry upload / download speed; null if nothing was sampled in the last two minutes |
+| traffic | object | Daily traffic per server in the period: `days`, `servers[]` (name, group, role, daily_gb, total_gb), `total_gb` |
+| route_hop / route_policy / failover_ms / routes | — | Only for chains with a route-selection segment, see below |
+
+### groups\[\] and servers\[\] fields
+
+| Field | Type / unit | Description |
+| --- | --- | --- |
+| groups[].name | string | Group name |
+| groups[].role | string | entry, mid (relay), or exit |
+| groups[].to_next_ms / loss_pct | integer, ms / number, % | Latency and loss from this group to the next |
+| groups[].servers[] | array | Every server in the group |
+| servers[].name | string | Server display name |
+| servers[].to_next_ms / loss_pct | integer, ms / number, % | Latency and loss from this server to the next group |
+| servers[].healthy | boolean | Whether this server reaches the next group |
+| servers[].route | string | For members of the forking group: the route currently in use |
+| servers[].ups | array | Pairwise latency matrix: this server to **every server in the next group**, see below |
+
+### ups\[\]: pairwise latency matrix
+
+Returned when the full-server latency matrix is on. For example, with one entry server and seven exit servers, the entry server's `ups` has seven items, one per exit server.
+
+| Field | Type / unit | Description |
+| --- | --- | --- |
+| name | string | Display name of the server in the next group |
+| ms | integer \| null, ms | Current latency; null when unreachable or no data yet |
+| loss_pct | number, % | Packet loss |
+| healthy | boolean \| null | true reachable, false unreachable, null no data for this pair yet |
+
+```json
+{
+  "name": "Guangzhou entry",
+  "to_next_ms": 64,
+  "loss_pct": 0,
+  "healthy": true,
+  "ups": [
+    { "name": "Hong Kong exit A", "ms": 64, "loss_pct": 0, "healthy": true },
+    { "name": "Japan exit B", "ms": 71, "loss_pct": 0, "healthy": true },
+    { "name": "US exit C", "ms": null, "loss_pct": 0, "healthy": false }
+  ]
+}
+```
+
+`ups` is omitted for the exit group (there is no next group), relay groups, the forking group of a route-selection segment, and branch members that match no server in the next group. Latency between two servers in the same group is not measured and not returned.
+
+### routes\[\]: route selection
+
+For chains with a route-selection segment, `route_hop` is the index of the forking group in `groups`, `route_policy` is lowest_latency, failover, or weighted, and `failover_ms` is the switch threshold. `routes[]` lists the parallel routes from the forking group to the next group:
+
+| Field | Type / unit | Description |
+| --- | --- | --- |
+| name | string | Route name |
+| via | array | Relay group names passed in order; empty means direct to the next group |
+| latency_ms | integer, ms | Average latency from the forking group's servers to the exit via this route; 0 means not measured |
+| loss_pct | number, % | Packet loss |
+| selected / selected_by | boolean / array | Whether a server is using this route; names of those servers |
 
 ## History series
 

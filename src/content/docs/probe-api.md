@@ -56,7 +56,7 @@ tableOfContents:
 
 内置探针使用同源浏览器请求。独立探针开启接口保护后必须发送 X-MMwx-Probe-Token 请求头。通道或探针未开启时通常返回 404。
 
-<table class="w-full min-w-[620px] text-sm"><tbody><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-servers</td><td class="px-4 py-3">当前状态及近一小时延迟摘要</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">WS /api/public/probe-ws</td><td class="px-4 py-3">每 5 秒推送相同的快照结构</td></tr><tr><td class="px-4 py-3 font-mono">GET /api/public/probe-series</td><td class="px-4 py-3">延迟或系统指标历史</td></tr></tbody></table>
+<table class="w-full min-w-[620px] text-sm"><tbody><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-servers</td><td class="px-4 py-3">当前状态及近一小时延迟摘要</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">WS /api/public/probe-ws</td><td class="px-4 py-3">按「数据刷新间隔」推送相同的快照结构（默认 3 秒，与各服务器上报同一节拍）</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-series</td><td class="px-4 py-3">延迟或系统指标历史</td></tr><tr><td class="px-4 py-3 font-mono">GET /api/public/probe-forward</td><td class="px-4 py-3">转发链结构、逐跳延迟、趋势与流量（与快照里的 forward 相同）</td></tr></tbody></table>
 
 ## 服务器快照字段
 
@@ -71,6 +71,8 @@ tableOfContents:
 | show_globe    | boolean   | 是否显示 3D 地球                         |
 | license_badge | object    | 可选许可证铭牌：name、display_name       |
 | servers       | array     | 管理员选择展示的服务器列表               |
+| show_forward  | boolean   | 是否展示转发链                           |
+| forward       | array     | 转发链列表，结构见下方「转发链」；没有转发链或关闭展示时缺省 |
 
 ## servers\[\] 字段
 
@@ -110,6 +112,84 @@ tableOfContents:
 `ping[]`: `key`, `label`, `isp`, `current_ms`, `loss_pct`, `buckets`. 列表包含 12 个五分钟桶；桶内 ms 为平均延迟，loss 为 0–100 丢包率，-1 表示无数据。
 
 `return_routes[]`: `carrier` (telecom/unicom/mobile), `region`, `route_type`, `tested_at` (RFC 3339).
+
+## 转发链
+
+转发链数据有两个来源，结构相同：快照（HTTP 与 WebSocket）里的 `forward`，以及单独的 `GET /api/public/probe-forward`（返回 `{ enabled, chains, generated_at }`）。在「系统设置 → 探针」里：
+
+- **转发链拓扑与延迟**：关闭后不返回任何转发链数据（默认开）。
+- **转发链全服务器延迟矩阵（每台→下一组每台）**：开启后每台服务器多一个 `ups` 数组（默认关，v0.6.2 起）。
+
+只返回服务器和组的展示名，不返回 IP、端口或规则。
+
+### chains\[\] 字段
+
+| 字段 | 类型/单位 | 说明 |
+| --- | --- | --- |
+| name | string | 转发链名称 |
+| end_to_end_ms | integer, ms | 当前端到端延迟 |
+| loss_pct | number, % | 当前端到端丢包 |
+| groups | array | 按顺序排列的各组（入口、中转、出口） |
+| bucket_sec / trend | integer / array | 近一小时端到端趋势：5 分钟一桶，`{ ts, e2e_ms, loss }` |
+| availability_24h | number \| null | 近 24 小时可用率（0–1），没有数据为 null |
+| jitter_ms | number \| null | 最近一次采样的抖动 |
+| cells | string | 近 24 小时状态条，20 分钟一格共 72 个字符：o 正常、d 降级、b 中断、n 无数据 |
+| speed_up / speed_down | integer \| null, B/s | 入口此刻的上下行速度；两分钟内没有采样时为 null |
+| traffic | object | 周期内每日每台服务器的流量：`days`、`servers[]`（name、group、role、daily_gb、total_gb）、`total_gb` |
+| route_hop / route_policy / failover_ms / routes | — | 只有带选路段的链才返回，见下文 |
+
+### groups\[\] 与 servers\[\] 字段
+
+| 字段 | 类型/单位 | 说明 |
+| --- | --- | --- |
+| groups[].name | string | 组名 |
+| groups[].role | string | entry（入口）、mid（中转）或 exit（出口） |
+| groups[].to_next_ms / loss_pct | integer, ms / number, % | 这一组到下一组的延迟与丢包 |
+| groups[].servers[] | array | 组内每台服务器 |
+| servers[].name | string | 服务器展示名 |
+| servers[].to_next_ms / loss_pct | integer, ms / number, % | 这台到下一组的延迟与丢包 |
+| servers[].healthy | boolean | 这台到下一组是否连通 |
+| servers[].route | string | 选路段分叉那组的成员：当前走的路 |
+| servers[].ups | array | 逐对延迟矩阵：这台到**下一组每台**的延迟，见下 |
+
+### ups\[\]：逐对延迟矩阵
+
+开启「转发链全服务器延迟矩阵」后返回。例如入口组 1 台、出口组 7 台，入口那台的 `ups` 就有 7 条，分别是它到每台出口的延迟。
+
+| 字段 | 类型/单位 | 说明 |
+| --- | --- | --- |
+| name | string | 下一组那台服务器的展示名 |
+| ms | integer \| null, ms | 当前延迟；不通或还没有数据时为 null |
+| loss_pct | number, % | 丢包 |
+| healthy | boolean \| null | true 通、false 不通、null 还没有这条的数据 |
+
+```json
+{
+  "name": "广州入口",
+  "to_next_ms": 64,
+  "loss_pct": 0,
+  "healthy": true,
+  "ups": [
+    { "name": "香港出口 A", "ms": 64, "loss_pct": 0, "healthy": true },
+    { "name": "日本出口 B", "ms": 71, "loss_pct": 0, "healthy": true },
+    { "name": "美国出口 C", "ms": null, "loss_pct": 0, "healthy": false }
+  ]
+}
+```
+
+以下情况不带 `ups`：出口组（后面没有下一组）、中转组、选路段分叉那一组，以及走分支、一台下一组都对不上的成员。同一组内两台之间的延迟没有测量，不返回。
+
+### routes\[\]：选路段
+
+链上有选路段时，`route_hop` 是分叉那一组在 `groups` 里的下标，`route_policy` 为 lowest_latency、failover 或 weighted，`failover_ms` 是切换阈值。`routes[]` 是从分叉组到下一组之间并行的几条路：
+
+| 字段 | 类型/单位 | 说明 |
+| --- | --- | --- |
+| name | string | 路的名称 |
+| via | array | 依次绕经的中转组名；空数组表示直连下一组 |
+| latency_ms | integer, ms | 分叉组各台经这条路到出口的平均延迟；0 表示没测到 |
+| loss_pct | number, % | 丢包 |
+| selected / selected_by | boolean / array | 是否有服务器正在走这条；正在走的服务器名 |
 
 ## 历史序列
 
