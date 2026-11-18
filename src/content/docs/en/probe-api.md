@@ -51,12 +51,13 @@ Sort, grouping and density choices are remembered in the visitor's own browser. 
 - Specs are written under the progress bars: CPU cores, and used / total memory and disk.
 - The health status is shown in the top-right corner; cards with alerts get a red outline.
 - Offline servers keep only specs, renewal info and "last seen xx minutes ago".
+- Servers with a recognized provider show the provider logo in the top-right corner of the card (before the name in list mode); it can be turned off under "System settings → Probe".
 
 ## Access and authentication
 
 The built-in probe uses same-origin browser requests. A protected standalone probe must send X-MMwx-Probe-Token. Disabled probe channels normally return 404.
 
-<table class="w-full min-w-[620px] text-sm"><tbody><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-servers</td><td class="px-4 py-3">Current state and one-hour latency summary</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">WS /api/public/probe-ws</td><td class="px-4 py-3">Pushes the same snapshot at the data refresh interval (3 seconds by default, on the same beat as server reports)</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-series</td><td class="px-4 py-3">Latency or system metric history</td></tr><tr><td class="px-4 py-3 font-mono">GET /api/public/probe-forward</td><td class="px-4 py-3">Forward chain structure, per-hop latency, trend, and traffic (same as forward in the snapshot)</td></tr></tbody></table>
+<table class="w-full min-w-[620px] text-sm"><tbody><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-servers</td><td class="px-4 py-3">Current state and one-hour latency summary</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">WS /api/public/probe-ws</td><td class="px-4 py-3">Pushes the same snapshot at the data refresh interval (3 seconds by default, on the same beat as server reports)</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-series</td><td class="px-4 py-3">Latency or system metric history</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-forward</td><td class="px-4 py-3">Forward chain structure, per-hop latency, trend, and traffic (same as forward in the snapshot)</td></tr><tr><td class="px-4 py-3 font-mono">GET /api/public/provider-logo/{file}</td><td class="px-4 py-3">Provider logo image, see "Provider logo" below</td></tr></tbody></table>
 
 ## Snapshot fields
 
@@ -84,6 +85,7 @@ The built-in probe uses same-origin browser requests. A protected standalone pro
 | region                                                        | string           | Region emoji                                                                             |
 | region_country / region_name / region_city                    | string           | Country, full region, and city                                                           |
 | provider_name / provider_url                                  | string           | Provider name and validated HTTP(S) URL                                                  |
+| provider_logo                                                 | string           | Provider logo URL (same-origin path on the master, see "Provider logo" below); omitted when the switch is off or no provider is recognized |
 | telecom_paid_peer                                             | boolean          | Provider is marked as Telecom 163 Paid Peer                                              |
 | upload_speed / download_speed                                 | integer, B/s     | Current system-NIC rates; independent of traffic_source/mode                             |
 | traffic_used / traffic_limit                                  | integer, byte    | Server billing counter and limit; zero means unlimited                                   |
@@ -110,6 +112,16 @@ The built-in probe uses same-origin browser requests. A protected standalone pro
 | renewal_cycle                                                 | string           | month, quarter, half_year, or year                                                       |
 | renewal_price_cny                                             | number           | CNY conversion using license-server rates                                                |
 | return_routes                                                 | array            | Three-carrier return-route results                                                       |
+
+## Provider logo
+
+`servers[].provider_logo` looks like `/api/public/provider-logo/4.c087a73762.png` (since v0.6.3-beta.3).
+
+- **Source**: the provider recognized automatically or picked manually for the server under "Servers"; the logo comes from the license service. The master downloads it once on first request and serves the cached file afterwards. Visitors' browsers only ever request the master's own address, never the license service, so a disguised probe page does not give itself away.
+- **Switch**: "Provider logo (card top-right, before the name in lists)" under "System settings → Probe", on by default. When off, `provider_logo` is no longer returned in the snapshot.
+- **Image endpoint**: `GET /api/public/provider-logo/{file}` returns a PNG (most have a transparent background). No login or probe token is needed, and it is cached for a year as `immutable` (the file name contains a content hash, so a new image gets a new name). Only file names recorded in the master's database are served; anything else is a 404.
+- **External probe**: it is on a different origin, so the Worker forwards `/api/provider-logo/{file}`; the page uses it the same way.
+- **Display tip**: show it transparent in light themes; in dark themes put it on a white background, otherwise black-text logos are hard to read (both the built-in and the external probe do this).
 
 ## Nested structures
 

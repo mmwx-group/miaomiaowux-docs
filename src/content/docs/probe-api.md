@@ -51,12 +51,13 @@ tableOfContents:
 - 进度条下写出规格：CPU 核心数、内存和硬盘的「已用 / 总量」。
 - 卡片右上角显示健康状态；有告警的卡片带红色描边。
 - 离线的服务器只保留规格、续费信息和「最后在线 xx 分钟前」。
+- 识别到服务商的服务器在卡片右上角显示服务商 logo（列表模式在名称前），可在「系统设置 → 探针」关闭。
 
 ## 访问与鉴权
 
 内置探针使用同源浏览器请求。独立探针开启接口保护后必须发送 X-MMwx-Probe-Token 请求头。通道或探针未开启时通常返回 404。
 
-<table class="w-full min-w-[620px] text-sm"><tbody><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-servers</td><td class="px-4 py-3">当前状态及近一小时延迟摘要</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">WS /api/public/probe-ws</td><td class="px-4 py-3">按「数据刷新间隔」推送相同的快照结构（默认 3 秒，与各服务器上报同一节拍）</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-series</td><td class="px-4 py-3">延迟或系统指标历史</td></tr><tr><td class="px-4 py-3 font-mono">GET /api/public/probe-forward</td><td class="px-4 py-3">转发链结构、逐跳延迟、趋势与流量（与快照里的 forward 相同）</td></tr></tbody></table>
+<table class="w-full min-w-[620px] text-sm"><tbody><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-servers</td><td class="px-4 py-3">当前状态及近一小时延迟摘要</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">WS /api/public/probe-ws</td><td class="px-4 py-3">按「数据刷新间隔」推送相同的快照结构（默认 3 秒，与各服务器上报同一节拍）</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-series</td><td class="px-4 py-3">延迟或系统指标历史</td></tr><tr class="border-b"><td class="px-4 py-3 font-mono">GET /api/public/probe-forward</td><td class="px-4 py-3">转发链结构、逐跳延迟、趋势与流量（与快照里的 forward 相同）</td></tr><tr><td class="px-4 py-3 font-mono">GET /api/public/provider-logo/{文件名}</td><td class="px-4 py-3">服务商 logo 图片，见下方「服务商 logo」</td></tr></tbody></table>
 
 ## 服务器快照字段
 
@@ -84,6 +85,7 @@ tableOfContents:
 | region                                                   | string           | 地区 Emoji                                                    |
 | region_country / region_name / region_city               | string           | 国家、完整地域和城市                                          |
 | provider_name / provider_url                             | string           | 服务商名称与安全的 HTTP(S) 网址                               |
+| provider_logo                                            | string           | 服务商 logo 地址（主控同源相对路径，见下方「服务商 logo」）；开关关闭或没识别到服务商时缺省 |
 | telecom_paid_peer                                        | boolean          | 服务商是否标记为电信 163 Paid Peer                            |
 | upload_speed / download_speed                            | integer, B/s     | 当前上行、下行网速                                            |
 | traffic_used / traffic_limit                             | integer, byte    | 按服务器统计模式计算的当前周期计费用量和限额；限额 0 表示不限 |
@@ -104,6 +106,16 @@ tableOfContents:
 | renewal_cycle                                            | string           | month、quarter、half_year 或 year                             |
 | renewal_price_cny                                        | number           | 按许可证服务器汇率折算的人民币价格                            |
 | return_routes                                            | array            | 三网回程测试结果                                              |
+
+## 服务商 logo
+
+`servers[].provider_logo` 形如 `/api/public/provider-logo/4.c087a73762.png`（v0.6.3-beta.3 起）。
+
+- **来源**：服务器在「服务管理」里自动识别或手动选定的服务商，logo 由许可证服务提供。主控第一次被请求时下载一份缓存到本地，之后直接返回本地文件；访客浏览器只请求主控自己的地址，不会访问许可证服务，伪装探针不会因此露馅。
+- **开关**：「系统设置 → 探针」的「服务商 logo（卡片右上角、列表名称前）」，默认开启；关闭后快照里不再返回 `provider_logo`。
+- **图片接口**：`GET /api/public/provider-logo/{文件名}` 返回 PNG（多数为透明背景），不需要登录或探针令牌，带一年的 `immutable` 缓存（文件名里含内容哈希，换图即换名）。只认主控库里记录过的文件名，其它一律 404。
+- **外置探针**：与主控不同源，由 Worker 的 `/api/provider-logo/{文件名}` 转发，页面上的写法相同。
+- **显示建议**：浅色主题直接透明显示；深色主题请垫白底，否则黑字 logo 看不清（内置与外置探针都是这样处理的）。
 
 ## 嵌套结构
 
