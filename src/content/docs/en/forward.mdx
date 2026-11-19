@@ -222,7 +222,7 @@ Use this when the exit is followed by an existing node (which may be someone els
 Bind existing node: pick the node; leave the port empty to have one assigned
 
 - **Forwarded protocol**: "Bind existing node" on a card and classic mode pick TCP or UDP automatically from the landing protocol (Hysteria2 / TUIC etc. use UDP). To choose TCP / UDP / TCP + UDP yourself, use the canvas side panel (for a newly dropped landing node) or "Nodes → Add node → Forward chain"
-- **Related nodes**: if the node has related nodes sharing the same IP and port (its parent node, or routed-outbound children of the same parent), a dialog lists them when you bind; the ones you tick are pointed at this chain's entry address too and show the entry address in node management. Deleting the entry node later puts them back on their original address
+- **Related nodes**: if the node has related nodes sharing the same IP and port (its parent node, or routed-outbound children of the same parent), a dialog lists them when you bind; the ones you tick are pointed at this chain's entry address too and show the entry address in node management. Deleting the entry node later puts them back on their original address. See [Send related nodes through the same forward / relay](/docs/en/related-nodes) for a step-by-step guide
 
 You can also attach a landing node on the canvas: drag the node from the "Node pool" into the exit group; in the right panel you can fill in the "Entry port" and choose the "Forwarding protocol", then "Save and push".
 

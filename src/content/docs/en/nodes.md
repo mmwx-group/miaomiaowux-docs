@@ -193,6 +193,8 @@ Forward a port on one Agent to a chosen landing node or a manual target.
 
 Relay configuration does not perform forwarding inside MiaoMiaoWu X. It is meant for scenarios where forwarding is already set up externally and you only want to attach that relay address to nodes.
 
+If the selected node has routed-outbound children (or a parent) sharing the same IP and port, you are asked whether to move them to the same relay — see [Send related nodes through the same forward / relay](/docs/en/related-nodes).
+
 ## URI management
 
 View the protocol:// URIs of every user on every node.
