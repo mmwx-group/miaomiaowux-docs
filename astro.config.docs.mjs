@@ -195,6 +195,11 @@ export default defineConfig({
           items: ["mcp", "tool-mmwx-tgbot", "tool-cloudflare-turnstile"],
         },
         {
+          label: "插件开发",
+          translations: { en: "Plugin development" },
+          items: ["plugin-dev", "plugin-reference", "plugin-guidelines"],
+        },
+        {
           label: "常见问题",
           translations: { en: "FAQ" },
           items: [
