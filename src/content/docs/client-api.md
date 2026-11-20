@@ -439,17 +439,77 @@ wss://panel.example.com/api/secure/ws
 ```
 
 1. 连上后**第一帧**发二进制的 32 字节临时 X25519 公钥。双方按加密请求的同一套方法派生两把密钥，info 换成 `mmx-secure-ws-c2s-v1`（客户端发）和 `mmx-secure-ws-s2c-v1`（主控发）。
-2. **第二帧**发加密的鉴权帧，明文是 `{"token":"会话令牌或 API 令牌","ts":1794000000,"nonce":"…"}`，时间和 nonce 规则同加密请求。令牌不要放在 URL 里。鉴权失败主控直接断开，不回错误。
+2. **第二帧**发加密的鉴权帧，明文是 `{"token":"会话令牌或 API 令牌","ts":1794000000,"nonce":"…","caps":["entry_v2","ack"]}`，时间和 nonce 规则同加密请求。令牌不要放在 URL 里。鉴权失败主控直接断开，不回错误。`caps` 可选，声明客户端支持的能力（见下文[转发链入口](#转发链入口)），不带就按最早的方式推送。
 3. 之后每一帧（双向，二进制）的布局是 `计数器(8 字节大端) ‖ 密文 ‖ tag(16)`，nonce 是 `4 个 0x00 ‖ 计数器`。两个方向各自从 0 开始计数，**客户端发的计数器必须严格递增**，否则主控断开。
 
 主控推给客户端的消息：
 
 | type | 示例 | 处理 |
 | --- | --- | --- |
-| `entry_failover` | `{"type":"entry_failover","domain":"entry.example.com","healthyIPs":["203.0.113.5"],"chainId":12}` | 转发链入口故障切换：把 `domain` 解析成 `healthyIPs` 里的地址；`healthyIPs` 为空数组表示取消覆盖。鉴权成功后会立刻推一次当前状态 |
+| `entry_failover` | `{"type":"entry_failover","domain":"entry.example.com","healthyIPs":["203.0.113.5"],"chainId":12,"rev":1794000000123,"names":{"203.0.113.5":"香港 A"}}` | 转发链入口切换：主控选中的入口 IP 变了，把 `domain` 解析成 `healthyIPs` 里的地址；`healthyIPs` 为空数组表示取消覆盖。字段见[转发链入口](#转发链入口) |
+| `entry_snapshot` | `{"type":"entry_snapshot","ready":true,"entries":[…]}` | 声明了 `entry_v2` 时，鉴权成功后先推这一帧：所有入口的当前状态。没声明时改为逐个入口各推一帧 `entry_failover` |
 | `subscription_changed` | `{"type":"subscription_changed","rev":"3f2a9c01b7de"}` | 订阅内容变了，重新下载；可以用 `rev` 去重 |
 
 保活：主控每 30 秒发一次 WebSocket ping；70 秒内收不到客户端任何帧（或 pong）就断开。客户端可以每 55～60 秒发一个加密的 `{"type":"ping"}`（主控不回复）。每个用户最多 16 条连接（网页和客户端合计）。会话被吊销或账号被停用时，主控会主动断开。
+
+### 转发链入口
+
+转发链节点在订阅里的地址（`server`）是链的入口域名，没设域名时是入口组第一台的地址。主控按入口组的策略（主备、负载均衡、故障切换、按时段上线等）随时选出「现在该用的入口 IP」，推给用到这条链的客户端。客户端收到后直接改连这些 IP，SNI、Host、端口都不变，不用等 DNS 生效。
+
+`entry_failover` 一帧对应一个入口：
+
+```json
+{
+  "type": "entry_failover",
+  "domain": "entry.example.com",
+  "healthyIPs": ["203.0.113.5"],
+  "chainId": 12,
+  "rev": 1794000000123,
+  "reason": "failover",
+  "ports": [44301, 44302],
+  "names": { "203.0.113.5": "香港 A" }
+}
+```
+
+| 字段 | 说明 |
+| --- | --- |
+| `domain` | 入口键，等于订阅里这些节点的 `server`（域名为小写） |
+| `healthyIPs` | 主控当前选中的入口 IP。客户端把 `domain` 解析成这些地址；空数组表示取消覆盖、回到正常 DNS 解析 |
+| `chainId` | 转发链 ID |
+| `rev` | 主控做出这次选择时的毫秒时间戳，同一个入口只增不减。只接受比手上更大的 `rev`，乱序到达的旧消息直接丢弃 |
+| `reason` | 这次切换的原因：`online` 上线、`unload` 摘除、`failover` 故障切换、`recover` 恢复、`pause` 暂停、`schedule` 按时段、`probe` 探测结果、`guard` 流量保护、`admin` 管理员操作。只用于日志 |
+| `ports` | 走这个入口的转发节点的入口端口。只对 `server` 等于 `domain` **且**端口在这个列表里的节点使用覆盖：同一台机器上另开的直连节点 `server` 相同，不能被改连到别的入口。空数组表示这个入口还没有节点。没有这个字段的是较早版本的主控，只比 `server` |
+| `names` | 入口服务器名称：`healthyIPs` 里的 IP → 那台入口服务器在主控里的名字。只用于界面显示，例如节点详情里的「主控指定入口 香港 A（203.0.113.5）」，不参与匹配。**只有管理员账号的连接才带**；没有名字的 IP 不写，一个都没有时不带这个字段 |
+
+`rev`、`reason`、`ports`、`names` 是后来加的，较早版本的主控只发 `domain`、`healthyIPs`、`chainId`，缺的字段按上表的说明处理即可。
+
+鉴权帧的 `caps` 里可以声明：
+
+- `entry_v2`：鉴权成功后先收一帧 `entry_snapshot`（所有入口的当前状态）；不声明时，主控改为逐个入口各推一帧 `entry_failover`。
+- `ack`：每应用完一条 `entry_failover`，回一帧加密的 `{"type":"entry_ack","chainId":12,"rev":1794000000123}`（`chainId`、`rev` 照抄收到的）。管理员在转发链详情里能看到「在线官方客户端 N 台 · 已切换 M 台」。
+
+`entry_snapshot` 的格式：
+
+```json
+{
+  "type": "entry_snapshot",
+  "ready": true,
+  "entries": [
+    {
+      "server": "entry.example.com",
+      "chainId": 12,
+      "ips": ["203.0.113.5"],
+      "rev": 1794000000123,
+      "ports": [44301, 44302],
+      "names": { "203.0.113.5": "香港 A" }
+    }
+  ]
+}
+```
+
+`entries` 每一项对应一个入口：`server`、`ips` 相当于 `entry_failover` 的 `domain`、`healthyIPs`，其余字段含义相同（`names` 同样只给管理员账号）。`ready` 为 `true` 时，本地记着、但快照里没有的入口要清掉；为 `false` 表示主控刚重启、还没算完，保留本地已有的覆盖，主控算完后会再推一份 `ready: true` 的快照。
+
+实时通道连不上时，可以加密请求 `/user/forward/entry-state`（GET）拉同一份内容：`{"ready":true,"entries":[…]}`，`entries` 格式同上。
 
 ## 实现建议
 

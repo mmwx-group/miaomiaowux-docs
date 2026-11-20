@@ -441,17 +441,77 @@ wss://panel.example.com/api/secure/ws
 ```
 
 1. Right after connecting, send the **first frame**: the 32-byte ephemeral X25519 public key as a binary frame. Both sides derive two keys the same way as encrypted requests, with info `mmx-secure-ws-c2s-v1` (client to master) and `mmx-secure-ws-s2c-v1` (master to client).
-2. Send the **second frame**, an encrypted auth frame whose plaintext is `{"token":"session token or API token","ts":1794000000,"nonce":"…"}`, with the same time and nonce rules as encrypted requests. Do not put the token in the URL. On auth failure the master just closes the connection without an error.
+2. Send the **second frame**, an encrypted auth frame whose plaintext is `{"token":"session token or API token","ts":1794000000,"nonce":"…","caps":["entry_v2","ack"]}`, with the same time and nonce rules as encrypted requests. Do not put the token in the URL. On auth failure the master just closes the connection without an error. `caps` is optional and declares what the client supports (see [Forward-chain entries](#forward-chain-entries)); without it the master pushes the oldest way.
 3. Every following frame (both directions, binary) is laid out as `counter (8 bytes, big-endian) ‖ ciphertext ‖ tag (16)`, with nonce `four 0x00 bytes ‖ counter`. Each direction counts from 0 on its own, and **the counter in client frames must strictly increase**, or the master disconnects.
 
 Messages pushed by the master:
 
 | type | Example | Handling |
 | --- | --- | --- |
-| `entry_failover` | `{"type":"entry_failover","domain":"entry.example.com","healthyIPs":["203.0.113.5"],"chainId":12}` | Forward-chain entry failover: resolve `domain` to the addresses in `healthyIPs`; an empty array clears the override. The current state is pushed once right after auth succeeds |
+| `entry_failover` | `{"type":"entry_failover","domain":"entry.example.com","healthyIPs":["203.0.113.5"],"chainId":12,"rev":1794000000123,"names":{"203.0.113.5":"HK A"}}` | Forward-chain entry switch: the entry IPs selected by the master changed. Resolve `domain` to the addresses in `healthyIPs`; an empty array clears the override. Fields are described in [Forward-chain entries](#forward-chain-entries) |
+| `entry_snapshot` | `{"type":"entry_snapshot","ready":true,"entries":[…]}` | With `entry_v2` declared, this frame comes first right after auth succeeds: the current state of every entry. Without it the master pushes one `entry_failover` per entry instead |
 | `subscription_changed` | `{"type":"subscription_changed","rev":"3f2a9c01b7de"}` | Subscription content changed; download it again. `rev` can be used to deduplicate |
 
 Keepalive: the master sends a WebSocket ping every 30 seconds and disconnects if it receives no frame (or pong) from the client for 70 seconds. Clients can send an encrypted `{"type":"ping"}` every 55–60 seconds (the master does not reply). Each user can have at most 16 connections (web and clients combined). The master closes the connections when the session is revoked or the account is disabled.
+
+### Forward-chain entries
+
+A forward-chain node's address (`server`) in the subscription is the chain's entry domain, or the first server in the entry group when no domain is set. The master keeps picking "the entry IPs to use now" according to the entry group's strategy (primary/backup, load balancing, failover, scheduled hours, …) and pushes them to clients that use the chain. On receipt the client connects to those IPs directly, keeping SNI, Host and port unchanged, without waiting for DNS.
+
+One `entry_failover` frame describes one entry:
+
+```json
+{
+  "type": "entry_failover",
+  "domain": "entry.example.com",
+  "healthyIPs": ["203.0.113.5"],
+  "chainId": 12,
+  "rev": 1794000000123,
+  "reason": "failover",
+  "ports": [44301, 44302],
+  "names": { "203.0.113.5": "HK A" }
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `domain` | Entry key, equal to the `server` of those nodes in the subscription (domains are lowercase) |
+| `healthyIPs` | The entry IPs currently selected by the master. Resolve `domain` to these addresses; an empty array clears the override and goes back to normal DNS |
+| `chainId` | Forward chain ID |
+| `rev` | Millisecond timestamp of when the master made this choice; it only increases for a given entry. Accept only a `rev` larger than the one you hold and drop older messages that arrive out of order |
+| `reason` | Why it switched: `online`, `unload` (removed), `failover`, `recover`, `pause`, `schedule` (scheduled hours), `probe` (probe result), `guard` (traffic guard), `admin` (admin action). For logging only |
+| `ports` | Entry ports of the forward nodes behind this entry. Apply the override only to nodes whose `server` equals `domain` **and** whose port is in this list: a direct node on the same machine has the same `server` and must not be redirected to another entry. An empty array means the entry has no nodes yet. Older masters do not send this field; then compare `server` only |
+| `names` | Entry server names: IP in `healthyIPs` → that entry server's name on the master. For display only, e.g. "Master-assigned entry HK A (203.0.113.5)" in node details; not used for matching. **Only connections signed in with an admin account get it**; IPs without a name are left out, and the field is omitted when none has one |
+
+`rev`, `reason`, `ports` and `names` were added later; older masters send only `domain`, `healthyIPs` and `chainId`. Handle missing fields as described in the table.
+
+The auth frame's `caps` can declare:
+
+- `entry_v2`: receive one `entry_snapshot` (the current state of every entry) right after auth succeeds; without it the master pushes one `entry_failover` per entry instead.
+- `ack`: after applying each `entry_failover`, send back an encrypted `{"type":"entry_ack","chainId":12,"rev":1794000000123}` (copy `chainId` and `rev` from the message). Admins see "N official clients online · M switched" in the forward chain details.
+
+`entry_snapshot` looks like this:
+
+```json
+{
+  "type": "entry_snapshot",
+  "ready": true,
+  "entries": [
+    {
+      "server": "entry.example.com",
+      "chainId": 12,
+      "ips": ["203.0.113.5"],
+      "rev": 1794000000123,
+      "ports": [44301, 44302],
+      "names": { "203.0.113.5": "HK A" }
+    }
+  ]
+}
+```
+
+Each item in `entries` is one entry: `server` and `ips` correspond to `domain` and `healthyIPs` in `entry_failover`, and the other fields mean the same (`names` is again admin-only). When `ready` is `true`, drop locally stored entries that are not in the snapshot; `false` means the master has just restarted and has not finished computing, so keep your existing overrides — the master pushes another snapshot with `ready: true` once it is done.
+
+When the realtime channel cannot connect, send an encrypted GET to `/user/forward/entry-state` for the same content: `{"ready":true,"entries":[…]}`, with `entries` in the same format.
 
 ## Implementation tips
 
