@@ -71,11 +71,16 @@ import { DocDemo } from "@/components/docs/islands/certificates";
 
 ## 证书存储
 
+部署到服务器时默认写到面板管理的 Nginx 证书目录，文件名就是域名（泛域名 `*.example.com` 写成 `_.example.com`）：
+
 ```
-证书文件路径（远程服务器）：
-  证书: /root/cert/{domain}/fullchain.pem
-  私钥: /root/cert/{domain}/privkey.pem
+证书: /usr/local/nginx/cert/{domain}.pem
+私钥: /usr/local/nginx/cert/{domain}.key
 ```
+
+也可以在「部署」里填自己的路径（例如节点自建 Nginx 引用的 `/etc/nginx/certs/hk-fullchain.pem`、`hk-privkey.pem`），会按填的文件名原样写入。证书和私钥必须是两个不同的文件，写成同一个路径会直接报错。
+
+出于安全考虑，Agent 拒绝把证书写进 `/root`、`/home`、系统可执行目录（`/usr/bin`、`/usr/local/bin` 等）以及 cron、systemd、sudoers 等系统配置目录。
 
 ## 使用场景
 

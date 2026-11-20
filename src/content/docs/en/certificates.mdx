@@ -71,11 +71,16 @@ Certificates are renewed before expiry and the new files are updated on every re
 
 ## Storage
 
+Deploying to a server writes to the panel-managed Nginx certificate directory by default, named after the domain (a wildcard `*.example.com` becomes `_.example.com`):
+
 ```
-Certificate paths (remote server):
-  cert: /root/cert/{domain}/fullchain.pem
-  key:  /root/cert/{domain}/privkey.pem
+cert: /usr/local/nginx/cert/{domain}.pem
+key:  /usr/local/nginx/cert/{domain}.key
 ```
+
+You can enter your own paths under "Deploy" (for example `/etc/nginx/certs/hk-fullchain.pem` and `hk-privkey.pem` referenced by a node's own Nginx); the file names are used as entered. The certificate and key must be two different files — the same path for both is rejected.
+
+For security, the Agent refuses to write certificates into `/root`, `/home`, system executable directories (`/usr/bin`, `/usr/local/bin`, etc.), or system configuration directories such as cron, systemd and sudoers.
 
 ## Use cases
 
