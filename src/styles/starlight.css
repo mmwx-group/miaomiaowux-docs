@@ -359,6 +359,15 @@ starlight-toc a[aria-current="true"] {
   border: 0;
   padding: 0.55rem 0.85rem;
   vertical-align: top;
+  /* 单元格里很长、中间没有空格的内容(JSON 示例、权限名这类行内代码)允许在任意处折行。
+     否则表格按它的最小宽度撑开,比正文栏还宽,桌面上溢出到右侧「本页目录」下面跟它叠在一起。
+     anywhere(而不是 break-word)才会把最小宽度一起算小。 */
+  overflow-wrap: anywhere;
+}
+
+.sl-markdown-content table:not(:where(.not-content *)) :is(th, td) code {
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .sl-markdown-content
