@@ -1,6 +1,6 @@
 ---
 title: "客户端下载"
-description: "官方推荐客户端 MeowX（macOS / Android / Windows / Linux / OpenWrt / 飞牛 NAS）下载与安装说明"
+description: "官方推荐客户端 MeowX（macOS / Android / Windows / Linux / OpenWrt / 飞牛 NAS / NAS Docker 版）下载与安装说明"
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 3
@@ -129,12 +129,16 @@ OpenWrt 版基于开源项目 [OpenWrt-nikki](https://github.com/nikkinikki-org/
 
 飞牛 NAS 版和 OpenWrt 版用同一个内核，以 GPL-3.0 开源。
 
+### 群晖 / 威联通 / 绿联等 NAS（Docker）
+
+和飞牛 NAS 版是同一套程序，以 Docker 容器运行：镜像 `ghcr.io/mmwx-group/meowx-docker`（x86_64 / arm64），连不上 ghcr.io 的 NAS 可以下载离线镜像（[GitHub Release](https://github.com/mmwx-group/meowx-fnos/releases) 里的 `meowx-docker-<版本>-<amd64|arm64>.tar`）导入，再用仓库里的 compose 文件建容器，管理页面同样是 `http://<NAS 的地址>:7899`。群晖要先加载 TUN 模块。各家 NAS 的步骤、升级与常见问题见 [NAS Docker 版](/docs/client-nas-docker)。
+
 ## 登录与导入订阅
 
 - **网页端登录客户端**（macOS / Windows）：在面板网页「个人菜单 → 扫码登录手机」里点「登录客户端」，MeowX 会自动打开并完成登录。
 - **手机扫码**（Android / iOS）：在桌面端「个人菜单 → 扫码登录手机」出示二维码，用 MeowX 扫一扫即可。
 - **账号登录**（Linux，其它客户端也可用）：在「我的」页点「账号登录」，填主控地址、用户名和密码（开了二步验证再填验证码）。Linux 版暂不支持网页端的「登录客户端」唤起。
-- **复制登录链接**（OpenWrt / 飞牛 NAS）：路由器和 NAS 上没法扫码，在面板网页「个人菜单 → 扫码登录手机」里点「复制登录链接」，粘贴到 OpenWrt 版「插件配置」页或飞牛版「订阅」页的「主控账户」卡里登录；链接只能用一次、5 分钟内有效。飞牛版登录时如果还没有在用的订阅、账号下又恰好只有一份，会自动导入并切过去。
+- **复制登录链接**（OpenWrt / 飞牛 NAS / NAS Docker 版）：路由器和 NAS 上没法扫码，在面板网页「个人菜单 → 扫码登录手机」里点「复制登录链接」，粘贴到 OpenWrt 版「插件配置」页或飞牛版「订阅」页的「主控账户」卡里登录；链接只能用一次、5 分钟内有效。飞牛版登录时如果还没有在用的订阅、账号下又恰好只有一份，会自动导入并切过去。
 - **订阅链接**：在「我的」页点「导入订阅」，粘贴订阅 URL 或妙妙屋X 短链；也支持 `clash://install-config` 深链。
 
 登录后「我的订阅」会列出账号下的全部订阅，点一下即下载并切换为当前配置；面板更新订阅后客户端会自动同步。退出登录时，从该面板导入的订阅会一并删除。

@@ -69,6 +69,7 @@ export default defineConfig({
           translations: { en: "Clients" },
           items: [
             "client-download",
+            "client-nas-docker",
             "client-login",
             "client-settings",
             "client-api",

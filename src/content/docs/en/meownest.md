@@ -158,6 +158,8 @@ The [fnOS NAS edition](/docs/en/client-download#fnos-nas) of MeowX ships the off
 2. Optional: tick the “LAN subnets to share” (the subnets of the NAS's network interfaces); “MeowNest devices can access the NAS itself” is on by default; “Always map” and the device name work as on OpenWrt.
 3. “Leave MeowNest” deletes the device from the panel and withdraws the subnets it shared.
 
+The [NAS Docker edition](/docs/en/client-nas-docker) for Synology / QNAP / UGREEN joins the same way (on Synology, which uses iptables, each mapped subnet is limited to a /24).
+
 Subnet limits and mapping are the same as for OpenWrt above. If your home router already shares the NAS's subnet, the NAS doesn't need to share it again: the account's devices reach the NAS's LAN address through the router, and the NAS's own MeowNest address works directly too.
 
 ## Managing devices and sites
