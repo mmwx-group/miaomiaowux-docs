@@ -387,6 +387,18 @@ starlight-toc a[aria-current="true"] {
   white-space: nowrap;
 }
 
+/* 第一列(字段名 / 消息类型名)照旧不折行:上面给单元格里的行内代码开了任意处折行,
+   第一列的 entry_failover 这类名字会被拆成几段 */
+.sl-markdown-content table:not(:where(.not-content *)) tbody td:first-child,
+.sl-markdown-content
+  table:not(:where(.not-content *))
+  tbody
+  td:first-child
+  code {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
 @media (max-width: 767px) {
   .sl-markdown-content table:not(:where(.not-content *)) {
     display: block;
@@ -394,7 +406,12 @@ starlight-toc a[aria-current="true"] {
     overflow-x: auto;
     overscroll-behavior-inline: contain;
   }
-  .sl-markdown-content table:not(:where(.not-content *)) tbody td:first-child {
+  .sl-markdown-content table:not(:where(.not-content *)) tbody td:first-child,
+  .sl-markdown-content
+    table:not(:where(.not-content *))
+    tbody
+    td:first-child
+    code {
     white-space: normal;
   }
 }
