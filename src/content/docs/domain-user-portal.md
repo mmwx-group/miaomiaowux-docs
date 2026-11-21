@@ -52,7 +52,7 @@ tableOfContents:
 
 - 普通用户在主控域名登录时，会提示「主控域名不接受普通用户登录，请前往用户入口 https://sub.example.com 登录」。
 - 管理员不受影响。
-- 客户端 App（MeowX 等）的登录不受影响：App 只能连主控域名。
+- 客户端 App（MeowX 等）的登录不受影响：普通用户的客户端经用户入口（订阅域名）登录，扫码登录的二维码里也已经是它，见 [隐藏主控地址](/docs/domain-hide-master)。
 - 需要先开启用户入口；关闭用户入口时，这个开关会被一起关掉，避免普通用户哪里都登录不了。
 
 两个开关都打开后，管理员只在主控域名登录，普通用户只在用户入口登录。
@@ -105,12 +105,42 @@ server {
         proxy_read_timeout                  60s;
     }
 
+    # MMWX 客户端加密接口(扫码登录 / 实时通道):普通用户的客户端经订阅域名连接,不必知道主控地址
+    location = /api/secure/ws {
+        proxy_pass                          http://127.0.0.1:12889;
+        proxy_http_version                  1.1;
+        proxy_set_header Upgrade            $http_upgrade;
+        proxy_set_header Connection         "upgrade";
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_set_header X-Forwarded-Host   $host;
+        proxy_set_header X-Forwarded-Port   $server_port;
+        proxy_buffering                     off;
+        proxy_connect_timeout               60s;
+        proxy_send_timeout                  1h;
+        proxy_read_timeout                  1h;
+    }
+
+    location ~ ^/api/secure/(?:cert|rpc)$ {
+        proxy_pass                          http://127.0.0.1:12889;
+        proxy_http_version                  1.1;
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_set_header X-Forwarded-Host   $host;
+        proxy_set_header X-Forwarded-Port   $server_port;
+        proxy_connect_timeout               60s;
+        proxy_send_timeout                  60s;
+        proxy_read_timeout                  60s;
+    }
+
     # MMWX 用户入口:放行用户面板;管理面先在这里挡一道(主控按域名还有完整白名单)
     location = /api/v3 { return 404; }
     location = /mcp { return 404; }
     location = /tg-app/admin { return 404; }
-    location = /api/secure/rpc { return 404; }
-    location = /api/secure/ws { return 404; }
     location ^~ /api/admin/ { return 404; }
     location ^~ /mcp/ { return 404; }
     location ^~ /tg-app/admin/ { return 404; }
@@ -175,7 +205,7 @@ server {
 ```caddy
 sub.example.com {
 	# MMWX 用户入口:放行用户面板;管理面先在这里挡一道(主控按域名还有完整白名单)
-	@admin path /api/v3 /mcp /tg-app/admin /api/secure/rpc /api/secure/ws /api/admin/* /mcp/* /tg-app/admin/* /api/tg-webapp/admin/* /api/remote/* /api/child/* /api/federation/* /api/setup/* /api/xray/* /api/speedtest/* /api/user/debug/*
+	@admin path /api/v3 /mcp /tg-app/admin /api/admin/* /mcp/* /tg-app/admin/* /api/tg-webapp/admin/* /api/remote/* /api/child/* /api/federation/* /api/setup/* /api/xray/* /api/speedtest/* /api/user/debug/*
 	handle @admin {
 		respond 404
 	}

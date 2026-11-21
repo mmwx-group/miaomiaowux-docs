@@ -11,7 +11,7 @@ tableOfContents:
 | 域名 | 谁在访问 | 放行的路径 | 在哪里配置 | 必须 |
 | --- | --- | --- | --- | --- |
 | [主控域名](/docs/domain-master) | 管理员和用户的浏览器（面板）；未单独配置时也承担订阅和 Agent 通信 | 全部 | 系统设置 →「系统」→ 主服务器地址 | 是 |
-| [订阅域名](/docs/domain-subscription) | 代理客户端拉订阅、客户端上报白名单 IP；开了 [用户入口](/docs/domain-user-portal) 时还有普通用户的浏览器 | 订阅相关路径（`/x/*`、订阅接口、`/api/fw/*`）；用户入口下再加用户面板，管理页面与管理接口仍然 404 | 系统设置 →「系统」→ 订阅域名 | 否 |
+| [订阅域名](/docs/domain-subscription) | 代理客户端拉订阅、客户端上报白名单 IP、普通用户的客户端登录；开了 [用户入口](/docs/domain-user-portal) 时还有普通用户的浏览器 | 订阅相关路径（`/x/*`、订阅接口、`/api/fw/*`）与客户端加密接口（`/api/secure/*`）；用户入口下再加用户面板，管理页面与管理接口仍然 404 | 系统设置 →「系统」→ 订阅域名 | 否 |
 | [上报域名（Agent 通信地址）](/docs/domain-agent) | 各台服务器上的 Agent：长连接、心跳、流量上报、安装脚本 | `/api/remote/*`（含 WebSocket） | 系统设置 →「系统」→ Agent 通信地址 | 否 |
 
 后两个都是可选的：不单独配置时，订阅链接和 Agent 都直接用主控域名。
@@ -30,8 +30,9 @@ tableOfContents:
 | 有多个用户、订阅链接会外发 | 主控域名 + 订阅域名 |
 | 用户要登录面板，但不想让他们知道管理后台在哪 | 主控域名 + 订阅域名，并打开 [用户入口](/docs/domain-user-portal) |
 | 服务器多、不想让每台 Agent 都知道面板域名 | 三个都配 |
+| 连主控地址都不想让普通用户知道（拉订阅、登录客户端都只用订阅域名） | 主控域名 + 订阅域名，并按 [隐藏主控地址](/docs/domain-hide-master) 的部署要求来 |
 
-三个域名都可以是同一张证书覆盖的子域名（例如泛域名证书 `*.example.com` 下的 `panel.`、`sub.`、`agent.`）。
+三个域名都可以是同一张证书覆盖的子域名（例如泛域名证书 `*.example.com` 下的 `panel.`、`sub.`、`agent.`）。但要对普通用户隐藏主控地址时不要这样做：泛域名证书和同一个主域名都会把主控域名带出去，见 [隐藏主控地址 · 部署要求](/docs/domain-hide-master#部署要求)。
 
 ## 配置顺序
 
@@ -51,7 +52,7 @@ panel.example.com {
 
 # 订阅域名：只放行订阅相关路径
 sub.example.com {
-    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe /api/secure/cert /api/secure/rpc /api/secure/ws
     handle @subscriptions {
         reverse_proxy 127.0.0.1:12889
     }

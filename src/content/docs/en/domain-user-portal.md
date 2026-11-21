@@ -52,7 +52,7 @@ The user portal only stops admins from signing in on it. To make regular users s
 
 - When a regular user signs in on the panel domain, they're told the panel domain doesn't accept regular users and to go to the user portal (with its address).
 - Admins are not affected.
-- Client apps (MeowX, etc.) are not affected: apps can only connect to the panel domain.
+- Client apps (MeowX, etc.) are not affected: regular users' clients sign in through the user portal (the subscription domain), and the QR code already carries it — see [Hide the master address](/docs/en/domain-hide-master).
 - It requires the user portal to be on. Turning the portal off turns this switch off too, so users are never locked out everywhere.
 
 With both switches on, admins only sign in on the panel domain and regular users only on the user portal.
@@ -105,12 +105,42 @@ server {
         proxy_read_timeout                  60s;
     }
 
+    # MMWX client encryption endpoints (QR sign-in / realtime channel): regular users' clients connect via the subscription domain without knowing the master address
+    location = /api/secure/ws {
+        proxy_pass                          http://127.0.0.1:12889;
+        proxy_http_version                  1.1;
+        proxy_set_header Upgrade            $http_upgrade;
+        proxy_set_header Connection         "upgrade";
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_set_header X-Forwarded-Host   $host;
+        proxy_set_header X-Forwarded-Port   $server_port;
+        proxy_buffering                     off;
+        proxy_connect_timeout               60s;
+        proxy_send_timeout                  1h;
+        proxy_read_timeout                  1h;
+    }
+
+    location ~ ^/api/secure/(?:cert|rpc)$ {
+        proxy_pass                          http://127.0.0.1:12889;
+        proxy_http_version                  1.1;
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_set_header X-Forwarded-Host   $host;
+        proxy_set_header X-Forwarded-Port   $server_port;
+        proxy_connect_timeout               60s;
+        proxy_send_timeout                  60s;
+        proxy_read_timeout                  60s;
+    }
+
     # MMWX user portal: serve the user panel; block the admin side here first (the master has a full allowlist per domain)
     location = /api/v3 { return 404; }
     location = /mcp { return 404; }
     location = /tg-app/admin { return 404; }
-    location = /api/secure/rpc { return 404; }
-    location = /api/secure/ws { return 404; }
     location ^~ /api/admin/ { return 404; }
     location ^~ /mcp/ { return 404; }
     location ^~ /tg-app/admin/ { return 404; }
@@ -175,7 +205,7 @@ After saving, run `/usr/local/nginx/sbin/nginx -t`, then `systemctl reload nginx
 ```caddy
 sub.example.com {
 	# MMWX user portal: serve the user panel; block the admin side here first (the master has a full allowlist per domain)
-	@admin path /api/v3 /mcp /tg-app/admin /api/secure/rpc /api/secure/ws /api/admin/* /mcp/* /tg-app/admin/* /api/tg-webapp/admin/* /api/remote/* /api/child/* /api/federation/* /api/setup/* /api/xray/* /api/speedtest/* /api/user/debug/*
+	@admin path /api/v3 /mcp /tg-app/admin /api/admin/* /mcp/* /tg-app/admin/* /api/tg-webapp/admin/* /api/remote/* /api/child/* /api/federation/* /api/setup/* /api/xray/* /api/speedtest/* /api/user/debug/*
 	handle @admin {
 		respond 404
 	}

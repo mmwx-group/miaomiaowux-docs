@@ -17,8 +17,13 @@ tableOfContents:
 | `/api/user/package-subscribe` | 套餐订阅                                                                                        |
 | `/api/subscribe`              | 兼容旧版的订阅地址                                                                              |
 | `/api/fw/*`                   | 客户端 IP 白名单上报（官方推荐客户端 MeowX 会自动上报，见 [客户端设置](/docs/client-settings)） |
+| `/api/secure/cert`、`/api/secure/rpc`、`/api/secure/ws` | 客户端加密接口：普通用户的客户端经订阅域名扫码登录、连实时通道，不必知道主控地址（见 [隐藏主控地址](/docs/domain-hide-master)） |
 
 其余路径一律 404。
+
+:::note[从旧版本升级]
+主控 v0.6.4-beta.3 起订阅域名多放行了 `/api/secure/*`。主控自动配置的 Nginx 会提示「Nginx 配置与当前开关不一致」，点 **重新配置 Nginx** 即可；自己维护的反代按下方 [手动配置](#手动配置) 补上。没补之前一切照旧，只是普通用户扫码登录仍会拿到主控域名。
+:::
 
 :::tip[想让用户也从这个域名登录面板？]
 打开「同时作为用户入口」后，订阅域名还会给普通用户提供面板（登录、订阅、流量、个人设置），但管理页面和管理接口仍然一律 404，管理员也登录不了。见 [用户入口](/docs/domain-user-portal)。
@@ -75,6 +80,30 @@ server {
         proxy_read_timeout    60s;
     }
 
+    # 客户端加密接口（扫码登录 / 实时通道）：普通用户的客户端经订阅域名连接，不必知道主控地址
+    location = /api/secure/ws {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade            $http_upgrade;
+        proxy_set_header Connection         "upgrade";
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_buffering off;
+        proxy_send_timeout 1h;
+        proxy_read_timeout 1h;
+    }
+
+    location ~ ^/api/secure/(?:cert|rpc)$ {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+    }
+
     location / {
         return 404;
     }
@@ -96,8 +125,8 @@ server {
 
 ```caddy
 sub.example.com {
-    # 只放行订阅相关路径（短链接、订阅接口、客户端 IP 白名单上报）
-    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+    # 只放行订阅相关路径（短链接、订阅接口、客户端 IP 白名单上报）和客户端加密接口
+    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe /api/secure/cert /api/secure/rpc /api/secure/ws
     handle @subscriptions {
         reverse_proxy 127.0.0.1:12889
     }
@@ -124,4 +153,4 @@ sub.example.com {
 
 ## 和「关闭公网访问」一起用
 
-开启 [关闭公网访问](/docs/domain-master#关闭公网访问) 后，订阅域名上的上述路径照常放行，其它路径会被跳转到主控域名。
+开启 [关闭公网访问](/docs/domain-master#关闭公网访问) 后，订阅域名上的上述路径照常放行，其它路径一律 404。不会跳转到主控域名：跳转的目标地址就是主控域名，等于把它告诉每一个在订阅域名上点开面板的人。

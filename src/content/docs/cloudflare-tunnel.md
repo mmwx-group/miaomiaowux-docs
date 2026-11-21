@@ -68,7 +68,7 @@ Dashboard 会提供包含 Tunnel Token 的安装命令。Token 等同凭证，�
 订阅域名的 Path：
 
 ```regex
-^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe))$
+^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe|secure/(cert|rpc|ws)))$
 ```
 
 该规则只允许以下端点：
@@ -78,6 +78,7 @@ Dashboard 会提供包含 Tunnel Token 的安装命令。Token 等同凭证，�
 - `/api/clash/subscribe`：Clash/Mihomo 订阅。
 - `/api/user/package-subscribe`：套餐订阅。
 - `/api/subscribe`：兼容订阅端点。
+- `/api/secure/cert`、`/api/secure/rpc`、`/api/secure/ws`：客户端加密接口，普通用户的客户端经订阅域名扫码登录、连实时通道（见 [隐藏主控地址](/docs/domain-hide-master)）。
 
 未匹配的路由必须返回 404，不能再添加一条把 `sub.example.com` 全路径转发到主控的规则。
 
@@ -93,7 +94,7 @@ ingress:
   - hostname: panel.example.com
     service: http://127.0.0.1:12889
   - hostname: sub.example.com
-    path: ^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe))$
+    path: ^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe|secure/(cert|rpc|ws)))$
     service: http://127.0.0.1:12889
   - service: http_status:404
 ```

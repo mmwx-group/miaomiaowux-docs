@@ -99,6 +99,7 @@ export default defineConfig({
             "domain-master",
             "domain-subscription",
             "domain-user-portal",
+            "domain-hide-master",
             "domain-agent",
           ],
         },

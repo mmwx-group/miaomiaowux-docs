@@ -68,7 +68,7 @@ Open the Tunnel's **Routes** section and add two **Published application** route
 Path for the subscription hostname:
 
 ```regex
-^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe))$
+^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe|secure/(cert|rpc|ws)))$
 ```
 
 This permits only:
@@ -78,6 +78,7 @@ This permits only:
 - `/api/clash/subscribe`: Clash/Mihomo subscriptions.
 - `/api/user/package-subscribe`: package subscriptions.
 - `/api/subscribe`: compatibility endpoint.
+- `/api/secure/cert`, `/api/secure/rpc`, `/api/secure/ws`: client encryption endpoints; regular users' clients sign in by QR code and open the realtime channel through the subscription domain (see [Hide the master address](/docs/en/domain-hide-master)).
 
 Unmatched requests must return 404. Do not add another rule that forwards every path on `sub.example.com` to the master.
 
@@ -93,7 +94,7 @@ ingress:
   - hostname: panel.example.com
     service: http://127.0.0.1:12889
   - hostname: sub.example.com
-    path: ^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe))$
+    path: ^/(x/.*|api/fw/.*|api/(clash/subscribe|user/package-subscribe|subscribe|secure/(cert|rpc|ws)))$
     service: http://127.0.0.1:12889
   - service: http_status:404
 ```

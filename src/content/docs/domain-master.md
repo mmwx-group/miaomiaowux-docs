@@ -101,7 +101,7 @@ panel.example.com {
 
 - 主控只监听 `127.0.0.1`，IP + 端口直连会失效。它只适合**同机**反向代理；Docker 端口映射和跨服务器反代都不适用。
 - 主服务器地址是 `https://` 时，Host 不是主控域名的请求会被 307 跳转到主控域名。例外：
-  - [订阅域名](/docs/domain-subscription) 上的订阅相关路径；
+  - [订阅域名](/docs/domain-subscription) 上的订阅相关路径与客户端加密接口（`/api/secure/*`）；订阅域名上的其它路径直接 404，不跳转，免得把主控域名告诉对方；
   - [上报域名](/docs/domain-agent) 上的 Agent 通信路径（WebSocket 不能跟随跳转，必须放行）；
   - 来自本机（127.0.0.1）的请求。
 

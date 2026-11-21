@@ -101,7 +101,7 @@ After enabling **Disable public access** in the "System" tab and restarting the 
 
 - The master listens on `127.0.0.1` only, so IP + port access stops working. This is for a reverse proxy **on the same host**; Docker port mappings and cross-server proxies do not work with it.
 - When the Master Server URL is `https://`, requests whose Host is not the master domain are redirected (307) to the master domain. Exceptions:
-  - subscription paths on the [subscription domain](/docs/en/domain-subscription);
+  - subscription paths and the client encryption endpoints (`/api/secure/*`) on the [subscription domain](/docs/en/domain-subscription); other paths on the subscription domain return 404 instead of redirecting, so the master domain isn't revealed;
   - Agent communication paths on the [report domain](/docs/en/domain-agent) (WebSocket cannot follow redirects, so they must be let through);
   - requests from the host itself (127.0.0.1).
 

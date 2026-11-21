@@ -17,8 +17,13 @@ The subscription domain is for proxy clients only: fetching subscriptions and re
 | `/api/user/package-subscribe` | Package subscriptions                                                                                                                        |
 | `/api/subscribe`              | Compatibility endpoint                                                                                                                       |
 | `/api/fw/*`                   | Client IP allowlist reports (the officially recommended client MeowX reports automatically, see [Client settings](/docs/en/client-settings)) |
+| `/api/secure/cert`, `/api/secure/rpc`, `/api/secure/ws` | Client encryption endpoints: regular users' clients sign in by QR code and open the realtime channel through the subscription domain, without knowing the master address (see [Hide the master address](/docs/en/domain-hide-master)) |
 
 Everything else returns 404.
+
+:::note[Upgrading from an older version]
+Since master v0.6.4-beta.3 the subscription domain also allows `/api/secure/*`. If the master configured Nginx for you, the card shows "The Nginx config doesn't match the current setting" — click **Reconfigure Nginx**. If you maintain the reverse proxy yourself, add the paths as in [Manual configuration](#manual-configuration) below. Until then everything works as before, except that regular users' QR codes still carry the master domain.
+:::
 
 :::tip[Want users to sign in to the panel on this domain too?]
 With "Also use as the user portal" on, the subscription domain also gives regular users the panel (sign-in, subscriptions, traffic, personal settings), while admin pages and admin APIs still return 404 and admins can't sign in. See [User portal](/docs/en/domain-user-portal).
@@ -75,6 +80,30 @@ server {
         proxy_read_timeout    60s;
     }
 
+    # Client encryption endpoints (QR sign-in / realtime channel): regular users' clients connect via the subscription domain without knowing the master address
+    location = /api/secure/ws {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade            $http_upgrade;
+        proxy_set_header Connection         "upgrade";
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+        proxy_buffering off;
+        proxy_send_timeout 1h;
+        proxy_read_timeout 1h;
+    }
+
+    location ~ ^/api/secure/(?:cert|rpc)$ {
+        proxy_pass http://127.0.0.1:12889;
+        proxy_http_version 1.1;
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  https;
+    }
+
     location / {
         return 404;
     }
@@ -96,8 +125,8 @@ Run `/usr/local/nginx/sbin/nginx -t` to check, then `systemctl reload nginx`.
 
 ```caddy
 sub.example.com {
-    # Only subscription paths (short links, subscription endpoints, client IP allowlist reports)
-    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe
+    # Only subscription paths (short links, subscription endpoints, client IP allowlist reports) and the client encryption endpoints
+    @subscriptions path /x/* /api/fw/* /api/clash/subscribe /api/user/package-subscribe /api/subscribe /api/secure/cert /api/secure/rpc /api/secure/ws
     handle @subscriptions {
         reverse_proxy 127.0.0.1:12889
     }
@@ -124,4 +153,4 @@ Once the **Also use as the user portal** switch below the card is on, this domai
 
 ## With "Disable public access"
 
-After enabling [Disable public access](/docs/en/domain-master#disabling-public-access), the paths above keep working on the subscription domain; anything else is redirected to the master domain.
+After enabling [Disable public access](/docs/en/domain-master#disabling-public-access), the paths above keep working on the subscription domain and anything else returns 404. It is not redirected to the master domain: the redirect target is the master domain itself, which would reveal it to anyone opening the panel on the subscription domain.
