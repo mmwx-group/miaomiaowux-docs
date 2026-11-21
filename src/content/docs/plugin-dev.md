@@ -18,6 +18,7 @@ tableOfContents:
 - 一台**测试用的主控**（别在正式环境上开发），版本要带插件系统。
 - 本机装好 **Node.js 20.12 或更新**。
 - 主控的管理员账号。
+- 开发工具是 npm 上的 [`@mmwx/plugin-sdk`](https://www.npmjs.com/package/@mmwx/plugin-sdk)（源码 [mmwx-group/plugin-sdk](https://github.com/mmwx-group/plugin-sdk)），不用单独安装：第 1 步的 `npx` 会临时拉它来新建项目，项目里再作为开发依赖装一份。
 
 :::tip
 开发令牌只能操作你指定的那一个插件，但开发中的插件跑的是你本机的代码。请用测试主控，或者至少不要在用户多的时段调试。
@@ -196,6 +197,25 @@ npx mmwx-plugin pack     # 打成插件包 my-plugin-0.1.0.zip
 
 用完记得在面板里「结束开发」，或者等令牌 24 小时后自动过期。
 
+## SDK 包含什么、怎么升级
+
+`@mmwx/plugin-sdk` 一个包里有四样东西：
+
+| 部分 | 用途 |
+| --- | --- |
+| `mmwx-plugin` 命令 | 新建、开发、构建、打包、推送、看日志（见下面的命令速查） |
+| `@mmwx/plugin-sdk` | 前端用的 `definePlugin`、`ui.*`、`useApi`、`useT`、`toast` 等。打包时指到面板自带的那一份，插件包里不带它 |
+| `@mmwx/plugin-sdk/server` | 后端 `server.js` 的类型定义，只给编辑器补全和检查用（`/// <reference types="@mmwx/plugin-sdk/server" />`） |
+| 项目模板 | `create` 新建项目时用的模板 |
+
+升级到最新版：
+
+```bash
+npm install -D @mmwx/plugin-sdk@latest
+```
+
+查看项目里装的版本：`npm ls @mmwx/plugin-sdk`。主控的插件系统加了新接口后，升级 SDK 才有对应的类型和命令。SDK 的问题和建议请到 [GitHub](https://github.com/mmwx-group/plugin-sdk/issues) 提。
+
 ## 命令速查
 
 | 命令 | 作用 |
@@ -209,8 +229,15 @@ npx mmwx-plugin pack     # 打成插件包 my-plugin-0.1.0.zip
 | `mmwx-plugin pack [-o 文件名]` | 构建并打包 |
 | `mmwx-plugin deploy` | 构建、打包、推送 |
 | `mmwx-plugin logs` | 只看实时日志 |
+| `mmwx-plugin keygen -o <私钥文件>` | 生成签名密钥对 |
+| `mmwx-plugin pack --key <私钥文件>` | 打包并用这把私钥签名 |
+
+`keygen` / `pack --key` 生成的签名只对**自己编译**的主控有效（编译时把公钥注入 `PLUGIN_SIGN_PUB_KEYS`）。官方发布的主控只认官方签名，第三方插件在这些主控上仍是未签名的，安装后要点「信任」。
 
 ## 常见问题
+
+**`npx @mmwx/plugin-sdk` 很慢或者装不上？**
+国内网络可以先切到 npm 镜像再装：`npm config set registry https://registry.npmmirror.com`（想换回官方源：`npm config set registry https://registry.npmjs.org`）。刚发布的新版本，镜像同步可能会晚几分钟。
 
 **插件启用了，但页面 / 卡片没出来？**
 未签名的插件要在「系统设置 → 插件」点「信任」前端才会加载。另外确认页面、插槽在 `plugin.json` 里声明过。

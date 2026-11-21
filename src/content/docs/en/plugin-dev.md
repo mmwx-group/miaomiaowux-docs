@@ -18,6 +18,7 @@ This page walks you through writing a plugin and debugging it against your own m
 - A **test master** (don't develop on production) running a version with the plugin system.
 - **Node.js 20.12 or newer** on your machine.
 - An admin account on the master.
+- The dev tooling is [`@mmwx/plugin-sdk`](https://www.npmjs.com/package/@mmwx/plugin-sdk) on npm (source: [mmwx-group/plugin-sdk](https://github.com/mmwx-group/plugin-sdk)). You don't install it separately: `npx` in step 1 fetches it to create the project, and the project then installs it as a dev dependency.
 
 :::tip
 A dev token can only touch the one plugin you choose, but while you develop, that plugin runs code from your machine. Use a test master, or at least avoid busy hours.
@@ -196,6 +197,25 @@ npx mmwx-plugin pack     # build the package my-plugin-0.1.0.zip
 
 When you're done, click "Stop developing" in the panel, or let the token expire after 24 hours.
 
+## What's in the SDK, and upgrading
+
+`@mmwx/plugin-sdk` is one package with four parts:
+
+| Part | Purpose |
+| --- | --- |
+| `mmwx-plugin` command | Create, develop, build, package, push and view logs (see the cheat sheet below) |
+| `@mmwx/plugin-sdk` | Frontend APIs: `definePlugin`, `ui.*`, `useApi`, `useT`, `toast` and so on. Bundling points it at the copy shipped with the panel, so it isn't included in your package |
+| `@mmwx/plugin-sdk/server` | Type definitions for the backend `server.js`, for editor completion and checks only (`/// <reference types="@mmwx/plugin-sdk/server" />`) |
+| Project template | What `create` uses for new projects |
+
+Upgrade to the latest version:
+
+```bash
+npm install -D @mmwx/plugin-sdk@latest
+```
+
+Check the version installed in a project with `npm ls @mmwx/plugin-sdk`. When the master's plugin system gains new APIs, upgrade the SDK to get the matching types and commands. Report SDK issues and suggestions on [GitHub](https://github.com/mmwx-group/plugin-sdk/issues).
+
 ## Command cheat sheet
 
 | Command | What it does |
@@ -209,8 +229,15 @@ When you're done, click "Stop developing" in the panel, or let the token expire 
 | `mmwx-plugin pack [-o file]` | Build and package |
 | `mmwx-plugin deploy` | Build, package and push |
 | `mmwx-plugin logs` | Live logs only |
+| `mmwx-plugin keygen -o <key file>` | Generate a signing key pair |
+| `mmwx-plugin pack --key <key file>` | Package and sign with that private key |
+
+Signatures made with `keygen` / `pack --key` only count on masters **you build yourself** (inject the public key via `PLUGIN_SIGN_PUB_KEYS` at build time). Official master releases only trust the official signature, so third-party plugins stay unsigned there and need "Trust" after installing.
 
 ## FAQ
+
+**`npx @mmwx/plugin-sdk` is slow or fails to install?**
+On networks in mainland China, switch to an npm mirror first: `npm config set registry https://registry.npmmirror.com` (switch back with `npm config set registry https://registry.npmjs.org`). A freshly published version may take a few minutes to reach the mirror.
 
 **The plugin is enabled but the page / card doesn't show?**
 Unsigned plugins need "Trust" in System settings → Plugins before their frontend loads. Also check that the page or slot is declared in `plugin.json`.
